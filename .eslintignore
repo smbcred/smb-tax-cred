@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Configuration
+*.config.js
+*.config.ts
+vite.config.ts
+tailwind.config.ts
+
+# Testing
+coverage/
+*.test.ts
+*.spec.ts
+
+# Generated files
+migrations/
+
+# Temporary
+*.log
+tmp/
+temp/
