@@ -227,11 +227,11 @@
   }
   
   .progress-step-pending {
-    @apply bg-slate-50 border-slate-200 opacity-60;
+    @apply bg-cloud border-ash/20 opacity-60;
   }
   
   .dashboard-card {
-    @apply bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow;
+    @apply bg-white p-6 rounded-xl shadow-sm border border-ash/20 hover:shadow-md transition-shadow;
   }
   
   .feature-icon {

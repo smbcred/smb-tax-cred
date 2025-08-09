@@ -99,7 +99,7 @@ const CheckoutForm = ({ calculationData }: { calculationData: any }) => {
             )}
           </Button>
           <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 text-xs text-slate-500">
+            <div className="flex items-center justify-center space-x-4 text-xs text-ash">
               <div className="flex items-center">
                 <i className="fas fa-shield-alt mr-1"></i>
                 <span>Secure Payment</span>
@@ -130,24 +130,24 @@ const PaymentSummary = ({ calculationData }: { calculationData: any }) => {
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-slate-600">Service Package</span>
+            <span className="text-ash">Service Package</span>
             <span className="font-semibold">{tierName}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-600">Estimated Credit</span>
+            <span className="text-ash">Estimated Credit</span>
             <span className="font-semibold text-rd-secondary-600">
               {formatCurrency(calculationData.federalCredit)}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-600">Total QREs</span>
+            <span className="text-ash">Total QREs</span>
             <span className="font-semibold">
               {formatCurrency(calculationData.totalQRE)}
             </span>
           </div>
-          <div className="border-t border-slate-200 pt-4">
+          <div className="border-t border-ash/20 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold text-slate-900">Total Amount</span>
+              <span className="text-lg font-semibold text-ink">Total Amount</span>
               <span className="text-2xl font-bold text-rd-primary-500">
                 {formatCurrency(calculationData.pricingAmount)}
               </span>
