@@ -1,0 +1,182 @@
+/**
+ * @file calculations.ts
+ * @description R&D tax credit calculation utilities (FIXED VERSION)
+ * @knowledgeBase system-architecture-explanation.md, additional-project-specs.md
+ * 
+ * CRITICAL FIX: Wage calculations now properly account for full technical wages
+ * without applying the 65% contractor limitation to employee wages
+ */
+
+export interface ExpenseInputs {
+  totalEmployees: number;
+  technicalEmployees: number;
+  averageTechnicalSalary: number;
+  rdAllocationPercentage?: number; // NEW: Percentage of time on R&D (default 100%)
+  contractorCosts: number;
+  softwareCosts: number;
+  cloudCosts: number;
+  suppliesCosts?: number; // NEW: Additional supplies
+}
+
+export interface CalculationResult {
+  totalQRE: number;
+  federalCredit: number;
+  stateCredit: number;
+  totalBenefit: number;
+  breakdown: {
+    wages: number;
+    contractors: number;
+    supplies: number;
+    cloud: number;
+  };
+  creditRate: number;
+  pricingTier?: {
+    name: string;
+    price: number;
+    creditRange: string;
+  };
+}
+
+/**
+ * Calculate R&D tax credit using Alternative Simplified Credit (ASC) method
+ * 
+ * FIXED CALCULATION METHOD:
+ * - Wages: Full technical salary * R&D allocation % (no 65% reduction)
+ * - Contractors: 65% of contractor costs per IRS Section 41
+ * - Supplies/Cloud: 100% if used for R&D
+ * - Federal Credit: 14% of QREs (simplified ASC)
+ * 
+ * Example: Marketing agency with 2 employees tuning chatbot prompts
+ * - 2 technical employees at $80k each, 50% time on R&D = $80,000 QRE
+ * - $10k contractor for custom GPT setup = $6,500 QRE (65%)
+ * - $2k cloud/AI tools = $2,000 QRE
+ * - Total QRE: $88,500 → Federal Credit: $12,390
+ */
+export function calculateRDCredit(expenses: ExpenseInputs): CalculationResult {
+  // Validate inputs
+  const rdAllocation = expenses.rdAllocationPercentage ?? 100;
+  const rdAllocationDecimal = Math.min(100, Math.max(0, rdAllocation)) / 100;
+  
+  // FIXED: Calculate wage QREs correctly
+  // Only count wages for time actually spent on R&D experimentation
+  const annualTechnicalWages = expenses.technicalEmployees * expenses.averageTechnicalSalary;
+  const qualifiedWages = annualTechnicalWages * rdAllocationDecimal;
+  
+  // Contractor costs (65% qualified per IRS rules)
+  const qualifiedContractors = expenses.contractorCosts * 0.65;
+  
+  // Supplies and cloud costs (100% qualified if used for R&D)
+  const qualifiedSupplies = (expenses.suppliesCosts || 0) + expenses.softwareCosts;
+  const qualifiedCloud = expenses.cloudCosts;
+  
+  // Total QRE
+  const totalQRE = qualifiedWages + qualifiedContractors + qualifiedSupplies + qualifiedCloud;
+  
+  // Federal credit calculation using simplified ASC method
+  // For first-time claimants: 6% of all QREs
+  // For repeat claimants: 14% of QREs exceeding base
+  // We use 14% as simplified rate for estimates
+  const federalCreditRate = 0.14;
+  const federalCredit = Math.round(totalQRE * federalCreditRate);
+  
+  // State credit (varies by state, using 0% for federal-only focus)
+  // Can be updated to 5% average if state credits are included
+  const stateCredit = 0; // Federal-only focus per project specs
+  
+  // Determine pricing tier
+  const pricingTier = getPricingTier(federalCredit);
+  
+  return {
+    totalQRE: Math.round(totalQRE),
+    federalCredit,
+    stateCredit,
+    totalBenefit: federalCredit + stateCredit,
+    breakdown: {
+      wages: Math.round(qualifiedWages),
+      contractors: Math.round(qualifiedContractors),
+      supplies: Math.round(qualifiedSupplies),
+      cloud: Math.round(qualifiedCloud)
+    },
+    creditRate: federalCreditRate,
+    pricingTier
+  };
+}
+
+/**
+ * Determine pricing tier based on federal credit amount
+ * Aligned with pricing_strategy_rd_platform.md
+ */
+function getPricingTier(federalCredit: number): CalculationResult['pricingTier'] {
+  if (federalCredit <= 10000) {
+    return { name: 'Starter', price: 500, creditRange: 'Up to $10,000' };
+  } else if (federalCredit <= 20000) {
+    return { name: 'Growth', price: 750, creditRange: '$10,001 - $20,000' };
+  } else if (federalCredit <= 30000) {
+    return { name: 'Scale', price: 1000, creditRange: '$20,001 - $30,000' };
+  } else if (federalCredit <= 50000) {
+    return { name: 'Professional', price: 1500, creditRange: '$30,001 - $50,000' };
+  } else {
+    return { name: 'Enterprise', price: 2500, creditRange: 'Over $50,000' };
+  }
+}
+
+/**
+ * Format currency for display
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+/**
+ * Format number with commas
+ */
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat('en-US').format(num);
+}
+
+/**
+ * Validate calculator inputs
+ */
+export function validateCalculatorInputs(expenses: ExpenseInputs): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+  
+  // Validate employee counts
+  if (expenses.technicalEmployees > expenses.totalEmployees) {
+    errors.push('Technical employees cannot exceed total employees');
+  }
+  
+  // Validate salary ranges
+  if (expenses.averageTechnicalSalary < 20000) {
+    errors.push('Average salary seems too low for technical employees');
+  } else if (expenses.averageTechnicalSalary > 500000) {
+    errors.push('Average salary seems unusually high');
+  }
+  
+  // Validate R&D allocation
+  const rdAllocation = expenses.rdAllocationPercentage ?? 100;
+  if (rdAllocation > 100) {
+    errors.push('R&D allocation cannot exceed 100%');
+  } else if (rdAllocation > 80) {
+    errors.push('Note: Allocating over 80% of time to R&D is unusual and may require additional documentation');
+  }
+  
+  // Check for negative values
+  Object.entries(expenses).forEach(([key, value]) => {
+    if (typeof value === 'number' && value < 0) {
+      errors.push(`${key} cannot be negative`);
+    }
+  });
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}

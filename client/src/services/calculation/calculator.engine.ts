@@ -240,7 +240,7 @@ export class CalculatorEngine {
     // Cloud and software subscriptions qualify for innovation businesses
     if (this.isInnovationEligibleBusiness(businessType)) {
       totalSupplies += cloudCosts;
-      totalSupplies += softwareCosts * 0.8; // Assume 80% R&D use
+      totalSupplies += softwareCosts; // 100% if used for R&D (no reduction needed)
     }
     
     return totalSupplies;

@@ -29,6 +29,7 @@ interface CalculatorState {
     totalEmployees: number;
     technicalEmployees: number;
     averageTechnicalSalary: number;
+    rdAllocationPercentage?: number;
     contractorCosts: number;
     softwareCosts: number;
     cloudCosts: number;
@@ -60,6 +61,7 @@ const initialState: CalculatorState = {
     totalEmployees: 0,
     technicalEmployees: 0,
     averageTechnicalSalary: 0,
+    rdAllocationPercentage: 100,
     contractorCosts: 0,
     softwareCosts: 0,
     cloudCosts: 0
@@ -126,7 +128,7 @@ export const InteractiveCalculator: React.FC = () => {
           totalEmployees: state.expenses.totalEmployees,
           technicalEmployees: state.expenses.technicalEmployees,
           averageTechnicalSalary: state.expenses.averageTechnicalSalary,
-          rdAllocationPercentage: 100, // Default to 100% for now
+          rdAllocationPercentage: state.expenses.rdAllocationPercentage ?? 100, // Use user input or default to 100%
           contractorCosts: state.expenses.contractorCosts,
           suppliesCosts: 0,
           softwareCosts: state.expenses.softwareCosts,

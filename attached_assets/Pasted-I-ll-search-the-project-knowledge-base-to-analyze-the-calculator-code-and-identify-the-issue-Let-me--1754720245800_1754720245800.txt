@@ -1,0 +1,51 @@
+I'll search the project knowledge base to analyze the calculator code and identify the issue.Let me search for more specific calculator implementation details.Let me search for specific files in the calculator implementation.Based on my analysis of the calculator code in the project knowledge base, I've identified the issue with the calculator's output accuracy. The problem appears to be with how wages are being calculated. Let me provide you with the fix:
+
+## The Issue
+
+The current calculator implementation has a critical error in the wage calculation. Looking at the code:
+
+```typescript
+// Current problematic calculation in calculations.ts
+const qualifiedWages = technicalWages * 0.65; // Assumes 65% of time on qualified activities
+```
+
+However, the proper calculation according to the knowledge base should be:
+1. Wages should be calculated as: `technicalEmployees * averageTechnicalSalary`
+2. The 65% limitation only applies to **contractor costs**, not wages
+3. For wages, the user should specify the actual R&D allocation percentage
+
+## Recommended Fix
+
+Here's the corrected calculation logic:## Summary of the Fix
+
+The main issues with the calculator were:
+
+1. **Incorrect Wage Calculation**: The calculator was applying a 65% reduction to wages, but this limitation only applies to contractor costs per IRS Section 41. Employee wages should be calculated at full value, with the R&D allocation percentage specified by the user.
+
+2. **Missing R&D Allocation Input**: The calculator should allow users to specify what percentage of technical employees' time was spent on R&D activities (experimentation, testing, iteration), not just their total salary.
+
+3. **State Credit Calculation**: Since the platform focuses on federal credits only (per the project specs), the state credit should be set to 0, not 5%.
+
+## Implementation Steps
+
+1. **Update the calculation function** to use the corrected logic above
+2. **Add an R&D allocation percentage input** to your calculator UI (default to 100% for simplicity)
+3. **Update the UI to clarify** that only federal credits are calculated
+4. **Add validation** to ensure R&D allocation doesn't exceed 100%
+
+## Example Calculation (Corrected)
+
+For a marketing agency that refined a custom GPT:
+- 2 technical employees at $80,000 each
+- 50% of their time spent on AI experimentation 
+- $10,000 contractor costs
+- $2,000 in cloud/AI tools
+
+**Correct calculation:**
+- Wages: 2 × $80,000 × 50% = $80,000
+- Contractors: $10,000 × 65% = $6,500
+- Supplies/Cloud: $2,000
+- Total QRE: $88,500
+- Federal Credit: $88,500 × 14% = **$12,390**
+
+This aligns with the knowledge base specifications and IRS rules for R&D tax credit calculations.

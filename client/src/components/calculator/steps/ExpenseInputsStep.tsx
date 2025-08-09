@@ -12,6 +12,7 @@ interface ExpenseInputsStepProps {
     totalEmployees: number;
     technicalEmployees: number;
     averageTechnicalSalary: number;
+    rdAllocationPercentage?: number;
     contractorCosts: number;
     softwareCosts: number;
     cloudCosts: number;
@@ -43,13 +44,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     }));
   };
 
-  // Quick estimate display
-  const estimatedCredit = Math.round(
-    (localExpenses.technicalEmployees * localExpenses.averageTechnicalSalary * 0.65 +
-     localExpenses.contractorCosts * 0.65 +
-     localExpenses.softwareCosts +
-     localExpenses.cloudCosts) * 0.14
-  );
+  // Quick estimate display - FIXED calculation
+  const rdAllocation = (localExpenses.rdAllocationPercentage ?? 100) / 100;
+  const wageQRE = localExpenses.technicalEmployees * localExpenses.averageTechnicalSalary * rdAllocation;
+  const contractorQRE = localExpenses.contractorCosts * 0.65; // Only contractors limited to 65%
+  const suppliesQRE = localExpenses.softwareCosts + localExpenses.cloudCosts;
+  const totalQRE = wageQRE + contractorQRE + suppliesQRE;
+  const estimatedCredit = Math.round(totalQRE * 0.14);
 
   return (
     <div>
@@ -95,9 +96,10 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </p>
             </div>
           </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Average Salary of AI Project Employees
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Average Salary of Innovation Employees
             </label>
             <div className="relative">
               <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -108,6 +110,27 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 95,000"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                % Time on R&D Activities
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={localExpenses.rdAllocationPercentage ?? 100}
+                  onChange={(e) => handleChange('rdAllocationPercentage', e.target.value)}
+                  min="0"
+                  max="100"
+                  className="w-full pr-8 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="100"
+                />
+                <span className="absolute right-3 top-2 text-gray-500">%</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Percentage of time spent on experimentation & testing
+              </p>
+            </div>
             </div>
           </div>
         </div>
