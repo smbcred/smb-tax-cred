@@ -32,6 +32,7 @@ import ResponsiveNav from "@/components/navigation/ResponsiveNav";
 import ResponsiveHero from "@/components/sections/ResponsiveHero";
 import { BenefitsGrid, PricingGrid, ProcessStepsGrid } from "@/components/layout/ResponsiveGrid";
 import { MetaTags } from "@/components/seo/MetaTags";
+import { InteractiveCalculator } from "@/components/calculator/InteractiveCalculator";
 import { benefitsContent } from "@/data/benefitsContent";
 import { processSteps } from "@/data/processContent";
 import { pricingContent } from "@/data/pricingContent";
@@ -193,38 +194,20 @@ export default function LandingPage() {
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Calculate Your R&D Tax Credit
+              Estimate Your R&D Tax Credit
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600">
-              See your potential federal credit in under 2 minutes
+              Use our calculator to see your potential savings in under 2 minutes
             </p>
           </motion.div>
 
-          {/* Calculator component placeholder with blur effect - Mobile optimized */}
+          {/* Interactive Calculator Component */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={calcInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative max-w-4xl mx-auto"
           >
-            <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 filter blur-sm">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="h-10 sm:h-12 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-10 sm:h-12 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-10 sm:h-12 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-10 sm:h-12 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-2xl max-w-sm w-full">
-                <p className="text-base sm:text-lg font-semibold text-gray-700 text-center">
-                  Complete all steps to see your estimate
-                </p>
-                <button className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                  Start Calculator
-                </button>
-              </div>
-            </div>
+            <InteractiveCalculator />
           </motion.div>
         </div>
       </section>

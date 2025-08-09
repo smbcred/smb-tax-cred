@@ -1,201 +1,311 @@
 /**
  * @file InteractiveCalculator.tsx
- * @description 4-step interactive R&D tax credit calculator
- * @author R&D Tax Credit SAAS Team
- * @date 2024-01-15
- * @modified 2024-01-15
- * @dependencies React, Calculator Service, Calculator Steps
- * @knowledgeBase Multi-step calculator with business type, activities, expenses, and results
+ * @description 4-step R&D tax credit calculator with real-time calculations
+ * @knowledgeBase system-architecture-explanation.md - Calculator Component
  */
 
-import { useState } from "react";
-import BusinessTypeStep from "./BusinessTypeStep";
-import QualifyingActivities from "./QualifyingActivities";
-import ExpenseInputs from "./ExpenseInputs";
-import ResultsDisplay from "./ResultsDisplay";
-import { CalculatorExpenses, CalculationResult } from "@/types";
+import { useState, useReducer, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BusinessTypeStep } from './steps/BusinessTypeStep';
+import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
+import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
+import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
+import { CalculatorProgress } from './CalculatorProgress';
+import { calculateRDCredit } from '@/utils/calculations';
+import { assignPricingTier } from '@/utils/pricing';
 
-interface InteractiveCalculatorProps {
-  onResultsReady: (data: CalculationResult) => void;
+// Calculator state interface
+interface CalculatorState {
+  currentStep: number;
+  businessType: string | null;
+  qualifyingActivities: string[];
+  expenses: {
+    totalEmployees: number;
+    technicalEmployees: number;
+    averageTechnicalSalary: number;
+    contractorCosts: number;
+    softwareCosts: number;
+    cloudCosts: number;
+  };
+  results: {
+    totalQRE: number;
+    federalCredit: number;
+    stateCredit: number;
+    totalBenefit: number;
+    pricingTier: number;
+    tierInfo: any;
+    roi: number;
+    breakdown?: {
+      wages: number;
+      contractors: number;
+      supplies: number;
+      cloud: number;
+    };
+  } | null;
+  isValid: boolean;
 }
 
-export default function InteractiveCalculator({ onResultsReady }: InteractiveCalculatorProps) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [businessType, setBusinessType] = useState("");
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  const [expenses, setExpenses] = useState<CalculatorExpenses>({
-    wages: 0,
-    contractors: 0,
-    supplies: 0,
-    cloud: 0
-  });
-  const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
+// Initial state
+const initialState: CalculatorState = {
+  currentStep: 1,
+  businessType: null,
+  qualifyingActivities: [],
+  expenses: {
+    totalEmployees: 0,
+    technicalEmployees: 0,
+    averageTechnicalSalary: 0,
+    contractorCosts: 0,
+    softwareCosts: 0,
+    cloudCosts: 0
+  },
+  results: null,
+  isValid: false
+};
 
-  const totalSteps = 4;
-  const progressPercentage = (currentStep / totalSteps) * 100;
+// Action types
+type Action = 
+  | { type: 'SET_BUSINESS_TYPE'; payload: string }
+  | { type: 'SET_ACTIVITIES'; payload: string[] }
+  | { type: 'UPDATE_EXPENSES'; payload: any }
+  | { type: 'CALCULATE_RESULTS'; payload: any }
+  | { type: 'NEXT_STEP' }
+  | { type: 'PREV_STEP' }
+  | { type: 'GO_TO_STEP'; payload: number }
+  | { type: 'RESET' };
 
+// Reducer for state management
+function calculatorReducer(state: CalculatorState, action: Action): CalculatorState {
+  switch (action.type) {
+    case 'SET_BUSINESS_TYPE':
+      return { ...state, businessType: action.payload };
+    case 'SET_ACTIVITIES':
+      return { ...state, qualifyingActivities: action.payload };
+    case 'UPDATE_EXPENSES':
+      return { 
+        ...state, 
+        expenses: { ...state.expenses, ...action.payload } 
+      };
+    case 'CALCULATE_RESULTS':
+      return { ...state, results: action.payload };
+    case 'NEXT_STEP':
+      return { ...state, currentStep: Math.min(4, state.currentStep + 1) };
+    case 'PREV_STEP':
+      return { ...state, currentStep: Math.max(1, state.currentStep - 1) };
+    case 'GO_TO_STEP':
+      return { ...state, currentStep: action.payload };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+export const InteractiveCalculator: React.FC = () => {
+  const [state, dispatch] = useReducer(calculatorReducer, initialState);
+  const [showLeadCapture, setShowLeadCapture] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  // Real-time calculation effect
+  const performCalculation = useCallback(() => {
+    if (state.expenses.technicalEmployees > 0 && state.expenses.averageTechnicalSalary > 0) {
+      setIsCalculating(true);
+      
+      // Calculate QRE and credits
+      const calculation = calculateRDCredit(state.expenses);
+      const tier = assignPricingTier(calculation.federalCredit);
+      
+      const results = {
+        ...calculation,
+        pricingTier: tier.tier,
+        tierInfo: tier,
+        roi: Math.round((calculation.federalCredit / tier.price))
+      };
+      
+      dispatch({ type: 'CALCULATE_RESULTS', payload: results });
+      setIsCalculating(false);
+    }
+  }, [state.expenses]);
+
+  // Navigation handlers
+  const handleNext = () => {
+    if (state.currentStep === 3) {
+      // Calculate before showing results
+      performCalculation();
+    }
+    if (state.currentStep === 4 && !showLeadCapture) {
+      setShowLeadCapture(true);
+    } else {
+      dispatch({ type: 'NEXT_STEP' });
+    }
+  };
+
+  const handlePrev = () => {
+    dispatch({ type: 'PREV_STEP' });
+  };
+
+  // Validation for navigation
   const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return businessType !== "";
-      case 2:
-        return selectedActivities.length > 0;
-      case 3:
-        const totalExpenses = Object.values(expenses).reduce((sum, value) => sum + value, 0);
-        return totalExpenses > 0;
-      case 4:
-        return true;
-      default:
-        return false;
-    }
-  };
-
-  const nextStep = async () => {
-    setErrors([]);
-    
-    if (!canProceed()) {
-      setErrors(["Please complete all required fields before proceeding"]);
-      return;
-    }
-
-    if (currentStep === 3) {
-      // Calculate results when moving to step 4
-      try {
-        const response = await fetch("/api/calculator/calculate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(expenses)
-        });
-        
-        if (!response.ok) {
-          throw new Error("Calculation failed");
-        }
-        
-        const result = await response.json();
-        setCalculationResult(result);
-      } catch (error) {
-        setErrors(["Failed to calculate results. Please try again."]);
-        return;
-      }
-    }
-
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const previousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleResultsReady = () => {
-    if (calculationResult) {
-      onResultsReady(calculationResult);
+    switch (state.currentStep) {
+      case 1: return state.businessType !== null;
+      case 2: return state.qualifyingActivities.length > 0;
+      case 3: return state.expenses.technicalEmployees > 0 && state.expenses.averageTechnicalSalary > 0;
+      default: return true;
     }
   };
 
   return (
-    <section id="calculator" className="py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
-            Calculate Your R&D Tax Credit
-          </h2>
-          <p className="text-lg text-slate-600">
-            Follow our simple 4-step process to estimate your potential federal tax credits
-          </p>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-rd-primary-500">
-              Step {currentStep} of {totalSteps}
-            </span>
-            <span className="text-sm text-slate-600">
-              {Math.round(progressPercentage)}% Complete
-            </span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <div 
-              className="progress-bar transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Error Display */}
-        {errors.length > 0 && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            {errors.map((error, index) => (
-              <p key={index} className="text-sm text-red-600">
-                {error}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* Calculator Steps Container */}
-        <div className="bg-slate-50 rounded-xl p-8 shadow-sm border border-slate-200">
-          
-          {/* Step 1: Business Type */}
-          {currentStep === 1 && (
-            <BusinessTypeStep
-              selectedType={businessType}
-              onTypeSelect={setBusinessType}
-            />
-          )}
-
-          {/* Step 2: Qualifying Activities */}
-          {currentStep === 2 && (
-            <QualifyingActivities
-              selectedActivities={selectedActivities}
-              onActivitiesChange={setSelectedActivities}
-              businessType={businessType}
-            />
-          )}
-
-          {/* Step 3: Expense Inputs */}
-          {currentStep === 3 && (
-            <ExpenseInputs
-              expenses={expenses}
-              onExpensesChange={setExpenses}
-            />
-          )}
-
-          {/* Step 4: Results */}
-          {currentStep === 4 && calculationResult && (
-            <ResultsDisplay
-              result={calculationResult}
-              onGetFullReport={handleResultsReady}
-            />
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
-            <button
-              onClick={previousStep}
-              className={`px-6 py-2 text-slate-600 hover:text-slate-900 transition-colors ${
-                currentStep === 1 ? 'invisible' : ''
-              }`}
-            >
-              <i className="fas fa-arrow-left mr-2"></i>Previous
-            </button>
-            
-            <button
-              onClick={nextStep}
-              disabled={!canProceed()}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {currentStep === totalSteps ? 'View Results' : 'Next'}
-              <i className="fas fa-arrow-right ml-2"></i>
-            </button>
-          </div>
-        </div>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow-lg">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center">
+          Calculate Your R&D Tax Credit
+        </h2>
+        <p className="text-gray-600 text-center mt-2 text-sm sm:text-base">
+          See your potential federal credit in under 2 minutes
+        </p>
       </div>
-    </section>
+
+      {/* Progress Indicator */}
+      <CalculatorProgress 
+        currentStep={state.currentStep} 
+        totalSteps={4}
+      />
+
+      {/* Step Content */}
+      <div className="mt-6 sm:mt-8 min-h-[400px]">
+        <AnimatePresence mode="wait">
+          {state.currentStep === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <BusinessTypeStep
+                selectedType={state.businessType}
+                onSelect={(type) => dispatch({ type: 'SET_BUSINESS_TYPE', payload: type })}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <QualifyingActivitiesStep
+                selectedActivities={state.qualifyingActivities}
+                onUpdate={(activities) => dispatch({ type: 'SET_ACTIVITIES', payload: activities })}
+                businessType={state.businessType}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ExpenseInputsStep
+                expenses={state.expenses}
+                onUpdate={(updates) => {
+                  dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
+                }}
+                businessType={state.businessType}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ResultsDisplayStep
+                results={state.results}
+                isBlurred={!showLeadCapture}
+                onCTAClick={() => setShowLeadCapture(true)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between mt-6 sm:mt-8">
+        <button
+          onClick={handlePrev}
+          disabled={state.currentStep === 1}
+          className={`
+            px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all
+            ${state.currentStep === 1 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }
+          `}
+        >
+          Back
+        </button>
+
+        <button
+          onClick={handleNext}
+          disabled={!canProceed()}
+          className={`
+            px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-all
+            ${canProceed()
+              ? 'bg-green-600 text-white hover:bg-green-700 transform hover:scale-105'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }
+          `}
+        >
+          {state.currentStep === 4 ? 'See Full Results' : 'Next'}
+        </button>
+      </div>
+
+      {/* Lead Capture Modal - Placeholder for now */}
+      {showLeadCapture && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white p-6 sm:p-8 rounded-lg max-w-md w-full"
+          >
+            <h3 className="text-xl sm:text-2xl font-bold mb-4">See Your Full Results</h3>
+            <p className="text-gray-600 mb-6">
+              Enter your email to unlock your complete R&D credit estimate and pricing.
+            </p>
+            <form className="space-y-4">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+              <button 
+                type="submit"
+                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold"
+              >
+                Get My Results
+              </button>
+            </form>
+            <button
+              onClick={() => setShowLeadCapture(false)}
+              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Close
+            </button>
+          </motion.div>
+        </div>
+      )}
+    </div>
   );
-}
+};
