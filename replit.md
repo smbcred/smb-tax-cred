@@ -12,6 +12,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Database Schema Enhancement (January 5, 2025)
+- Enhanced PostgreSQL database schema with comprehensive fields for R&D tax credit documentation
+- Added indexes on frequently queried fields for improved performance
+- Implemented proper foreign key relationships with CASCADE options
+- Added new fields for external integrations (Airtable, Make.com, AWS S3)
+- Created subscriptions table for Stripe payment tracking
+- Enhanced all tables with additional tracking and metadata fields
+- Added JSONB fields for flexible data storage (form sections, calculations)
+- Implemented comprehensive field types including inet for IP addresses, bigint for file sizes
+
 ### Development Environment Configuration (January 3, 2025)
 - Added comprehensive linting with ESLint and code formatting with Prettier
 - Configured TypeScript with enhanced path mappings for better imports

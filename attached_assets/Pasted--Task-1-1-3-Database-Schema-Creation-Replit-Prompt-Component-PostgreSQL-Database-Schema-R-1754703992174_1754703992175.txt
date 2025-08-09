@@ -1,0 +1,629 @@
+# Task 1.1.3: Database Schema Creation - Replit Prompt
+
+## Component: PostgreSQL Database Schema
+**Reference**: additional-project-specs.md, system-architecture-explanation.md, rd-credit-file-structure.md
+
+### Overview
+Implement the complete PostgreSQL database structure for SMBTaxCredits.com, establishing all tables, relationships, indexes, and constraints needed to support the R&D tax credit documentation platform.
+
+### Technical Requirements
+- **Database**: PostgreSQL 14+
+- **Extensions**: uuid-ossp for UUID generation
+- **Dependencies**: pg (Node.js driver), db-migrate for migrations
+- **Relationships**: Foreign key constraints with CASCADE options
+- **Performance**: Indexes on frequently queried fields
+
+### Implementation Prompt
+
+"Create a comprehensive PostgreSQL database schema for the SMBTaxCredits.com platform with proper relationships, constraints, and performance optimizations. The schema should support user authentication, company profiles, calculator results, intake forms, and document management.
+
+**1. Create Database Setup Script (backend/database/schema/000_setup.sql):**
+```sql
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Create enum types for better data integrity
+CREATE TYPE user_status AS ENUM ('active', 'inactive', 'suspended');
+CREATE TYPE entity_type AS ENUM ('c-corp', 's-corp', 'llc', 'partnership', 'sole-proprietorship');
+CREATE TYPE intake_status AS ENUM ('not_started', 'in_progress', 'submitted', 'processing', 'completed');
+CREATE TYPE document_type AS ENUM ('form_6765', 'form_8974', 'technical_narrative', 'compliance_memo', 'expense_workbook', 'state_form');
+CREATE TYPE subscription_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
+CREATE TYPE airtable_sync_status AS ENUM ('pending', 'synced', 'failed', 'retry');
+
+-- Create updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+```
+
+**2. Create Users Table (backend/database/schema/001_users.sql):**
+```sql
+/**
+ * @file Users table schema
+ * @description Stores user authentication and profile data
+ * @knowledgeBase additional-project-specs.md - User authentication
+ */
+
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  phone VARCHAR(20),
+  stripe_customer_id VARCHAR(255) UNIQUE,
+  email_verified BOOLEAN DEFAULT false,
+  email_verification_token VARCHAR(255),
+  password_reset_token VARCHAR(255),
+  password_reset_expires TIMESTAMP,
+  last_login_at TIMESTAMP,
+  login_count INTEGER DEFAULT 0,
+  status user_status DEFAULT 'active',
+  created_from_lead BOOLEAN DEFAULT true,
+  lead_captured_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_stripe_customer_id ON users(stripe_customer_id);
+CREATE INDEX idx_users_status ON users(status);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Comments for documentation
+COMMENT ON TABLE users IS 'User accounts created through lead capture and Stripe checkout';
+COMMENT ON COLUMN users.created_from_lead IS 'Whether user started as a calculator lead';
+COMMENT ON COLUMN users.stripe_customer_id IS 'Stripe customer ID for payment processing';
+```
+
+**3. Create Companies Table (backend/database/schema/002_companies.sql):**
+```sql
+/**
+ * @file Companies table schema
+ * @description Stores business information for R&D credit claims
+ * @knowledgeBase additional-project-specs.md - Company data structure
+ */
+
+CREATE TABLE companies (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  legal_name VARCHAR(255) NOT NULL,
+  dba_name VARCHAR(255),
+  ein VARCHAR(20),
+  entity_type entity_type,
+  incorporation_state CHAR(2),
+  naics_code VARCHAR(10),
+  naics_description VARCHAR(255),
+  year_founded INTEGER,
+  first_revenue_date DATE,
+  website VARCHAR(255),
+  address_line1 VARCHAR(255),
+  address_line2 VARCHAR(255),
+  city VARCHAR(100),
+  state CHAR(2),
+  zip_code VARCHAR(10),
+  phone VARCHAR(20),
+  primary_contact_name VARCHAR(255),
+  primary_contact_email VARCHAR(255),
+  primary_contact_phone VARCHAR(20),
+  airtable_record_id VARCHAR(255) UNIQUE,
+  airtable_sync_status airtable_sync_status DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_companies_user_id ON companies(user_id);
+CREATE INDEX idx_companies_ein ON companies(ein);
+CREATE INDEX idx_companies_airtable_record_id ON companies(airtable_record_id);
+
+-- Trigger
+CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Comments
+COMMENT ON TABLE companies IS 'Company profiles for R&D credit documentation';
+COMMENT ON COLUMN companies.naics_code IS 'North American Industry Classification System code';
+COMMENT ON COLUMN companies.airtable_record_id IS 'Synced record ID in Airtable base';
+```
+
+**4. Create Calculations Table (backend/database/schema/003_calculations.sql):**
+```sql
+/**
+ * @file Calculations table schema
+ * @description Stores R&D credit calculator results and estimates
+ * @knowledgeBase additional-project-specs.md - Calculator logic
+ */
+
+CREATE TABLE calculations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  -- Calculator inputs
+  business_type VARCHAR(50),
+  total_employees INTEGER,
+  technical_employees INTEGER,
+  average_technical_salary DECIMAL(12,2),
+  contractor_costs DECIMAL(12,2),
+  software_costs DECIMAL(12,2),
+  cloud_costs DECIMAL(12,2),
+  other_costs DECIMAL(12,2),
+  -- Calculated results
+  total_qre DECIMAL(12,2),
+  federal_credit DECIMAL(12,2),
+  state_credit DECIMAL(12,2),
+  total_benefit DECIMAL(12,2),
+  pricing_tier INTEGER CHECK (pricing_tier BETWEEN 1 AND 4),
+  tier_name VARCHAR(50),
+  service_price DECIMAL(10,2),
+  -- Additional data
+  tax_year INTEGER DEFAULT EXTRACT(YEAR FROM CURRENT_DATE),
+  qualifying_activities TEXT[],
+  calculation_method VARCHAR(20) DEFAULT 'simplified',
+  calculation_data JSONB,
+  -- Lead tracking
+  is_lead BOOLEAN DEFAULT true,
+  lead_converted_at TIMESTAMP,
+  session_id VARCHAR(255),
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_calculations_user_id ON calculations(user_id);
+CREATE INDEX idx_calculations_company_id ON calculations(company_id);
+CREATE INDEX idx_calculations_created_at ON calculations(created_at DESC);
+CREATE INDEX idx_calculations_pricing_tier ON calculations(pricing_tier);
+CREATE INDEX idx_calculations_is_lead ON calculations(is_lead);
+
+-- Comments
+COMMENT ON TABLE calculations IS 'R&D credit calculator results and lead tracking';
+COMMENT ON COLUMN calculations.total_qre IS 'Total Qualified Research Expenses';
+COMMENT ON COLUMN calculations.calculation_data IS 'Full calculation breakdown in JSON format';
+```
+
+**5. Create Intake Forms Table (backend/database/schema/004_intake_forms.sql):**
+```sql
+/**
+ * @file Intake forms table schema
+ * @description Stores comprehensive R&D credit intake data
+ * @knowledgeBase additional-project-specs.md - Intake form structure
+ */
+
+CREATE TABLE intake_forms (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tax_year INTEGER NOT NULL,
+  status intake_status DEFAULT 'not_started',
+  
+  -- Form sections as JSONB for flexibility
+  company_info JSONB DEFAULT '{}',
+  rd_activities JSONB DEFAULT '{}',
+  expense_breakdown JSONB DEFAULT '{}',
+  supporting_info JSONB DEFAULT '{}',
+  
+  -- Progress tracking
+  sections_completed INTEGER DEFAULT 0,
+  total_sections INTEGER DEFAULT 4,
+  last_saved_section VARCHAR(50),
+  
+  -- Calculated values
+  total_wages DECIMAL(12,2),
+  total_supplies DECIMAL(12,2),
+  total_contractors DECIMAL(12,2),
+  total_cloud_software DECIMAL(12,2),
+  total_qre DECIMAL(12,2),
+  
+  -- Processing
+  submitted_at TIMESTAMP,
+  processing_started_at TIMESTAMP,
+  completed_at TIMESTAMP,
+  airtable_record_id VARCHAR(255) UNIQUE,
+  airtable_sync_status airtable_sync_status DEFAULT 'pending',
+  make_webhook_sent BOOLEAN DEFAULT false,
+  make_run_id VARCHAR(255),
+  
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_intake_forms_company_id ON intake_forms(company_id);
+CREATE INDEX idx_intake_forms_user_id ON intake_forms(user_id);
+CREATE INDEX idx_intake_forms_status ON intake_forms(status);
+CREATE INDEX idx_intake_forms_tax_year ON intake_forms(tax_year);
+CREATE INDEX idx_intake_forms_airtable_record_id ON intake_forms(airtable_record_id);
+
+-- Trigger
+CREATE TRIGGER update_intake_forms_updated_at BEFORE UPDATE ON intake_forms
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Comments
+COMMENT ON TABLE intake_forms IS 'Comprehensive intake form data for document generation';
+COMMENT ON COLUMN intake_forms.rd_activities IS 'JSON array of R&D projects and activities';
+```
+
+**6. Create Documents Table (backend/database/schema/005_documents.sql):**
+```sql
+/**
+ * @file Documents table schema
+ * @description Tracks generated documents and their S3 locations
+ * @knowledgeBase system-architecture-explanation.md - Document flow
+ */
+
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  intake_form_id UUID NOT NULL REFERENCES intake_forms(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  
+  document_type document_type NOT NULL,
+  document_name VARCHAR(255) NOT NULL,
+  file_size_bytes BIGINT,
+  mime_type VARCHAR(100) DEFAULT 'application/pdf',
+  
+  -- S3 storage
+  s3_bucket VARCHAR(255),
+  s3_key VARCHAR(500),
+  s3_url TEXT,
+  s3_version_id VARCHAR(255),
+  
+  -- Access control
+  access_expires_at TIMESTAMP,
+  download_count INTEGER DEFAULT 0,
+  last_accessed_at TIMESTAMP,
+  
+  -- Generation metadata
+  generated_by VARCHAR(50), -- 'claude', 'documint', 'manual'
+  generation_time_ms INTEGER,
+  generation_cost_cents INTEGER,
+  
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_documents_intake_form_id ON documents(intake_form_id);
+CREATE INDEX idx_documents_company_id ON documents(company_id);
+CREATE INDEX idx_documents_user_id ON documents(user_id);
+CREATE INDEX idx_documents_document_type ON documents(document_type);
+CREATE INDEX idx_documents_access_expires_at ON documents(access_expires_at);
+
+-- Trigger
+CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON documents
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Comments
+COMMENT ON TABLE documents IS 'Generated R&D credit documentation files';
+COMMENT ON COLUMN documents.access_expires_at IS 'When S3 pre-signed URL expires';
+```
+
+**7. Create Subscriptions Table (backend/database/schema/006_subscriptions.sql):**
+```sql
+/**
+ * @file Subscriptions table schema
+ * @description Tracks payments and service subscriptions
+ * @knowledgeBase pricing_strategy_rd_platform.md
+ */
+
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  calculation_id UUID REFERENCES calculations(id),
+  
+  -- Stripe data
+  stripe_checkout_session_id VARCHAR(255) UNIQUE,
+  stripe_payment_intent_id VARCHAR(255) UNIQUE,
+  stripe_invoice_id VARCHAR(255),
+  
+  -- Pricing details
+  pricing_tier INTEGER NOT NULL,
+  base_price DECIMAL(10,2) NOT NULL,
+  additional_years INTEGER DEFAULT 0,
+  additional_years_price DECIMAL(10,2) DEFAULT 0,
+  rush_processing BOOLEAN DEFAULT false,
+  rush_processing_price DECIMAL(10,2) DEFAULT 0,
+  total_price DECIMAL(10,2) NOT NULL,
+  
+  -- Service details
+  tax_years INTEGER[] NOT NULL,
+  federal_credit_estimate DECIMAL(12,2),
+  state_credits_included TEXT[],
+  
+  -- Status
+  status subscription_status DEFAULT 'pending',
+  paid_at TIMESTAMP,
+  refunded_at TIMESTAMP,
+  refund_amount DECIMAL(10,2),
+  refund_reason TEXT,
+  
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_subscriptions_user_id ON subscriptions(user_id);
+CREATE INDEX idx_subscriptions_company_id ON subscriptions(company_id);
+CREATE INDEX idx_subscriptions_stripe_checkout_session_id ON subscriptions(stripe_checkout_session_id);
+CREATE INDEX idx_subscriptions_status ON subscriptions(status);
+
+-- Trigger
+CREATE TRIGGER update_subscriptions_updated_at BEFORE UPDATE ON subscriptions
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+**8. Create Audit Log Table (backend/database/schema/007_audit_log.sql):**
+```sql
+/**
+ * @file Audit log table schema
+ * @description Tracks all important system events for compliance
+ */
+
+CREATE TABLE audit_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  action VARCHAR(100) NOT NULL,
+  entity_type VARCHAR(50) NOT NULL,
+  entity_id UUID,
+  old_values JSONB,
+  new_values JSONB,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_audit_log_user_id ON audit_log(user_id);
+CREATE INDEX idx_audit_log_entity ON audit_log(entity_type, entity_id);
+CREATE INDEX idx_audit_log_created_at ON audit_log(created_at DESC);
+
+-- Comments
+COMMENT ON TABLE audit_log IS 'Audit trail for compliance and debugging';
+```
+
+**9. Create Database Views (backend/database/schema/008_views.sql):**
+```sql
+/**
+ * @file Database views
+ * @description Useful views for reporting and queries
+ */
+
+-- User dashboard view
+CREATE OR REPLACE VIEW user_dashboard AS
+SELECT 
+  u.id as user_id,
+  u.email,
+  u.first_name,
+  u.last_name,
+  c.id as company_id,
+  c.legal_name as company_name,
+  c.ein,
+  i.id as intake_form_id,
+  i.status as intake_status,
+  i.tax_year,
+  i.total_qre,
+  s.pricing_tier,
+  s.total_price,
+  s.status as payment_status,
+  COUNT(DISTINCT d.id) as document_count
+FROM users u
+LEFT JOIN companies c ON c.user_id = u.id
+LEFT JOIN intake_forms i ON i.user_id = u.id AND i.company_id = c.id
+LEFT JOIN subscriptions s ON s.user_id = u.id AND s.company_id = c.id
+LEFT JOIN documents d ON d.user_id = u.id
+GROUP BY u.id, c.id, i.id, s.id;
+
+-- Lead conversion funnel view
+CREATE OR REPLACE VIEW lead_funnel AS
+SELECT 
+  DATE_TRUNC('day', calc.created_at) as date,
+  COUNT(DISTINCT calc.id) as total_calculations,
+  COUNT(DISTINCT CASE WHEN u.id IS NOT NULL THEN calc.id END) as converted_leads,
+  COUNT(DISTINCT s.id) as paid_customers,
+  AVG(calc.federal_credit) as avg_credit_estimate,
+  AVG(s.total_price) as avg_purchase_price
+FROM calculations calc
+LEFT JOIN users u ON u.email = calc.calculation_data->>'email'
+LEFT JOIN subscriptions s ON s.user_id = u.id
+WHERE calc.is_lead = true
+GROUP BY DATE_TRUNC('day', calc.created_at);
+```
+
+**10. Create Migration Scripts (backend/database/migrations/001_initial_schema.js):**
+```javascript
+/**
+ * @file Initial database migration
+ * @description Creates all tables for SMBTaxCredits.com
+ * @author SMBTaxCredits.com Team
+ * @knowledgeBase additional-project-specs.md, system-architecture-explanation.md
+ */
+
+exports.up = async (db) => {
+  // Run all SQL files in order
+  const sqlFiles = [
+    '000_setup.sql',
+    '001_users.sql',
+    '002_companies.sql',
+    '003_calculations.sql',
+    '004_intake_forms.sql',
+    '005_documents.sql',
+    '006_subscriptions.sql',
+    '007_audit_log.sql',
+    '008_views.sql'
+  ];
+
+  for (const file of sqlFiles) {
+    const sql = await db.readFile(`./database/schema/${file}`);
+    await db.runSql(sql);
+  }
+};
+
+exports.down = async (db) => {
+  // Drop in reverse order due to foreign keys
+  await db.runSql(`
+    DROP VIEW IF EXISTS lead_funnel;
+    DROP VIEW IF EXISTS user_dashboard;
+    DROP TABLE IF EXISTS audit_log;
+    DROP TABLE IF EXISTS subscriptions;
+    DROP TABLE IF EXISTS documents;
+    DROP TABLE IF EXISTS intake_forms;
+    DROP TABLE IF EXISTS calculations;
+    DROP TABLE IF EXISTS companies;
+    DROP TABLE IF EXISTS users;
+    DROP TYPE IF EXISTS airtable_sync_status;
+    DROP TYPE IF EXISTS subscription_status;
+    DROP TYPE IF EXISTS document_type;
+    DROP TYPE IF EXISTS intake_status;
+    DROP TYPE IF EXISTS entity_type;
+    DROP TYPE IF EXISTS user_status;
+    DROP FUNCTION IF EXISTS update_updated_at_column();
+  `);
+};
+
+// MIGRATION: Run with: npm run migrate
+// ROLLBACK: Run with: npm run migrate:down
+```
+
+**11. Create Database Configuration (backend/src/config/database.ts):**
+```typescript
+/**
+ * @file Database configuration
+ * @description PostgreSQL connection and pool configuration
+ */
+
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20, // Maximum number of clients in the pool
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// Test connection on startup
+pool.on('connect', () => {
+  console.log('✅ Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+  console.error('❌ Unexpected database error:', err);
+  process.exit(-1);
+});
+
+export default pool;
+
+// Helper function for transactions
+export async function withTransaction<T>(
+  callback: (client: any) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await callback(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+```
+
+**12. Create Test Data Seeds (backend/database/seeds/test-data.sql):**
+```sql
+-- Test data for development
+-- WARNING: Only run in development environment
+
+-- Test users
+INSERT INTO users (email, password_hash, first_name, last_name, stripe_customer_id)
+VALUES 
+  ('test@example.com', '$2a$10$YourHashedPasswordHere', 'Test', 'User', 'cus_test123'),
+  ('demo@example.com', '$2a$10$YourHashedPasswordHere', 'Demo', 'User', 'cus_demo456');
+
+-- Test companies
+INSERT INTO companies (user_id, legal_name, ein, entity_type, year_founded)
+SELECT 
+  u.id,
+  'Test Company LLC',
+  '12-3456789',
+  'llc',
+  2020
+FROM users u WHERE u.email = 'test@example.com';
+
+-- Test calculations
+INSERT INTO calculations (user_id, company_id, total_employees, technical_employees, federal_credit, pricing_tier)
+SELECT 
+  u.id,
+  c.id,
+  10,
+  5,
+  75000.00,
+  2
+FROM users u
+JOIN companies c ON c.user_id = u.id
+WHERE u.email = 'test@example.com';
+```
+
+CRITICAL: Include comprehensive documentation:
+```javascript
+/**
+ * Database Schema Overview:
+ * 
+ * TABLES:
+ * - users: Authentication and user profiles
+ * - companies: Business entities claiming credits
+ * - calculations: Calculator results and lead tracking
+ * - intake_forms: Detailed R&D activity data
+ * - documents: Generated documentation tracking
+ * - subscriptions: Payment and service records
+ * - audit_log: Compliance and debugging trail
+ * 
+ * RELATIONSHIPS:
+ * - User (1) → (many) Companies
+ * - Company (1) → (many) Calculations
+ * - Company (1) → (many) IntakeForms
+ * - IntakeForm (1) → (many) Documents
+ * - User (1) → (many) Subscriptions
+ * 
+ * SECURITY:
+ * - All sensitive data encrypted at rest
+ * - Row-level security for multi-tenancy
+ * - Audit logging for compliance
+ * 
+ * PERFORMANCE:
+ * - Indexes on all foreign keys
+ * - Composite indexes for common queries
+ * - Materialized views for reporting
+ * 
+ * INTEGRATION: This schema syncs with Airtable for workflow management
+ * TODO: Add partitioning for audit_log table when it grows
+ * TODO: Implement read replicas for reporting queries
+ */
+```
+
+This comprehensive database schema provides:
+- Complete table structure with proper relationships
+- Performance optimizations with strategic indexes
+- Data integrity with constraints and enums
+- Audit trail for compliance
+- Views for common queries
+- Migration scripts for deployment
+- Test data for development"
