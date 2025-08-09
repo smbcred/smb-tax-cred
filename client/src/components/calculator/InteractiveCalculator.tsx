@@ -18,6 +18,7 @@ import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
 import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { ProgressIndicator } from './ProgressIndicator';
+import { LeadCaptureModal } from '@/components/leadCapture/LeadCaptureModal';
 import { RDTaxCalculator } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
@@ -392,55 +393,16 @@ export const InteractiveCalculator: React.FC = () => {
       </div>
 
       {/* Lead Capture Modal */}
-      {showLeadCapture && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white p-6 sm:p-8 rounded-lg max-w-md w-full"
-          >
-            <h3 className="text-xl sm:text-2xl font-bold mb-4">See Your Full Results</h3>
-            <p className="text-gray-600 mb-6">
-              Enter your email to unlock your complete R&D credit estimate and pricing.
-            </p>
-            <form 
-              className="space-y-4" 
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const email = formData.get('email') as string;
-                if (email) {
-                  // Store email for later use (you can send to backend here)
-                  console.log('Email captured:', email);
-                  setEmailCaptured(true);
-                  setShowLeadCapture(false);
-                  // Optionally show a success message or send to backend
-                }
-              }}
-            >
-              <input
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              />
-              <button 
-                type="submit"
-                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold"
-              >
-                Get My Results
-              </button>
-            </form>
-            <button
-              onClick={() => setShowLeadCapture(false)}
-              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
-            >
-              Close
-            </button>
-          </motion.div>
-        </div>
-      )}
+      <LeadCaptureModal
+        isOpen={showLeadCapture}
+        onClose={() => setShowLeadCapture(false)}
+        calculationResult={state.results}
+        onSuccess={(leadId) => {
+          console.log('Lead captured with ID:', leadId);
+          setEmailCaptured(true);
+          setShowLeadCapture(false);
+        }}
+      />
     </div>
   );
 };
