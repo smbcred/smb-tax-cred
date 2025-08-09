@@ -1,0 +1,322 @@
+# Task 1.2.1: Create Landing Page Layout - Replit Prompt
+
+## Component: Marketing Landing Page
+**Reference**: Updated Copywriting & Positioning Guide.md, Market Positioning Brief, user_archetype_profiles.md, R&D Tax Credit Document Generation App - Complete User Experience Flow.md
+**AI-Using Business Focus**: Marketing agencies, e-commerce brands, consultants, and service businesses experimenting with AI tools
+
+### Overview
+Build the main marketing landing page that converts AI-experimenting businesses into leads through an interactive calculator. This page targets businesses using ChatGPT, Claude, custom GPTs, and other AI tools - NOT tech companies building AI.
+
+### Technical Requirements
+- **Dependencies**: React 18+, Tailwind CSS, react-icons, framer-motion (for animations)
+- **Integrations**: Will connect to InteractiveCalculator component, Google Analytics
+- **Database needs**: None for this component (lead capture handled separately)
+- **Responsive**: Mobile-first design with breakpoints at sm (640px), md (768px), lg (1024px), xl (1280px)
+
+### Implementation Prompt
+
+"Create a high-converting marketing landing page for businesses using AI tools to claim R&D tax credits. Use React and Tailwind CSS. Focus on accessibility and non-technical language throughout.
+
+**1. Header/Navigation Section:**
+- Sticky navigation bar with transparent-to-white scroll effect
+- Logo placeholder on left (text: "SMBTaxCredits.com")
+- Navigation items: How It Works, Pricing, FAQ, AI Examples
+- Primary CTA button: "Check My AI Credits" (scrolls to calculator)
+- Mobile hamburger menu for screens < 768px
+
+**2. Hero Section:**
+- **Headline (H1)**: "Your AI Experiments Qualify for Tax Credits"
+- **Subheadline**: "Get back 10-15% of what you spend on ChatGPT projects, custom GPTs, and AI automation. No coding required. Federal credits only. Simple flat fee."
+- **Primary CTA**: Large button "Check My AI Credits" (green, #10B981)
+- **Secondary CTA**: Text link "See how it works" 
+- Hero image/illustration: Abstract representation of AI tools (ChatGPT interface, custom GPTs, automation flows)
+- Subtle gradient background: white to light purple (#F3E8FF)
+
+**3. Trust Signals Bar:**
+- Horizontal strip with:
+  - "Built for businesses using AI, not building it" with AI icon
+  - "IRS-compliant documentation" with shield icon
+  - "48-hour turnaround" with clock icon
+  - "Flat-fee pricing" with dollar icon
+- Light background (#F3F4F6) with subtle border
+
+**4. Qualifying Activities Section:**
+- Section heading: "What Counts as AI Experimentation?"
+- Two columns (stack on mobile):
+
+**✅ These AI Projects Qualify:**
+- Building custom GPTs for your business
+- Testing and refining AI prompts
+- Creating AI-powered automations
+- Developing chatbots for customers
+- Integrating AI into your workflows
+- Even failed AI experiments!
+
+**❌ What Doesn't Qualify:**
+- Just using ChatGPT for basic tasks
+- Following AI tutorials exactly
+- Buying AI subscriptions without customization
+
+Each item should have a small icon and be easily scannable.
+
+**5. Benefits/Features Grid:**
+- Section heading: "Turn Your AI Experiments Into Tax Savings"
+- 3x2 grid of benefit cards, each with:
+  - Icon (use react-icons)
+  - Title
+  - 2-3 sentence description
+  
+Benefits to include:
+1. **No Coding Required**
+   - Icon: FaCode (with strike-through)
+   - "If you're experimenting with prompts, custom GPTs, or AI workflows, you qualify. No technical degree needed."
+
+2. **Simple Flat Fee**
+   - Icon: FaDollarSign
+   - "Know your cost upfront—$500 to $1,500 based on credit size. No percentage-based fees eating into your savings."
+
+3. **15-Minute Process**
+   - Icon: FaClock
+   - "Answer simple questions about your AI projects. No tax forms to understand. Results in 48 hours."
+
+4. **Federal Credits Only**
+   - Icon: FaFlag
+   - "We keep it simple with federal credits only. No state complexity. Clear, straightforward calculations."
+
+5. **Built for AI Users**
+   - Icon: FaRobot
+   - "Designed for businesses using ChatGPT, Claude, and AI tools. Real examples from businesses like yours."
+
+6. **CPA-Friendly Package**
+   - Icon: FaFileAlt
+   - "Everything your accountant needs to file. Clean documentation, clear instructions, audit-ready format."
+
+**6. Real Examples Section:**
+- Section heading: "AI Credits for Real Businesses"
+- Carousel or grid of example cards:
+
+**Marketing Agency:**
+- "Created custom GPTs for different client campaigns"
+- "Qualified for: $32,000 in credits"
+- Icon: Megaphone
+
+**E-commerce Brand:**
+- "Built AI chatbot for customer service"
+- "Qualified for: $18,000 in credits"
+- Icon: Shopping cart
+
+**Consultant:**
+- "Developed AI workflow for client analysis"
+- "Qualified for: $12,000 in credits"
+- Icon: Chart
+
+**Restaurant:**
+- "Implemented AI scheduling system"
+- "Qualified for: $8,000 in credits"
+- Icon: Restaurant
+
+**7. How It Works Section:**
+- Section heading: "Your AI Credits in 3 Simple Steps"
+- Horizontal process flow (vertical on mobile):
+
+Step 1: **Tell Us About Your AI Projects**
+- Large "1" in circle with purple accent
+- Icon: FaClipboardList
+- "Quick questions about your ChatGPT usage, custom GPTs, and AI experiments"
+- Visual connector to next step
+
+Step 2: **We Calculate Your Credits**
+- Large "2" in circle with purple accent
+- Icon: FaCalculator
+- "See exactly how much you can claim for your AI experimentation"
+- Visual connector to next step
+
+Step 3: **Get Your Documentation**
+- Large "3" in circle with purple accent
+- Icon: FaDownload
+- "Everything your CPA needs to claim your federal credits"
+
+**8. Interactive Calculator Preview Section:**
+- Section heading: "Calculate Your AI Tax Credits in 2 Minutes"
+- Subheading: "See how much your ChatGPT experiments and AI projects could save you"
+- Pre-calculator trust points:
+  - "No technical knowledge needed"
+  - "Based on real business examples"
+  - "Federal credits worth 10-15% of costs"
+  - "Instant results"
+- Calculator component placeholder with subtle blur effect
+- Overlay message: "Ready to see your AI tax credits?"
+
+**9. Pricing Section:**
+- Section heading: "Simple, Transparent Pricing"
+- Subheading: "One flat fee based on your credit size. No surprises."
+- Pricing cards in a row (stack on mobile):
+
+**Starter** (Credits under $10K):
+- "$500 flat fee"
+- "Perfect for: Consultants and small teams"
+- "Example: $8K credit = 16x ROI"
+- Check icon: "All federal documentation"
+- Check icon: "48-hour delivery"
+
+**Growth** (Credits $10K-50K):
+- "$750 flat fee"
+- "Perfect for: Growing businesses and agencies"
+- "Example: $30K credit = 40x ROI"
+- Check icon: "All federal documentation"
+- Check icon: "48-hour delivery"
+
+**Scale** (Credits $50K-100K):
+- "$1,000 flat fee"
+- "Perfect for: Established companies"
+- "Example: $75K credit = 75x ROI"
+- Check icon: "All federal documentation"
+- Check icon: "48-hour delivery"
+
+**Enterprise** (Credits over $100K):
+- "$1,500 flat fee"
+- "Perfect for: Large AI implementations"
+- "Example: $150K credit = 100x ROI"
+- Check icon: "All federal documentation"
+- Check icon: "48-hour delivery"
+
+- Note: "Multiple years? Add $297 per additional year"
+
+**10. FAQ Preview Section:**
+- Section heading: "Questions About AI Tax Credits?"
+- Expandable FAQ items:
+
+1. "I just use ChatGPT for my business. Do I qualify?"
+   - "If you're experimenting with custom prompts, building GPTs, or figuring out how to use AI for your specific needs, you likely qualify. Basic daily use doesn't qualify, but most businesses do more experimentation than they realize."
+
+2. "What counts as AI experimentation?"
+   - "Testing prompts, building custom GPTs, creating chatbots, automating with AI, integrating AI tools, and even failed experiments all count. If you're figuring out how to make AI work for your business, that's R&D."
+
+3. "Do I need to be technical?"
+   - "Not at all! R&D credits aren't just for programmers. If you're solving business problems with AI—even without coding—your experimentation qualifies."
+
+4. "Is this legitimate?"
+   - "Yes! The IRS recognizes experimentation and testing as R&D. Prompt engineering and custom AI implementations qualify under federal guidelines."
+
+5. "How much can I claim?"
+   - "Most businesses claim $15,000-50,000 in credits. The amount depends on time spent experimenting and related costs."
+
+**11. Social Proof Section:**
+- Section heading: "Businesses Like Yours Are Claiming AI Credits"
+- Testimonial cards with:
+
+"We had no idea our custom GPT development qualified for $32,000 in credits. The process was surprisingly simple—just questions about our AI experiments."
+- Sarah M., Marketing Agency Owner
+
+"Our ChatGPT experiments for customer service turned into an $18,000 tax credit. No coding knowledge needed!"
+- David L., E-commerce Founder
+
+"I thought R&D credits were only for tech companies. Turns out my AI automation work qualified for $12,000."
+- Maria G., Business Consultant
+
+**12. Final CTA Section:**
+- Background: Gradient (purple to green)
+- Heading: "Ready to Turn Your AI Experiments Into Tax Savings?"
+- Subheading: "Join thousands of businesses claiming credits for their ChatGPT and AI projects"
+- Large CTA button: "Calculate My AI Credits Now"
+- Small text: "Takes 2 minutes. No credit card required. See your federal credit instantly."
+
+**13. Footer:**
+- Dark background (#1F2937)
+- 4 columns (stack on mobile):
+  
+Column 1 - Company:
+- Logo
+- Tagline: "Your AI Experiments Qualify™"
+- Copyright notice
+
+Column 2 - AI Examples:
+- Custom GPTs
+- Prompt Engineering
+- Chatbots
+- AI Automation
+- Integration Projects
+
+Column 3 - Resources:
+- AI Credit Guide
+- Qualifying Activities
+- FAQ
+- Success Stories
+
+Column 4 - Legal:
+- Privacy Policy
+- Terms of Service
+- Security
+- Contact Us
+
+**Styling Requirements:**
+- Use Tailwind's default color palette
+- Primary green: green-600 (#10B981) for CTAs
+- Secondary purple: purple-600 (#8B5CF6) for AI-related elements
+- Clean, approachable design with plenty of whitespace
+- Rounded corners on cards and buttons for friendliness
+- Smooth scroll behavior
+- Hover effects on all interactive elements
+- Focus states for accessibility
+- Loading skeleton screens for dynamic content
+
+**Animations (using framer-motion):**
+- Gentle fade-in animations on scroll
+- Number counting animation for credit amounts
+- Smooth hover transforms on cards
+- Subtle floating animation on AI icons
+
+**Mobile Optimizations:**
+- Large touch targets (min 48px)
+- Simplified navigation
+- Single column layouts
+- Reduced animations for performance
+- Sticky CTA button on mobile
+
+**Accessibility Requirements:**
+- Clear heading hierarchy (H1 → H2 → H3)
+- Alt text for all images
+- ARIA labels for interactive elements
+- Keyboard navigation support
+- Color contrast ratio of at least 4.5:1
+- Screen reader friendly content
+
+CRITICAL: Add comprehensive comments including:
+```javascript
+/**
+ * @file LandingPage.tsx
+ * @description Marketing landing page for AI-experimenting businesses to claim R&D tax credits
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @modified 2024-01-15
+ * @dependencies React, Tailwind CSS, framer-motion, react-icons
+ * @knowledgeBase Updated Copywriting & Positioning Guide.md, Market Positioning Brief
+ * @examples
+ * - Marketing agencies testing ChatGPT prompts
+ * - E-commerce brands building AI chatbots
+ * - Consultants creating AI workflows
+ * 
+ * This component targets businesses USING AI tools (not building AI) and emphasizes
+ * accessibility with "no coding required" messaging throughout.
+ */
+
+// CHANGE: Updated all messaging to focus on AI experimentation instead of traditional R&D
+// INTEGRATION: Calculator component will showcase AI-specific examples
+// TODO: Add testimonials from real AI-using businesses
+// TODO: Implement A/B testing for "AI Credits" vs "Tax Savings" messaging
+// BUG FIX: Ensure purple color contrast meets accessibility standards
+
+// Business logic: Federal credits only (no state complexity)
+// Pricing is flat-fee based on credit size, not percentage
+// All examples feature businesses using ChatGPT, Claude, custom GPTs
+// Messaging avoids technical jargon - uses "experiments" not "development"
+```
+
+Include inline comments for:
+- AI-specific examples and use cases
+- Non-technical language requirements
+- Federal-only calculations
+- Accessibility considerations
+- Places where "no coding required" messaging appears
+
+The component should feel approachable and friendly to non-technical business owners while maintaining professionalism and trust."
