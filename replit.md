@@ -12,17 +12,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### R&D Tax Credit ASC Calculation Engine (January 9, 2025)
-- Implemented comprehensive Alternative Simplified Credit (ASC) calculation method
-- Added support for first-time filers (6% rate) vs. experienced filers (14% rate)
-- Created proper QRE breakdown with 65% contractor limitation per IRS Section 41
-- Integrated prior year QRE support for base amount calculations
-- Built pricing tier system ($500-$2500) based on credit amounts
-- Added ROI calculations showing service value proposition
-- Implemented detailed validation with constructive business guidance
-- Enhanced supply QRE calculations including cloud and software costs
-- Fixed modal blur effect to properly show/hide results during email capture
-- Resolved form submission redirect issue for smooth user experience
+### Complete Calculator Engine Overhaul (January 9, 2025)
+- **FIXED CRITICAL BUG**: Employee wages now calculate at full value with R&D allocation percentage
+- **FIXED ASC CALCULATION**: Proper implementation with 6% for first-time filers, 14% for repeat filers
+- **FIXED PRICING TIERS**: Unified 7-tier system ($500-$2000) aligned across all components
+- **FIXED SOFTWARE COSTS**: Removed incorrect 80% reduction - now calculates at full value
+- Contractor costs correctly limited to 65% per IRS Section 41 (wages are NOT limited)
+- Added R&D allocation percentage input (defaults to 100%) for accurate wage calculations
+- Implemented prior year QRE handling for proper ASC base amount calculation
+- Federal-only focus confirmed (state credits always 0)
+- Enhanced validation with business-friendly warnings and error messages
+- Added detailed calculation breakdowns showing wage, contractor, and supply calculations
+- Improved UI labels from "AI" to "Innovation" for broader appeal
 
 ### Enhanced Calculator UI with 4-Step Flow (January 9, 2025)
 - Implemented comprehensive 4-step calculator flow with visual progress indicator

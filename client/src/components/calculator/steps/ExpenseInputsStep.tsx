@@ -82,7 +82,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Employees Working on AI Projects
+                Employees Working on Innovation Projects
               </label>
               <input
                 type="number"
@@ -92,7 +92,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 placeholder="e.g., 10"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Staff developing AI tools, prompts, or automations
+                Staff developing technology solutions, testing, or experimentation
               </p>
             </div>
           </div>
@@ -137,11 +137,11 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
 
         {/* AI-Related Expenses */}
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-900 mb-4">AI Tool & Service Expenses</h4>
+          <h4 className="font-semibold text-gray-900 mb-4">Innovation Tool & Service Expenses</h4>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                AI Consultants/Contractors (annual)
+                Technical Consultants/Contractors (annual)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -153,13 +153,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   placeholder="e.g., 50,000"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  External AI developers, prompt engineers, consultants
+                  External developers, engineers, technical consultants
                 </p>
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                AI Software & APIs (ChatGPT, Claude, etc.)
+                Software & APIs (Development tools, licenses, etc.)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -177,7 +177,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cloud & Infrastructure for AI
+                Cloud & Infrastructure for Innovation
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -189,7 +189,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   placeholder="e.g., 15,000"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  AWS, Azure, GCP for AI workloads, vector databases
+                  AWS, Azure, GCP for development, testing, production
                 </p>
               </div>
             </div>

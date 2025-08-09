@@ -18,7 +18,7 @@ import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
 import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { ProgressIndicator } from './ProgressIndicator';
-import { CalculatorEngine } from '@/services/calculation/calculator.engine';
+import { RDTaxCalculator } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
 interface CalculatorState {
@@ -123,7 +123,7 @@ export const InteractiveCalculator: React.FC = () => {
       
       try {
         // Use the new ASC method calculator
-        const calculationResult = CalculatorEngine.calculate({
+        const calculationResult = RDTaxCalculator.calculate({
           businessType: state.businessType || 'professional_services',
           totalEmployees: state.expenses.totalEmployees,
           technicalEmployees: state.expenses.technicalEmployees,
@@ -133,7 +133,8 @@ export const InteractiveCalculator: React.FC = () => {
           suppliesCosts: 0,
           softwareCosts: state.expenses.softwareCosts,
           cloudCosts: state.expenses.cloudCosts,
-          isFirstTimeFiler: true // Default to first-time filer for better initial estimates
+          priorYearQREs: [], // No prior QREs by default
+          isFirstTimeFiler: true // Default to first-time filer (6% rate)
         });
         
         const results = {
@@ -148,7 +149,7 @@ export const InteractiveCalculator: React.FC = () => {
             wages: calculationResult.qreBreakdown.wages,
             contractors: calculationResult.qreBreakdown.contractors,
             supplies: calculationResult.qreBreakdown.supplies,
-            cloud: calculationResult.qreBreakdown.cloudAndAI
+            cloud: calculationResult.qreBreakdown.cloudAndSoftware
           }
         };
         
