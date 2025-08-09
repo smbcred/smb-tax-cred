@@ -12,17 +12,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### Interactive R&D Tax Credit Calculator Implementation (January 9, 2025)
-- Built sophisticated 4-step calculator component with real-time calculations
-- Created BusinessTypeStep with 6 industry categories and visual icons
-- Implemented QualifyingActivitiesStep with dynamic activity lists per business type
-- Built ExpenseInputsStep with live credit calculation preview
-- Created ResultsDisplayStep with ROI calculations and pricing tier assignment
-- Integrated calculation utilities using simplified ASC method (14% of QREs)
-- Implemented pricing tier system with 7 tiers from $500 to $2000
-- Added lead capture modal trigger on results display
-- Created smooth step animations with framer-motion
-- Built progress indicator with visual step completion tracking
+### Innovation Tax Credit Calculator Implementation (January 9, 2025)
+- Pivoted from AI-specific to broader innovation tax credit focus
+- Built InnovationCalculatorEngine with 10-14% federal credit rates
+- Created BusinessExamplesService with industry-specific profiles
+- Updated business types to professional services, e-commerce, healthcare, etc.
+- Redesigned activities around automation, custom solutions, process optimization
+- Implemented sophisticated expense calculation across 4 categories
+- Added validation with constructive business guidance
+- Created industry presets with real-world examples
+- Maintained pricing tier system from $500-$1500
+- Enhanced with professional insights and recommendations
 
 ### Marketing Copy Integration (January 9, 2025)
 - Created comprehensive marketing data files with conversion-optimized copy

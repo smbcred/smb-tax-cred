@@ -1,6 +1,6 @@
 /**
  * @file QualifyingActivitiesStep.tsx
- * @description Step 2: Qualifying AI R&D activities selection
+ * @description Step 2: Qualifying innovation activities selection
  */
 
 import { motion } from 'framer-motion';
@@ -12,56 +12,53 @@ interface QualifyingActivitiesStepProps {
 }
 
 const allActivities = {
-  agency: [
-    { id: 'custom-gpts', label: 'Build custom GPTs or AI assistants for specific use cases' },
-    { id: 'content-systems', label: 'Create AI content generation systems and workflows' },
-    { id: 'client-chatbots', label: 'Develop chatbots for client websites or services' },
-    { id: 'ai-campaigns', label: 'Design AI-powered marketing campaigns' },
-    { id: 'prompt-engineering', label: 'Design and test prompts for consistent results' },
-    { id: 'automation-workflows', label: 'Build AI automation workflows for repetitive tasks' },
-    { id: 'ai-analytics', label: 'Implement AI-driven analytics and reporting' }
+  'professional-services': [
+    { id: 'automation-development', label: 'Creating automated workflows to eliminate manual processes' },
+    { id: 'custom-solution-development', label: 'Building tailored solutions for your specific business needs' },
+    { id: 'integration-engineering', label: 'Connecting different platforms to work seamlessly together' },
+    { id: 'process-optimization', label: 'Redesigning workflows for maximum efficiency' },
+    { id: 'proprietary-tool-creation', label: 'Developing unique tools that give you competitive advantage' },
+    { id: 'digital-transformation', label: 'Modernizing operations with digital technologies' }
   ],
-  ecommerce: [
-    { id: 'customer-service-ai', label: 'Build AI customer service tools and chatbots' },
-    { id: 'personalization', label: 'Create AI personalization and recommendation systems' },
-    { id: 'inventory-ai', label: 'Develop AI inventory management systems' },
-    { id: 'pricing-models', label: 'Build dynamic AI pricing models' },
-    { id: 'review-analysis', label: 'Implement AI review analysis and sentiment tracking' },
-    { id: 'product-descriptions', label: 'Create AI systems for product descriptions' },
-    { id: 'email-automation', label: 'Design AI email response systems' }
+  'ecommerce-retail': [
+    { id: 'integration-engineering', label: 'Creating sophisticated connections between sales channels' },
+    { id: 'automation-development', label: 'Building automated inventory and order management' },
+    { id: 'experimental-implementation', label: 'Testing new approaches to customer experience' },
+    { id: 'custom-solution-development', label: 'Creating personalized recommendation engines' },
+    { id: 'process-optimization', label: 'Streamlining fulfillment and logistics processes' },
+    { id: 'digital-transformation', label: 'Implementing omnichannel retail strategies' }
   ],
-  consultant: [
-    { id: 'custom-analysis', label: 'Build custom AI analysis tools for clients' },
-    { id: 'report-automation', label: 'Create AI-powered report generation systems' },
-    { id: 'gpt-assistants', label: 'Develop specialized GPT assistants for consulting' },
-    { id: 'data-processing', label: 'Build AI data processing and insight tools' },
-    { id: 'client-portals', label: 'Create AI-enhanced client portals' },
-    { id: 'knowledge-bases', label: 'Develop AI knowledge base systems' }
+  'creative-agency': [
+    { id: 'proprietary-tool-creation', label: 'Building custom creative production tools' },
+    { id: 'automation-development', label: 'Automating campaign management workflows' },
+    { id: 'custom-solution-development', label: 'Creating client-specific analytics platforms' },
+    { id: 'integration-engineering', label: 'Connecting creative tools with client systems' },
+    { id: 'experimental-implementation', label: 'Testing innovative creative approaches' },
+    { id: 'process-optimization', label: 'Optimizing project delivery workflows' }
   ],
-  service: [
-    { id: 'scheduling-ai', label: 'Build AI scheduling and booking systems' },
-    { id: 'quote-generation', label: 'Create AI quoting and estimation tools' },
-    { id: 'service-chatbots', label: 'Develop service-specific chatbots' },
-    { id: 'workflow-automation', label: 'Implement AI workflow automation' },
-    { id: 'customer-comm', label: 'Build AI customer communication systems' },
-    { id: 'predictive-maintenance', label: 'Create predictive AI maintenance tools' }
+  'healthcare-wellness': [
+    { id: 'digital-transformation', label: 'Modernizing patient care with technology' },
+    { id: 'process-optimization', label: 'Streamlining clinical workflows' },
+    { id: 'integration-engineering', label: 'Connecting healthcare systems and devices' },
+    { id: 'automation-development', label: 'Automating administrative tasks' },
+    { id: 'custom-solution-development', label: 'Building patient engagement platforms' },
+    { id: 'experimental-implementation', label: 'Testing new care delivery models' }
   ],
-  saas: [
-    { id: 'ai-features', label: 'Develop new AI-powered features' },
-    { id: 'llm-integration', label: 'Integrate LLMs (GPT, Claude, etc.) into products' },
-    { id: 'custom-models', label: 'Train custom AI models for specific use cases' },
-    { id: 'api-development', label: 'Build AI API endpoints and services' },
-    { id: 'ml-pipelines', label: 'Create machine learning data pipelines' },
-    { id: 'ai-infrastructure', label: 'Build AI infrastructure and scaling systems' },
-    { id: 'rag-systems', label: 'Implement RAG (Retrieval Augmented Generation) systems' }
+  'technology-services': [
+    { id: 'breakthrough-process-design', label: 'Creating revolutionary new approaches' },
+    { id: 'novel-integration-development', label: 'Building unprecedented system integrations' },
+    { id: 'proprietary-tool-creation', label: 'Developing cutting-edge development tools' },
+    { id: 'custom-solution-development', label: 'Building advanced technical solutions' },
+    { id: 'automation-development', label: 'Creating sophisticated automation systems' },
+    { id: 'experimental-implementation', label: 'Pushing boundaries with new technologies' }
   ],
-  other: [
-    { id: 'ai-automation', label: 'Develop AI-powered automation systems' },
-    { id: 'custom-ai-tools', label: 'Build custom AI tools for business processes' },
-    { id: 'prompt-libraries', label: 'Create and test prompt libraries' },
-    { id: 'ai-integration', label: 'Integrate AI into existing systems' },
-    { id: 'process-optimization', label: 'Use AI to optimize business processes' },
-    { id: 'ai-experimentation', label: 'Experiment with new AI technologies' }
+  'manufacturing-logistics': [
+    { id: 'process-optimization', label: 'Optimizing production and supply chain' },
+    { id: 'integration-engineering', label: 'Connecting manufacturing systems' },
+    { id: 'breakthrough-process-design', label: 'Reimagining production processes' },
+    { id: 'automation-development', label: 'Implementing predictive maintenance' },
+    { id: 'custom-solution-development', label: 'Building quality control systems' },
+    { id: 'digital-transformation', label: 'Digitizing factory operations' }
   ]
 };
 
@@ -70,7 +67,7 @@ export const QualifyingActivitiesStep: React.FC<QualifyingActivitiesStepProps> =
   onUpdate,
   businessType
 }) => {
-  const activities = businessType ? allActivities[businessType as keyof typeof allActivities] || allActivities.other : allActivities.other;
+  const activities = businessType ? allActivities[businessType as keyof typeof allActivities] || allActivities['professional-services'] : allActivities['professional-services'];
 
   const toggleActivity = (activityId: string) => {
     if (selectedActivities.includes(activityId)) {
@@ -84,10 +81,10 @@ export const QualifyingActivitiesStep: React.FC<QualifyingActivitiesStepProps> =
     <div>
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Which AI activities does your business do?
+          Which innovation activities does your business do?
         </h3>
         <p className="text-gray-600">
-          Select all that apply - these AI development activities qualify for R&D credits
+          Select all that apply - these technology innovation activities qualify for R&D credits
         </p>
       </div>
 

@@ -1,6 +1,6 @@
 /**
  * @file ExpenseInputsStep.tsx
- * @description Step 3: Expense inputs for calculation
+ * @description Step 3: Innovation expense inputs for calculation
  */
 
 import { useState, useEffect } from 'react';
@@ -55,10 +55,10 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     <div>
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Enter your AI-related expenses
+          Enter your innovation-related expenses
         </h3>
         <p className="text-gray-600">
-          Include wages for employees working on AI projects and AI tool/service costs
+          Include wages for employees working on innovation projects and technology costs
         </p>
       </div>
 

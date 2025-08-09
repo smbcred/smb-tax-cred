@@ -1,6 +1,6 @@
 /**
  * @file BusinessTypeStep.tsx
- * @description Step 1: Business type selection for AI R&D
+ * @description Step 1: Business type selection for innovation tax credits
  */
 
 import { motion } from 'framer-motion';
@@ -20,46 +20,46 @@ interface BusinessTypeStepProps {
 
 const businessTypes = [
   {
-    id: 'agency',
-    title: 'Marketing/Creative Agency',
-    description: 'Using AI for content, campaigns, automation',
-    icon: <FaPalette className="text-3xl" />,
-    examples: ['AI content generation', 'Automated campaigns', 'Custom chatbots for clients']
-  },
-  {
-    id: 'ecommerce',
-    title: 'E-commerce Brand',
-    description: 'AI for customer service, personalization',
-    icon: <FaShoppingCart className="text-3xl" />,
-    examples: ['AI customer support', 'Product recommendations', 'Dynamic pricing models']
-  },
-  {
-    id: 'consultant',
-    title: 'Consultant/Coach',
-    description: 'AI tools for client deliverables, analysis',
+    id: 'professional-services',
+    title: 'Professional Services',
+    description: 'Innovating through custom methodologies',
     icon: <FaBriefcase className="text-3xl" />,
-    examples: ['AI-powered reports', 'Automated analysis', 'Custom GPT assistants']
+    examples: ['Custom analysis frameworks', 'Automated reporting', 'Integration platforms']
   },
   {
-    id: 'service',
-    title: 'Service Business',
-    description: 'AI for operations, scheduling, quotes',
+    id: 'ecommerce-retail',
+    title: 'E-commerce & Retail',
+    description: 'Creating personalized experiences',
+    icon: <FaShoppingCart className="text-3xl" />,
+    examples: ['Recommendation engines', 'Inventory optimization', 'Omnichannel integration']
+  },
+  {
+    id: 'creative-agency',
+    title: 'Creative Agency',
+    description: 'Building proprietary creative tools',
+    icon: <FaPalette className="text-3xl" />,
+    examples: ['Campaign automation', 'Content workflows', 'Performance analytics']
+  },
+  {
+    id: 'healthcare-wellness',
+    title: 'Healthcare & Wellness',
+    description: 'Modernizing patient care',
     icon: <FaTools className="text-3xl" />,
-    examples: ['AI scheduling systems', 'Automated quotes', 'Service chatbots']
+    examples: ['Patient communication', 'Scheduling optimization', 'Telehealth platforms']
   },
   {
-    id: 'saas',
-    title: 'SaaS/Software Company',
-    description: 'Building AI features and integrations',
+    id: 'technology-services',
+    title: 'Technology Services',
+    description: 'Pushing innovation boundaries',
     icon: <FaRobot className="text-3xl" />,
-    examples: ['AI feature development', 'LLM integrations', 'Custom AI models']
+    examples: ['Architecture implementations', 'Development frameworks', 'Automation systems']
   },
   {
-    id: 'other',
-    title: 'Other Industries',
-    description: 'Any business using AI for innovation',
+    id: 'manufacturing-logistics',
+    title: 'Manufacturing & Logistics',
+    description: 'Optimizing through technology',
     icon: <FaBuilding className="text-3xl" />,
-    examples: ['AI automation', 'Process optimization', 'Custom AI tools']
+    examples: ['Predictive maintenance', 'Supply chain optimization', 'Quality control']
   }
 ];
 

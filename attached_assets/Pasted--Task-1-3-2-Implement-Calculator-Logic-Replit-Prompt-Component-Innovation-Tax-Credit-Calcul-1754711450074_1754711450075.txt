@@ -1,0 +1,1115 @@
+# Task 1.3.2: Implement Calculator Logic - Replit Prompt
+
+## Component: Innovation Tax Credit Calculation Engine
+**Reference**: Updated R&D Knowledge Base, Market Positioning Brief, expense-calculation-rules.md, form-6765-tech-specs.md
+**Business Innovation Focus**: Calculate credits for businesses experimenting with modern technology tools and custom solutions
+
+### Overview
+Build a calculation engine designed for businesses innovating through technology experimentation. The engine handles various innovation activities including automation development, custom tool creation, process optimization, and system integration. Focuses on federal credits with professional yet accessible validation messages.
+
+### Technical Requirements
+- **Dependencies**: TypeScript for type safety, calculation precision libraries
+- **Architecture**: Modular calculation services for different innovation categories
+- **Performance**: Real-time updates with intelligent debouncing
+- **Validation**: Business-friendly error messages with actionable guidance
+- **Integration**: Calculator UI, backend API, database storage
+
+### Implementation Prompt
+
+"Create an innovation tax credit calculation engine that handles modern business experimentation including automation, custom solutions, workflow optimization, and technology integration. Focus on federal credits with clear, professional calculations.
+
+**1. Create Core Innovation Credit Calculation Service (services/calculation/innovation-calculator.engine.ts):**
+```typescript
+/**
+ * @file innovation-calculator.engine.ts
+ * @description Innovation and experimentation tax credit calculation engine
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase Updated R&D Knowledge Base, Market Positioning Brief
+ * @examples
+ * - Marketing agencies developing custom automation workflows
+ * - E-commerce brands building personalization engines
+ * - Consultants creating proprietary analysis tools
+ * - Healthcare providers implementing patient communication systems
+ * 
+ * This engine calculates federal tax credits for business innovation:
+ * - Custom solution development
+ * - Process automation and optimization
+ * - Technology integration projects
+ * - Digital transformation initiatives
+ * - Experimental implementations
+ * 
+ * CALCULATION METHOD:
+ * - Federal credit: 10-14% of qualifying innovation expenses
+ * - Enhanced rates for substantial experimentation
+ * - Simplified federal-only approach
+ * 
+ * BUSINESS RULES:
+ * - Time invested in experimentation valued appropriately
+ * - Contractor costs for custom development qualify
+ * - Technology subscriptions (experimentation portion)
+ * - Failed experiments are valuable learning experiences
+ */
+
+import { 
+  InnovationInput, 
+  InnovationResult, 
+  ExpenseBreakdown,
+  ValidationResult,
+  InnovationActivity 
+} from '../../types/innovation-calculation.types';
+
+export class InnovationCalculatorEngine {
+  // Federal credit rates based on innovation intensity
+  private static readonly BASE_CREDIT_RATE = 0.10;
+  private static readonly STANDARD_CREDIT_RATE = 0.12;
+  private static readonly ENHANCED_CREDIT_RATE = 0.14;
+  
+  // Professional hourly valuations
+  private static readonly HOURLY_VALUATIONS = {
+    principal: { min: 125, max: 250, default: 175 },
+    senior: { min: 100, max: 200, default: 150 },
+    professional: { min: 75, max: 150, default: 100 },
+    support: { min: 50, max: 100, default: 75 }
+  };
+  
+  /**
+   * Main calculation entry point for innovation credits
+   * @param input Business innovation and experimentation data
+   * @returns Comprehensive calculation results with professional insights
+   */
+  public static calculate(input: InnovationInput): InnovationResult {
+    // Validate with constructive feedback
+    const validation = this.validateInputs(input);
+    if (!validation.isValid) {
+      throw new Error(validation.errors[0]);
+    }
+
+    // Calculate innovation expenses by category
+    const expenseBreakdown = this.calculateInnovationExpenses(input);
+    
+    // Determine appropriate credit rate
+    const creditRate = this.determineCreditRate(input);
+    
+    // Calculate federal credit
+    const federalCredit = Math.round(expenseBreakdown.total * creditRate);
+    
+    // Determine service tier and ROI
+    const serviceFee = this.determineServiceTier(federalCredit);
+    const roi = Math.round(federalCredit / serviceFee);
+    
+    return {
+      expenseBreakdown,
+      federalCredit,
+      creditRate,
+      serviceFee,
+      roi,
+      insights: this.generateInsights(input, federalCredit),
+      qualifyingActivities: this.analyzeActivities(input),
+      recommendations: this.generateRecommendations(input, expenseBreakdown),
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Calculate innovation expenses across all categories
+   * Recognizes various forms of business innovation
+   */
+  private static calculateInnovationExpenses(input: InnovationInput): ExpenseBreakdown {
+    // Personnel investment in innovation
+    const personnelInvestment = this.calculatePersonnelInvestment(input);
+    
+    // External expertise and contractors
+    const externalExpertise = this.calculateExternalExpertise(input);
+    
+    // Technology and tool investments
+    const technologyInvestment = this.calculateTechnologyInvestment(input);
+    
+    // Infrastructure and systems
+    const infrastructureCosts = this.calculateInfrastructureCosts(input);
+    
+    const total = personnelInvestment + externalExpertise + 
+                  technologyInvestment + infrastructureCosts;
+    
+    return {
+      personnelTime: Math.round(personnelInvestment),
+      externalExperts: Math.round(externalExpertise),
+      technologyTools: Math.round(technologyInvestment),
+      infrastructure: Math.round(infrastructureCosts),
+      total: Math.round(total),
+      distribution: {
+        personnel: (personnelInvestment / total) * 100,
+        external: (externalExpertise / total) * 100,
+        technology: (technologyInvestment / total) * 100,
+        infrastructure: (infrastructureCosts / total) * 100
+      }
+    };
+  }
+
+  /**
+   * Calculate personnel investment in innovation
+   * Values the time and expertise of team members
+   */
+  private static calculatePersonnelInvestment(input: InnovationInput): number {
+    const {
+      leadershipHours = 0,
+      technicalHours = 0,
+      supportHours = 0,
+      teamSize = 1,
+      averageCompensation,
+      innovationPercentage = 100
+    } = input;
+
+    // Leadership/owner time on strategic innovation
+    const leadershipRate = averageCompensation?.leadership || 
+                          this.HOURLY_VALUATIONS.principal.default;
+    const leadershipValue = leadershipHours * leadershipRate;
+    
+    // Technical team experimentation
+    const technicalRate = averageCompensation?.technical || 
+                         this.HOURLY_VALUATIONS.professional.default;
+    const technicalValue = technicalHours * technicalRate;
+    
+    // Support staff contribution
+    const supportRate = averageCompensation?.support || 
+                       this.HOURLY_VALUATIONS.support.default;
+    const supportValue = supportHours * supportRate;
+    
+    // Annual projection
+    const weeklyValue = leadershipValue + technicalValue + supportValue;
+    const annualValue = weeklyValue * 50; // 50 working weeks
+    
+    // Apply innovation percentage
+    return annualValue * (innovationPercentage / 100);
+  }
+
+  /**
+   * Calculate external expertise investments
+   * Recognizes value of specialized contractors and consultants
+   */
+  private static calculateExternalExpertise(input: InnovationInput): number {
+    const { 
+      contractorInvestment = 0,
+      specializedConsulting = 0,
+      trainingInvestment = 0
+    } = input;
+    
+    // Full value of external innovation expertise
+    return contractorInvestment + specializedConsulting + trainingInvestment;
+  }
+
+  /**
+   * Calculate technology tool investments
+   * Includes modern tools and platforms for innovation
+   */
+  private static calculateTechnologyInvestment(input: InnovationInput): number {
+    const { 
+      softwareSubscriptions = 0,
+      platformCosts = 0,
+      apiIntegrations = 0,
+      experimentationAllocation = 60 // Default 60% for experimentation
+    } = input;
+    
+    // Calculate based on experimentation usage
+    const totalToolCosts = softwareSubscriptions + platformCosts + apiIntegrations;
+    return totalToolCosts * (experimentationAllocation / 100);
+  }
+
+  /**
+   * Calculate infrastructure and system costs
+   * Supporting technology for innovation
+   */
+  private static calculateInfrastructureCosts(input: InnovationInput): number {
+    const { 
+      cloudInfrastructure = 0,
+      developmentEnvironments = 0,
+      testingSystems = 0
+    } = input;
+    
+    // Infrastructure supporting innovation
+    return cloudInfrastructure + developmentEnvironments + testingSystems;
+  }
+
+  /**
+   * Determine appropriate credit rate based on innovation profile
+   * Rewards deeper innovation and experimentation
+   */
+  private static determineCreditRate(input: InnovationInput): number {
+    const { activities = [], innovationDepth = 'moderate' } = input;
+    
+    // High-value innovation activities
+    const substantialInnovation = [
+      'custom-solution-development',
+      'proprietary-tool-creation',
+      'novel-integration-development',
+      'breakthrough-process-design'
+    ];
+    
+    const hasSubstantialInnovation = activities.some(
+      activity => substantialInnovation.includes(activity)
+    );
+    
+    // Determine rate based on innovation profile
+    if (innovationDepth === 'extensive' || hasSubstantialInnovation) {
+      return this.ENHANCED_CREDIT_RATE;
+    } else if (innovationDepth === 'moderate') {
+      return this.STANDARD_CREDIT_RATE;
+    } else {
+      return this.BASE_CREDIT_RATE;
+    }
+  }
+
+  /**
+   * Generate professional insights about the innovation profile
+   * Provides context and value beyond just numbers
+   */
+  private static generateInsights(
+    input: InnovationInput, 
+    federalCredit: number
+  ): string {
+    const { businessType, activities = [] } = input;
+    
+    const activityDescriptions = this.describeActivities(activities);
+    const businessContext = this.getBusinessContext(businessType);
+    
+    return `Your ${businessContext} innovation efforts, particularly in ` +
+           `${activityDescriptions}, demonstrate qualifying experimentation ` +
+           `that could generate approximately $${federalCredit.toLocaleString()} ` +
+           `in federal tax credits. This represents tangible recognition of your ` +
+           `investment in solving business challenges through technology.`;
+  }
+
+  /**
+   * Analyze and categorize innovation activities
+   * Provides detailed breakdown of qualifying work
+   */
+  private static analyzeActivities(
+    input: InnovationInput
+  ): Array<{ activity: string; description: string; impact: string }> {
+    const { activities = [] } = input;
+    
+    const activityAnalysis = {
+      'automation-development': {
+        description: 'Creating automated workflows and processes',
+        impact: 'Efficiency gains through systematic innovation'
+      },
+      'custom-solution-development': {
+        description: 'Building tailored solutions for specific challenges',
+        impact: 'Competitive advantage through proprietary tools'
+      },
+      'integration-engineering': {
+        description: 'Connecting disparate systems in novel ways',
+        impact: 'Operational excellence through unified platforms'
+      },
+      'process-optimization': {
+        description: 'Reimagining workflows with technology',
+        impact: 'Measurable improvements in business metrics'
+      },
+      'experimental-implementation': {
+        description: 'Testing new approaches and methodologies',
+        impact: 'Learning and iteration driving innovation'
+      },
+      'digital-transformation': {
+        description: 'Modernizing operations with current tools',
+        impact: 'Future-proofing business capabilities'
+      }
+    };
+    
+    return activities.map(activity => ({
+      activity: activityAnalysis[activity]?.description || activity,
+      description: this.getDetailedDescription(activity),
+      impact: activityAnalysis[activity]?.impact || 'Business innovation'
+    }));
+  }
+
+  /**
+   * Generate actionable recommendations
+   * Helps businesses maximize their credit potential
+   */
+  private static generateRecommendations(
+    input: InnovationInput,
+    expenses: ExpenseBreakdown
+  ): string[] {
+    const recommendations: string[] = [];
+    
+    // Time tracking recommendation
+    if (expenses.distribution.personnel < 40) {
+      recommendations.push(
+        'Consider tracking innovation time more comprehensively - ' +
+        'many businesses underestimate their experimentation hours'
+      );
+    }
+    
+    // Documentation recommendation
+    if (!input.hasDocumentation) {
+      recommendations.push(
+        'Start documenting your experimentation process - ' +
+        'project notes and iteration history strengthen your position'
+      );
+    }
+    
+    // Multi-year opportunity
+    if (!input.priorYearConsideration) {
+      recommendations.push(
+        'Review prior years - innovation from 2022-2024 may also qualify'
+      );
+    }
+    
+    // Activity expansion
+    if (input.activities.length < 3) {
+      recommendations.push(
+        'Explore other innovation areas in your business - ' +
+        'most companies have more qualifying activities than they realize'
+      );
+    }
+    
+    return recommendations;
+  }
+
+  /**
+   * Professional validation with constructive guidance
+   * Helps users provide complete information
+   */
+  private static validateInputs(input: InnovationInput): ValidationResult {
+    const errors: string[] = [];
+
+    // Ensure some innovation activity
+    const totalHours = (input.leadershipHours || 0) + 
+                      (input.technicalHours || 0) + 
+                      (input.supportHours || 0);
+    
+    if (totalHours === 0 && !input.contractorInvestment) {
+      errors.push(
+        'Please indicate time invested in innovation or external expertise engaged'
+      );
+    }
+
+    // Validate reasonable time commitments
+    if (input.leadershipHours && input.leadershipHours > 60) {
+      errors.push(
+        'Leadership hours seem high - please verify weekly time commitment'
+      );
+    }
+
+    // Ensure activities are selected
+    if (!input.activities || input.activities.length === 0) {
+      errors.push(
+        'Please select the innovation activities your business has undertaken'
+      );
+    }
+
+    // Check percentage allocations
+    const allocations = [
+      input.innovationPercentage,
+      input.experimentationAllocation
+    ].filter(a => a !== undefined);
+    
+    for (const allocation of allocations) {
+      if (allocation < 0 || allocation > 100) {
+        errors.push('Percentage allocations must be between 0 and 100');
+        break;
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+   * Determine service tier based on credit amount
+   * Transparent, value-based pricing
+   */
+  private static determineServiceTier(creditAmount: number): number {
+    if (creditAmount < 10000) return 500;
+    if (creditAmount < 50000) return 750;
+    if (creditAmount < 100000) return 1000;
+    return 1500;
+  }
+
+  /**
+   * Convert activities to natural language
+   */
+  private static describeActivities(activities: string[]): string {
+    if (activities.length === 0) return 'innovation initiatives';
+    
+    const descriptions = activities.slice(0, 2).map(activity => {
+      const mappings = {
+        'automation-development': 'automation development',
+        'custom-solution-development': 'custom solutions',
+        'integration-engineering': 'system integration',
+        'process-optimization': 'process optimization',
+        'digital-transformation': 'digital transformation'
+      };
+      return mappings[activity] || activity;
+    });
+    
+    if (activities.length > 2) {
+      return descriptions.join(', ') + ', and other innovations';
+    }
+    return descriptions.join(' and ');
+  }
+
+  /**
+   * Provide context based on business type
+   */
+  private static getBusinessContext(businessType: string): string {
+    const contexts = {
+      'professional-services': 'client-focused',
+      'ecommerce-retail': 'customer experience',
+      'healthcare-wellness': 'patient care',
+      'hospitality-restaurant': 'operational',
+      'creative-agency': 'creative and strategic',
+      'technology-services': 'technical'
+    };
+    
+    return contexts[businessType] || 'business';
+  }
+
+  /**
+   * Get detailed descriptions for activities
+   */
+  private static getDetailedDescription(activity: string): string {
+    const descriptions = {
+      'automation-development': 
+        'Designing and implementing automated systems to streamline operations',
+      'custom-solution-development': 
+        'Creating proprietary tools tailored to unique business requirements',
+      'integration-engineering': 
+        'Building connections between previously incompatible systems',
+      'process-optimization': 
+        'Redesigning workflows for efficiency and effectiveness',
+      'experimental-implementation': 
+        'Testing innovative approaches to business challenges',
+      'digital-transformation': 
+        'Modernizing operations through strategic technology adoption'
+    };
+    
+    return descriptions[activity] || 'Innovation through technology experimentation';
+  }
+}
+```
+
+**2. Create Innovation Calculation Hook (hooks/useInnovationCalculation.ts):**
+```typescript
+/**
+ * @description React hook for real-time innovation credit calculations
+ * FOCUS: Professional, responsive calculations for business innovators
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { debounce } from 'lodash';
+import { InnovationCalculatorEngine } from '../services/calculation/innovation-calculator.engine';
+import { InnovationInput, InnovationResult } from '../types/innovation-calculation.types';
+
+interface UseInnovationCalculationOptions {
+  debounceMs?: number;
+  onCalculate?: (result: InnovationResult) => void;
+  onError?: (error: Error) => void;
+}
+
+export const useInnovationCalculation = (
+  initialInput: Partial<InnovationInput> = {},
+  options: UseInnovationCalculationOptions = {}
+) => {
+  const {
+    debounceMs = 400,
+    onCalculate,
+    onError
+  } = options;
+
+  // Initialize with professional defaults
+  const [input, setInput] = useState<InnovationInput>({
+    businessType: 'professional-services',
+    leadershipHours: 0,
+    technicalHours: 0,
+    supportHours: 0,
+    teamSize: 1,
+    contractorInvestment: 0,
+    softwareSubscriptions: 0,
+    innovationPercentage: 100,
+    experimentationAllocation: 60,
+    activities: [],
+    innovationDepth: 'moderate',
+    ...initialInput
+  });
+
+  const [result, setResult] = useState<InnovationResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Professional calculation with clear error handling
+  const calculate = useCallback((calcInput: InnovationInput) => {
+    setIsCalculating(true);
+    setError(null);
+
+    try {
+      const calcResult = InnovationCalculatorEngine.calculate(calcInput);
+      setResult(calcResult);
+      
+      if (onCalculate) {
+        onCalculate(calcResult);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 
+        'Unable to complete calculation. Please review your inputs.';
+      setError(errorMessage);
+      setResult(null);
+      
+      if (onError) {
+        onError(err as Error);
+      }
+    } finally {
+      setIsCalculating(false);
+    }
+  }, [onCalculate, onError]);
+
+  // Smooth, debounced updates
+  const debouncedCalculate = useMemo(
+    () => debounce(calculate, debounceMs),
+    [calculate, debounceMs]
+  );
+
+  // Update input with intelligent recalculation
+  const updateInput = useCallback((updates: Partial<InnovationInput>) => {
+    setInput(prev => {
+      const newInput = { ...prev, ...updates };
+      
+      // Calculate if meaningful data exists
+      const hasHours = newInput.leadershipHours || newInput.technicalHours || newInput.supportHours;
+      const hasInvestment = newInput.contractorInvestment || newInput.softwareSubscriptions;
+      const hasActivities = newInput.activities.length > 0;
+      
+      if (hasHours || hasInvestment || hasActivities) {
+        debouncedCalculate(newInput);
+      }
+      
+      return newInput;
+    });
+  }, [debouncedCalculate]);
+
+  // Activity management
+  const toggleActivity = useCallback((activity: string) => {
+    setInput(prev => {
+      const activities = prev.activities.includes(activity)
+        ? prev.activities.filter(a => a !== activity)
+        : [...prev.activities, activity];
+      
+      const newInput = { ...prev, activities };
+      if (activities.length > 0) {
+        debouncedCalculate(newInput);
+      }
+      return newInput;
+    });
+  }, [debouncedCalculate]);
+
+  // Innovation depth adjustment
+  const setInnovationDepth = useCallback((depth: 'basic' | 'moderate' | 'extensive') => {
+    updateInput({ innovationDepth: depth });
+  }, [updateInput]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      debouncedCalculate.cancel();
+    };
+  }, [debouncedCalculate]);
+
+  return {
+    input,
+    result,
+    isCalculating,
+    error,
+    updateInput,
+    toggleActivity,
+    setInnovationDepth,
+    recalculate: () => calculate(input),
+    // Convenience methods
+    setLeadershipHours: (hours: number) => updateInput({ leadershipHours: hours }),
+    setTechnicalHours: (hours: number) => updateInput({ technicalHours: hours }),
+    setSupportHours: (hours: number) => updateInput({ supportHours: hours }),
+    setContractorInvestment: (amount: number) => updateInput({ contractorInvestment: amount }),
+    setSoftwareSubscriptions: (amount: number) => updateInput({ softwareSubscriptions: amount })
+  };
+};
+```
+
+**3. Create Innovation Types (types/innovation-calculation.types.ts):**
+```typescript
+/**
+ * @description TypeScript types for innovation credit calculations
+ * FOCUS: Professional business terminology, clear categorization
+ */
+
+export type BusinessType = 
+  | 'professional-services'
+  | 'ecommerce-retail'
+  | 'healthcare-wellness'
+  | 'hospitality-restaurant'
+  | 'creative-agency'
+  | 'technology-services'
+  | 'manufacturing-logistics'
+  | 'financial-services';
+
+export type InnovationActivity = 
+  | 'automation-development'
+  | 'custom-solution-development'
+  | 'integration-engineering'
+  | 'process-optimization'
+  | 'experimental-implementation'
+  | 'digital-transformation'
+  | 'proprietary-tool-creation'
+  | 'novel-integration-development'
+  | 'breakthrough-process-design';
+
+export type InnovationDepth = 'basic' | 'moderate' | 'extensive';
+
+export interface InnovationInput {
+  // Business profile
+  businessType: BusinessType;
+  teamSize: number;
+  
+  // Time investment (hours per week)
+  leadershipHours: number;
+  technicalHours: number;
+  supportHours: number;
+  innovationPercentage: number; // Percentage of time on innovation
+  
+  // Financial investments
+  contractorInvestment: number;
+  specializedConsulting?: number;
+  trainingInvestment?: number;
+  
+  // Technology investments (annual)
+  softwareSubscriptions: number;
+  platformCosts?: number;
+  apiIntegrations?: number;
+  experimentationAllocation: number; // Percentage for experimentation
+  
+  // Infrastructure
+  cloudInfrastructure?: number;
+  developmentEnvironments?: number;
+  testingSystems?: number;
+  
+  // Innovation profile
+  activities: InnovationActivity[];
+  innovationDepth: InnovationDepth;
+  
+  // Optional context
+  hasDocumentation?: boolean;
+  priorYearConsideration?: boolean;
+  biggestChallenge?: string;
+  
+  // Compensation (optional - we provide defaults)
+  averageCompensation?: {
+    leadership?: number;
+    technical?: number;
+    support?: number;
+  };
+}
+
+export interface ExpenseBreakdown {
+  personnelTime: number;
+  externalExperts: number;
+  technologyTools: number;
+  infrastructure: number;
+  total: number;
+  distribution: {
+    personnel: number;
+    external: number;
+    technology: number;
+    infrastructure: number;
+  };
+}
+
+export interface InnovationResult {
+  expenseBreakdown: ExpenseBreakdown;
+  federalCredit: number;
+  creditRate: number;
+  serviceFee: number;
+  roi: number;
+  insights: string;
+  qualifyingActivities: Array<{
+    activity: string;
+    description: string;
+    impact: string;
+  }>;
+  recommendations: string[];
+  timestamp: string;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+// Industry-specific presets
+export interface IndustryPreset {
+  businessType: BusinessType;
+  typicalProfile: string;
+  commonActivities: InnovationActivity[];
+  averageCreditRange: string;
+  exampleProjects: string[];
+}
+```
+
+**4. Create Business Examples Service (services/calculation/business-examples.service.ts):**
+```typescript
+/**
+ * @description Real-world examples of business innovation
+ * PURPOSE: Help businesses recognize their qualifying activities
+ */
+
+import { BusinessType, InnovationActivity, IndustryPreset } from '../../types/innovation-calculation.types';
+
+export class BusinessExamplesService {
+  private static readonly INDUSTRY_PROFILES: Record<BusinessType, IndustryPreset> = {
+    'professional-services': {
+      businessType: 'professional-services',
+      typicalProfile: 'Firms innovating through custom methodologies and automation',
+      commonActivities: [
+        'custom-solution-development',
+        'automation-development',
+        'process-optimization'
+      ],
+      averageCreditRange: '$15,000-50,000',
+      exampleProjects: [
+        'Proprietary analysis frameworks for client engagements',
+        'Automated reporting systems reducing delivery time by 70%',
+        'Custom integration platforms for multi-source data'
+      ]
+    },
+    'ecommerce-retail': {
+      businessType: 'ecommerce-retail',
+      typicalProfile: 'Retailers creating personalized customer experiences',
+      commonActivities: [
+        'integration-engineering',
+        'automation-development',
+        'experimental-implementation'
+      ],
+      averageCreditRange: '$10,000-40,000',
+      exampleProjects: [
+        'Dynamic recommendation engines using behavioral data',
+        'Automated inventory optimization systems',
+        'Omnichannel integration platforms'
+      ]
+    },
+    'healthcare-wellness': {
+      businessType: 'healthcare-wellness',
+      typicalProfile: 'Healthcare providers modernizing patient care',
+      commonActivities: [
+        'digital-transformation',
+        'process-optimization',
+        'integration-engineering'
+      ],
+      averageCreditRange: '$20,000-60,000',
+      exampleProjects: [
+        'Patient communication automation systems',
+        'Integrated scheduling and resource optimization',
+        'Telehealth platform customization'
+      ]
+    },
+    'creative-agency': {
+      businessType: 'creative-agency',
+      typicalProfile: 'Agencies building proprietary creative tools',
+      commonActivities: [
+        'proprietary-tool-creation',
+        'automation-development',
+        'custom-solution-development'
+      ],
+      averageCreditRange: '$12,000-45,000',
+      exampleProjects: [
+        'Campaign automation platforms for multi-channel delivery',
+        'Custom content generation workflows',
+        'Client-specific performance analytics systems'
+      ]
+    },
+    'manufacturing-logistics': {
+      businessType: 'manufacturing-logistics',
+      typicalProfile: 'Operations teams optimizing through technology',
+      commonActivities: [
+        'process-optimization',
+        'integration-engineering',
+        'breakthrough-process-design'
+      ],
+      averageCreditRange: '$25,000-80,000',
+      exampleProjects: [
+        'Predictive maintenance systems reducing downtime',
+        'Supply chain optimization algorithms',
+        'Quality control automation systems'
+      ]
+    }
+  };
+
+  /**
+   * Get industry profile and examples
+   */
+  public static getIndustryProfile(businessType: BusinessType): IndustryPreset {
+    return this.INDUSTRY_PROFILES[businessType] || this.INDUSTRY_PROFILES['professional-services'];
+  }
+
+  /**
+   * Get sample calculation inputs for demonstrations
+   */
+  public static getSampleInputs(businessType: BusinessType): Partial<InnovationInput> {
+    const samples: Record<BusinessType, Partial<InnovationInput>> = {
+      'professional-services': {
+        leadershipHours: 8,
+        technicalHours: 20,
+        supportHours: 10,
+        teamSize: 5,
+        contractorInvestment: 25000,
+        softwareSubscriptions: 15000,
+        innovationPercentage: 75,
+        activities: ['custom-solution-development', 'automation-development']
+      },
+      'ecommerce-retail': {
+        leadershipHours: 5,
+        technicalHours: 15,
+        supportHours: 8,
+        teamSize: 3,
+        contractorInvestment: 18000,
+        softwareSubscriptions: 12000,
+        platformCosts: 8000,
+        innovationPercentage: 60,
+        activities: ['integration-engineering', 'experimental-implementation']
+      },
+      'healthcare-wellness': {
+        leadershipHours: 6,
+        technicalHours: 25,
+        supportHours: 15,
+        teamSize: 8,
+        contractorInvestment: 35000,
+        softwareSubscriptions: 20000,
+        innovationPercentage: 50,
+        activities: ['digital-transformation', 'process-optimization']
+      }
+    };
+
+    return samples[businessType] || samples['professional-services'];
+  }
+
+  /**
+   * Generate activity recommendations by industry
+   */
+  public static getActivityRecommendations(businessType: BusinessType): Array<{
+    activity: InnovationActivity;
+    description: string;
+    expectedImpact: string;
+    difficulty: 'Foundational' | 'Intermediate' | 'Advanced';
+  }> {
+    const baseRecommendations = [
+      {
+        activity: 'process-optimization' as InnovationActivity,
+        description: 'Identify repetitive processes and design technology-enabled improvements',
+        expectedImpact: '20-40% efficiency gains in targeted areas',
+        difficulty: 'Foundational' as const
+      },
+      {
+        activity: 'automation-development' as InnovationActivity,
+        description: 'Build automated workflows for routine business operations',
+        expectedImpact: 'Redirect 10-15 hours/week to higher-value activities',
+        difficulty: 'Intermediate' as const
+      },
+      {
+        activity: 'custom-solution-development' as InnovationActivity,
+        description: 'Create proprietary tools addressing unique business challenges',
+        expectedImpact: 'Competitive advantage through exclusive capabilities',
+        difficulty: 'Advanced' as const
+      }
+    ];
+
+    // Add industry-specific recommendations
+    const industrySpecific = this.INDUSTRY_PROFILES[businessType]?.commonActivities || [];
+    
+    return baseRecommendations.filter(rec => 
+      industrySpecific.includes(rec.activity) || 
+      rec.difficulty === 'Foundational'
+    );
+  }
+}
+```
+
+**5. Create Professional Messaging Service (services/messaging/professional-messaging.service.ts):**
+```typescript
+/**
+ * @description Professional messaging for innovation calculations
+ * TONE: Sophisticated yet accessible business language
+ */
+
+export class ProfessionalMessagingService {
+  /**
+   * Generate insights based on calculation results
+   */
+  public static generateInsights(
+    businessType: string, 
+    creditAmount: number,
+    activities: string[]
+  ): string {
+    const businessContexts = {
+      'professional-services': 'professional service innovation',
+      'ecommerce-retail': 'retail transformation initiatives',
+      'healthcare-wellness': 'healthcare modernization efforts',
+      'creative-agency': 'creative technology development',
+      'manufacturing-logistics': 'operational innovation'
+    };
+
+    const context = businessContexts[businessType] || 'business innovation';
+    
+    return `Your ${context} represents substantial qualifying experimentation. ` +
+           `The federal government recognizes this type of innovation through ` +
+           `R&D tax credits, potentially returning $${creditAmount.toLocaleString()} ` +
+           `of your investment. This isn't just a tax benefit—it's validation ` +
+           `of your commitment to solving complex business challenges.`;
+  }
+
+  /**
+   * Activity descriptions in business terms
+   */
+  public static describeActivity(activity: string): {
+    title: string;
+    description: string;
+    businessValue: string;
+  } {
+    const descriptions = {
+      'automation-development': {
+        title: 'Process Automation',
+        description: 'Creating systematic solutions to eliminate manual repetition',
+        businessValue: 'Scalability without proportional cost increases'
+      },
+      'custom-solution-development': {
+        title: 'Proprietary Solutions',
+        description: 'Building unique tools tailored to your specific challenges',
+        businessValue: 'Competitive differentiation through exclusive capabilities'
+      },
+      'integration-engineering': {
+        title: 'System Integration',
+        description: 'Connecting disparate platforms into cohesive workflows',
+        businessValue: 'Operational efficiency through unified data and processes'
+      },
+      'process-optimization': {
+        title: 'Workflow Innovation',
+        description: 'Reimagining how work gets done using modern tools',
+        businessValue: 'Measurable improvements in speed, quality, and cost'
+      },
+      'digital-transformation': {
+        title: 'Digital Modernization',
+        description: 'Transitioning traditional processes to technology-enabled solutions',
+        businessValue: 'Future-ready operations with enhanced capabilities'
+      },
+      'experimental-implementation': {
+        title: 'Innovation Testing',
+        description: 'Exploring new approaches through controlled experimentation',
+        businessValue: 'Risk-managed innovation with learning benefits'
+      }
+    };
+
+    return descriptions[activity] || {
+      title: 'Business Innovation',
+      description: 'Developing new approaches to business challenges',
+      businessValue: 'Continuous improvement and adaptation'
+    };
+  }
+
+  /**
+   * Generate recommendations in professional tone
+   */
+  public static generateRecommendations(profile: any): string[] {
+    const recommendations = [];
+
+    if (profile.hasLowTimeTracking) {
+      recommendations.push(
+        'Consider implementing systematic innovation time tracking. ' +
+        'Many organizations discover they invest 2-3x more time than initially estimated.'
+      );
+    }
+
+    if (profile.lacksDiverseActivities) {
+      recommendations.push(
+        'Explore additional innovation vectors within your operations. ' +
+        'Most businesses have 3-5 distinct areas of qualifying experimentation.'
+      );
+    }
+
+    if (profile.missingDocumentation) {
+      recommendations.push(
+        'Establish light-touch documentation practices for innovation projects. ' +
+        'Simple project logs and decision rationales strengthen credit positions significantly.'
+      );
+    }
+
+    if (profile.singleYearFocus) {
+      recommendations.push(
+        'Review innovation activities from 2022-2024. ' +
+        'Retroactive credits often represent substantial additional value.'
+      );
+    }
+
+    return recommendations;
+  }
+
+  /**
+   * Validation messages that guide without patronizing
+   */
+  public static getValidationMessage(field: string, issue: string): string {
+    const messages = {
+      'no-activities': 'Please indicate which innovation areas your business has explored',
+      'no-time': 'Include approximate weekly hours invested in innovation initiatives',
+      'excessive-hours': 'Please verify weekly time commitment—this seems higher than typical',
+      'missing-context': 'Additional context about your innovation efforts would be helpful',
+      'percentage-range': 'Percentage allocations should fall between 0 and 100'
+    };
+
+    return messages[issue] || 'Please review this field for accuracy';
+  }
+}
+```
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * Innovation Tax Credit Calculation Engine
+ * 
+ * PURPOSE: Calculate federal tax credits for business innovation and experimentation
+ * TARGET: Sophisticated business owners investing in technology-enabled innovation
+ * 
+ * CORE PRINCIPLES:
+ * - Professional tone without condescension
+ * - Broad innovation focus (not just AI)
+ * - Federal credits simplified to 10-14%
+ * - Clear value proposition
+ * 
+ * QUALIFYING ACTIVITIES:
+ * - Custom solution development
+ * - Process automation and optimization
+ * - System integration engineering
+ * - Digital transformation initiatives
+ * - Experimental implementations
+ * 
+ * CALCULATION METHODOLOGY:
+ * - Personnel time valued at market rates
+ * - Full recognition of contractor expertise
+ * - Technology investments (experimentation portion)
+ * - Infrastructure supporting innovation
+ * 
+ * BUSINESS VALUE:
+ * - Validates innovation investment
+ * - Provides competitive advantage
+ * - Supports continued experimentation
+ * - Recognizes failed experiments as learning
+ * 
+ * USER EXPERIENCE:
+ * - Real-time professional insights
+ * - Industry-specific examples
+ * - Actionable recommendations
+ * - Clear next steps
+ * 
+ * INTEGRATION: Powers calculator UI with sophisticated calculations
+ * COMPLIANCE: Federal credits only for simplicity
+ * 
+ * TODO: Expand industry-specific examples
+ * TODO: Add comparative benchmarking
+ * TODO: Create executive summary generator
+ */
+```"
