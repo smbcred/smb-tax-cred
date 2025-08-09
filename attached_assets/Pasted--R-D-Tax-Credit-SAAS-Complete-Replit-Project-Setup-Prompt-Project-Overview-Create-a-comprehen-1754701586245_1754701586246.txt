@@ -1,0 +1,343 @@
+# R&D Tax Credit SAAS - Complete Replit Project Setup Prompt
+
+## Project Overview
+Create a comprehensive R&D Tax Credit documentation service for small businesses. This is a full-stack web application that helps SMBs calculate their potential R&D tax credits, capture leads through an interactive calculator, process payments via Stripe, collect detailed information through smart intake forms, and automatically generate IRS-compliant documentation using AI.
+
+## Core Business Logic
+The platform follows this user journey:
+1. **Discovery**: User lands on marketing site and uses interactive calculator
+2. **Lead Capture**: Calculator results are gated behind email capture
+3. **Conversion**: Dynamic pricing based on credit amount, payment via Stripe
+4. **Data Collection**: Comprehensive intake form with auto-save
+5. **Document Generation**: AI-powered narrative creation and IRS form generation
+6. **Delivery**: Secure download of complete filing package
+
+## Technical Architecture
+
+### Tech Stack
+- **Frontend**: React 18+ with TypeScript, Tailwind CSS for styling
+- **Backend**: Node.js with Express, TypeScript
+- **Database**: PostgreSQL for data persistence
+- **Authentication**: JWT-based auth with bcrypt for password hashing
+- **External Services**:
+  - Stripe (payment processing)
+  - Airtable (workflow management)
+  - Make.com (automation orchestration)
+  - Claude API (AI narrative generation)
+  - Documint (PDF generation)
+  - SendGrid (email delivery)
+  - AWS S3 (document storage)
+
+### Project Structure
+```
+/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── marketing/
+│   │   │   │   ├── LandingPage.tsx
+│   │   │   │   ├── HeroSection.tsx
+│   │   │   │   └── TrustSignals.tsx
+│   │   │   ├── calculator/
+│   │   │   │   ├── InteractiveCalculator.tsx
+│   │   │   │   ├── BusinessTypeStep.tsx
+│   │   │   │   ├── QualifyingActivities.tsx
+│   │   │   │   ├── ExpenseInputs.tsx
+│   │   │   │   └── ResultsDisplay.tsx
+│   │   │   ├── auth/
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   └── ProtectedRoute.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── DashboardLayout.tsx
+│   │   │   │   └── ProgressTracker.tsx
+│   │   │   └── intake/
+│   │   │       ├── IntakeForm.tsx
+│   │   │       ├── CompanyInfo.tsx
+│   │   │       ├── RDActivities.tsx
+│   │   │       └── ExpenseBreakdown.tsx
+│   │   ├── services/
+│   │   │   ├── api.service.ts
+│   │   │   ├── auth.service.ts
+│   │   │   └── calculator.service.ts
+│   │   ├── utils/
+│   │   └── types/
+│   ├── public/
+│   └── package.json
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── calculator.controller.ts
+│   │   │   ├── intake.controller.ts
+│   │   │   └── payment.controller.ts
+│   │   ├── services/
+│   │   │   ├── integrations/
+│   │   │   │   ├── stripe.service.ts
+│   │   │   │   ├── airtable.service.ts
+│   │   │   │   ├── make.service.ts
+│   │   │   │   ├── claude.service.ts
+│   │   │   │   ├── documint.service.ts
+│   │   │   │   ├── sendgrid.service.ts
+│   │   │   │   └── s3.service.ts
+│   │   │   └── processing/
+│   │   │       ├── document.orchestrator.ts
+│   │   │       └── validation.service.ts
+│   │   ├── models/
+│   │   │   ├── user.model.ts
+│   │   │   ├── company.model.ts
+│   │   │   ├── calculation.model.ts
+│   │   │   └── intake.model.ts
+│   │   ├── middleware/
+│   │   │   ├── auth.middleware.ts
+│   │   │   └── error.middleware.ts
+│   │   ├── routes/
+│   │   ├── utils/
+│   │   └── app.ts
+│   ├── migrations/
+│   └── package.json
+├── shared/
+│   └── types/
+├── scripts/
+├── .env.example
+└── README.md
+```
+
+## Key Features to Implement
+
+### 1. Interactive Calculator Component
+Create a 4-step calculator that:
+- **Step 1**: Business type selection (Software, E-commerce, Manufacturing, etc.)
+- **Step 2**: Qualifying activities checklist with smart suggestions
+- **Step 3**: Expense inputs with validation and real-time calculation
+- **Step 4**: Results display with animated counting and pricing tier reveal
+
+**Calculation Logic**:
+```javascript
+// Simplified ASC method (14% of QREs)
+const calculateCredit = (expenses) => {
+  const { wages, supplies, contractors, cloud } = expenses;
+  const totalQRE = wages + supplies + (contractors * 0.65) + cloud;
+  const federalCredit = totalQRE * 0.14;
+  
+  // Assign pricing tier based on credit amount
+  const pricingTier = getPricingTier(federalCredit);
+  
+  return { totalQRE, federalCredit, pricingTier };
+};
+
+// Pricing tier assignment
+const getPricingTier = (creditAmount) => {
+  if (creditAmount <= 10000) return { tier: 1, price: 495 };
+  if (creditAmount <= 25000) return { tier: 2, price: 1495 };
+  if (creditAmount <= 50000) return { tier: 3, price: 2495 };
+  return { tier: 4, price: 3995 };
+};
+```
+
+### 2. Lead Capture System
+- Modal overlay after calculator completion
+- Email, company name, and phone number collection
+- Store leads in PostgreSQL with calculation results
+- Trigger welcome email sequence
+
+### 3. Stripe Payment Integration
+- Dynamic checkout based on pricing tier
+- Pass calculator results as metadata
+- Handle success/cancel flows
+- Webhook for account creation
+
+### 4. User Dashboard
+- Welcome screen with progress overview
+- Action items checklist
+- Document status tracking
+- Intake form access
+
+### 5. Smart Intake Form
+Multi-section form with:
+- Company information (legal name, EIN, entity type)
+- R&D activities (projects, challenges, timelines)
+- Expense breakdown (detailed categorization)
+- Supporting information
+- Auto-save every 30 seconds
+- Progress persistence
+
+### 6. Document Generation Pipeline
+Workflow:
+1. Intake completion triggers Airtable save
+2. Make.com webhook initiates generation
+3. Claude API generates technical narratives
+4. Documint creates IRS Form 6765
+5. Documents stored in S3
+6. SendGrid sends download links
+
+### 7. Security & Compliance
+- JWT authentication with secure token storage
+- Input sanitization and validation
+- Rate limiting on all endpoints
+- Encrypted data transmission
+- PCI compliance for payment data
+
+## Database Schema (PostgreSQL)
+
+```sql
+-- Users table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  stripe_customer_id VARCHAR(255),
+  account_status VARCHAR(50) DEFAULT 'active'
+);
+
+-- Companies table
+CREATE TABLE companies (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  legal_name VARCHAR(255) NOT NULL,
+  ein VARCHAR(20),
+  entity_type VARCHAR(50),
+  industry VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Calculations table
+CREATE TABLE calculations (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  company_id INTEGER REFERENCES companies(id),
+  total_qre DECIMAL(12, 2),
+  federal_credit DECIMAL(12, 2),
+  pricing_tier INTEGER,
+  calculation_data JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Intake forms table
+CREATE TABLE intake_forms (
+  id SERIAL PRIMARY KEY,
+  company_id INTEGER REFERENCES companies(id),
+  status VARCHAR(50) DEFAULT 'in_progress',
+  form_data JSONB,
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Documents table
+CREATE TABLE documents (
+  id SERIAL PRIMARY KEY,
+  intake_form_id INTEGER REFERENCES intake_forms(id),
+  document_type VARCHAR(50),
+  s3_url VARCHAR(500),
+  expiration_date TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Environment Variables Required
+```
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/rd_tax_credit
+
+# Authentication
+JWT_SECRET=your-secret-key
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Airtable
+AIRTABLE_API_KEY=key...
+AIRTABLE_BASE_ID=app...
+
+# Make.com
+MAKE_WEBHOOK_URL=https://hook.make.com/...
+MAKE_API_KEY=...
+
+# Claude API
+CLAUDE_API_KEY=sk-ant-...
+
+# Documint
+DOCUMINT_API_KEY=...
+
+# SendGrid
+SENDGRID_API_KEY=SG...
+
+# AWS S3
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_S3_BUCKET=rd-tax-documents
+
+# Application
+NODE_ENV=development
+APP_URL=http://localhost:3000
+API_URL=http://localhost:5000
+```
+
+## Implementation Instructions
+
+### Phase 1: Foundation (Priority)
+1. **Set up project structure** with all folders and base files
+2. **Configure PostgreSQL database** and run migrations
+3. **Create marketing landing page** with responsive design
+4. **Build interactive calculator** with all 4 steps
+5. **Implement lead capture** modal and storage
+6. **Integrate Stripe checkout** for payments
+
+### Phase 2: User System
+1. **Set up JWT authentication** with secure routes
+2. **Create user dashboard** with progress tracking
+3. **Build multi-step intake form** with auto-save
+4. **Add form validation** and error handling
+
+### Phase 3: Integrations
+1. **Connect Airtable API** for data synchronization
+2. **Set up Make.com webhooks** for workflow triggers
+3. **Integrate external services** (Claude, Documint, S3, SendGrid)
+4. **Build document orchestrator** for generation pipeline
+
+### Phase 4: Polish & Launch
+1. **Add comprehensive error handling**
+2. **Implement rate limiting and security**
+3. **Create admin tools** for monitoring
+4. **Add analytics and tracking**
+5. **Optimize performance** and loading times
+
+## Code Quality Standards
+
+Every file must include comprehensive documentation:
+
+```javascript
+/**
+ * @file InteractiveCalculator.tsx
+ * @description 4-step R&D tax credit calculator with real-time calculations
+ * @author R&D Tax Credit SAAS Team
+ * @date 2024-01-15
+ * @modified 2024-01-15
+ * @dependencies React, Tailwind CSS, calculator.service
+ * @knowledgeBase system-architecture-explanation.md, additional-project-specs.md
+ */
+
+// Component implementation with inline comments explaining:
+// - Business logic from knowledge base
+// - Integration points with other services
+// - Validation rules and edge cases
+// - TODO items for future enhancements
+```
+
+## Testing Requirements
+- Unit tests for calculation logic
+- Integration tests for API endpoints
+- E2E tests for critical user flows
+- Load testing for calculator and forms
+- Security testing for authentication
+
+## Success Metrics
+- Calculator completion rate > 40%
+- Lead capture conversion > 25%
+- Checkout conversion > 15%
+- Intake form completion > 80%
+- Document generation success > 99%
+
+This is a comprehensive self-serve platform that automates R&D tax credit documentation for small businesses, reducing a complex multi-week process to a simple 30-minute experience.
