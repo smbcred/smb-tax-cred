@@ -36,6 +36,9 @@ export interface CalculationInput {
   // Prior year data for ASC calculation
   priorYearQREs?: number[]; // Up to 3 years
   isFirstTimeFiler: boolean;
+  
+  // Activities
+  qualifyingActivities?: string[];
 }
 
 export interface QREBreakdown {
@@ -75,6 +78,7 @@ export interface CalculationResult {
     serviceCost: number;
     netBenefit: number;
     roiMultiple: number;
+    paybackDays?: number;
   };
   warnings: string[];
   assumptions: string[];
@@ -224,19 +228,23 @@ export class RDTaxCalculator {
   }
 
   /**
-   * Calculate ROI metrics
+   * Calculate comprehensive ROI metrics
    */
   private static calculateROI(creditAmount: number, serviceCost: number): CalculationResult['roi'] {
+    const netBenefit = creditAmount - serviceCost;
+    const roiMultiple = serviceCost > 0 ? creditAmount / serviceCost : 0;
+    
     return {
       creditAmount,
       serviceCost,
-      netBenefit: creditAmount - serviceCost,
-      roiMultiple: Math.round((creditAmount / serviceCost) * 10) / 10
+      netBenefit,
+      roiMultiple: Math.round(roiMultiple * 10) / 10,
+      paybackDays: serviceCost > 0 ? Math.round(365 / roiMultiple) : 0
     };
   }
 
   /**
-   * Validate inputs and generate warnings
+   * Comprehensive validation with enhanced warnings
    */
   private static validateInputs(input: CalculationInput): { isValid: boolean; errors: string[]; warnings: string[] } {
     const errors: string[] = [];
@@ -251,29 +259,43 @@ export class RDTaxCalculator {
       errors.push('R&D allocation must be between 0-100%');
     }
     
+    // Must have some qualifying expenses
+    const hasWages = input.technicalEmployees > 0 && input.averageTechnicalSalary > 0;
+    const hasOtherExpenses = input.contractorCosts > 0 || input.suppliesCosts > 0 || 
+                            input.cloudCosts > 0 || input.softwareCosts > 0;
+    
+    if (!hasWages && !hasOtherExpenses) {
+      errors.push('Must have qualifying R&D expenses');
+    }
+    
     // Warnings for unusual patterns
     if (input.rdAllocationPercentage > 80) {
-      warnings.push('Allocating over 80% of time to R&D is unusual and may require additional documentation');
+      warnings.push('Over 80% R&D allocation is unusual - ensure accurate time tracking');
     }
     
-    if (input.averageTechnicalSalary < 30000) {
-      warnings.push('Average salary seems low for technical employees');
+    if (input.rdAllocationPercentage < 20 && input.technicalEmployees > 0) {
+      warnings.push('Low R&D allocation - ensure all experimentation time is included');
     }
     
-    if (input.averageTechnicalSalary > 300000) {
-      warnings.push('Average salary is unusually high - ensure this reflects actual wages');
+    if (input.averageTechnicalSalary > 0 && input.averageTechnicalSalary < 40000) {
+      warnings.push('Salary seems low for technical employees');
+    }
+    
+    if (input.averageTechnicalSalary > 200000) {
+      warnings.push('High average salary - ensure this reflects actual wages');
     }
     
     if (input.contractorCosts > (input.technicalEmployees * input.averageTechnicalSalary)) {
-      warnings.push('Contractor costs exceed employee wages - ensure proper documentation');
+      warnings.push('High contractor costs - ensure proper documentation');
     }
     
-    // Check for any qualifying expenses
-    const totalExpenses = (input.technicalEmployees * input.averageTechnicalSalary * input.rdAllocationPercentage / 100) +
-                         input.contractorCosts + input.suppliesCosts + input.cloudCosts + input.softwareCosts;
+    // AI-specific validations
+    if (input.qualifyingActivities?.includes('custom_gpts') && input.cloudCosts === 0) {
+      warnings.push('Custom GPT development typically involves cloud/API costs');
+    }
     
-    if (totalExpenses <= 0) {
-      errors.push('Must have qualifying expenses to calculate credit');
+    if (!input.qualifyingActivities || input.qualifyingActivities.length === 0) {
+      warnings.push('No activities selected - this may affect documentation quality');
     }
     
     return {

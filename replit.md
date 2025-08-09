@@ -12,6 +12,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### AI-Forward Calculator Implementation (January 9, 2025)
+- **PIVOTED TO AI-FORWARD**: Changed business types to focus on AI/automation use cases
+- **NEW BUSINESS TYPES**: Marketing/Creative Agency, E-commerce, Consulting, SaaS, Healthcare
+- **AI ACTIVITIES**: Custom GPTs, Prompt Engineering, Chatbots, AI Automations, Data Analysis
+- **ENHANCED VALIDATION**: Comprehensive input validation with AI-specific warnings
+- **ROI METRICS**: Added payback days calculation to ROI metrics
+- **CONFIDENCE SCORING**: Added confidence level assessment based on data quality
+
 ### Complete Calculator Engine Overhaul (January 9, 2025)
 - **FIXED CRITICAL BUG**: Employee wages now calculate at full value with R&D allocation percentage
 - **FIXED ASC CALCULATION**: Proper implementation with 6% for first-time filers, 14% for repeat filers

@@ -34,95 +34,95 @@ export interface PricingTier {
   features: string[];
 }
 
-// Business types with corresponding icons and descriptions
+// AI-forward business types with smart defaults
 export const businessTypes: BusinessType[] = [
   {
-    id: "software",
-    name: "Software Development",
-    description: "Custom software, SaaS, mobile apps",
-    icon: "fas fa-laptop-code"
+    id: "agency",
+    name: "Marketing/Creative Agency",
+    description: "Custom GPTs, content automation, client solutions",
+    icon: "fas fa-palette"
   },
   {
     id: "ecommerce",
-    name: "E-commerce",
-    description: "Online retail, marketplaces",
+    name: "E-commerce/Retail",
+    description: "Chatbots, recommendation engines, inventory AI",
     icon: "fas fa-shopping-cart"
   },
   {
-    id: "manufacturing",
-    name: "Manufacturing",
-    description: "Product development, process improvement",
-    icon: "fas fa-industry"
+    id: "consulting",
+    name: "Consulting/Services",
+    description: "AI analysis tools, automated reporting, workflows",
+    icon: "fas fa-briefcase"
   },
   {
-    id: "biotech",
-    name: "Biotechnology",
-    description: "Life sciences, medical research",
-    icon: "fas fa-dna"
+    id: "saas",
+    name: "Software/SaaS",
+    description: "AI features, integrations, intelligent systems",
+    icon: "fas fa-cloud"
   },
   {
-    id: "fintech",
-    name: "Financial Technology",
-    description: "Payment systems, trading platforms",
-    icon: "fas fa-coins"
+    id: "healthcare",
+    name: "Healthcare/Wellness",
+    description: "Patient chatbots, scheduling AI, data analysis",
+    icon: "fas fa-hospital"
   },
   {
     id: "other",
     name: "Other Business",
-    description: "Tell us more about your industry",
+    description: "Tell us about your AI experiments",
     icon: "fas fa-building"
   }
 ];
 
-// Qualifying activities for R&D tax credit
+// AI/automation qualifying activities
 export const qualifyingActivities: QualifyingActivity[] = [
   {
-    id: "new_software",
-    title: "Developed new software or applications",
-    description: "Creating new functionality, features, or systems",
-    category: "development"
+    id: "custom_gpts",
+    title: "Built Custom GPTs or AI Assistants",
+    description: "Created specialized AI tools for specific tasks",
+    category: "ai"
   },
   {
-    id: "process_improvement",
-    title: "Improved existing processes or products",
-    description: "Enhancing performance, efficiency, or capability",
-    category: "improvement"
+    id: "prompt_engineering",
+    title: "Developed & Tested Prompt Libraries",
+    description: "Iteratively improved prompts for consistency",
+    category: "ai"
   },
   {
-    id: "new_technology",
-    title: "Experimented with new technologies",
-    description: "Testing and implementing new technical approaches",
-    category: "research"
+    id: "chatbot_development",
+    title: "Created or Refined Chatbots",
+    description: "Built conversational AI for business use",
+    category: "ai"
   },
   {
-    id: "technical_challenges",
-    title: "Overcame technical challenges",
-    description: "Solving complex technical problems or uncertainties",
-    category: "problem-solving"
+    id: "automation_workflows",
+    title: "Designed AI-Powered Automations",
+    description: "Connected AI to business processes",
+    category: "automation"
   },
   {
-    id: "algorithm_development",
-    title: "Developed new algorithms or methods",
-    description: "Creating innovative computational or business methods",
-    category: "development"
+    id: "data_analysis",
+    title: "Built AI Analysis Tools",
+    description: "Created tools for data insights",
+    category: "ai"
   },
   {
-    id: "integration_work",
-    title: "System integration and compatibility work",
-    description: "Connecting disparate systems or ensuring compatibility",
-    category: "integration"
-  },
-  {
-    id: "performance_optimization",
-    title: "Performance optimization and scaling",
-    description: "Improving system speed, efficiency, or capacity",
+    id: "process_optimization",
+    title: "Optimized Processes with AI",
+    description: "Improved efficiency through experimentation",
     category: "optimization"
   },
   {
-    id: "security_implementation",
-    title: "Security feature implementation",
-    description: "Developing or enhancing security measures",
-    category: "security"
+    id: "api_integration",
+    title: "Integrated AI APIs & Services",
+    description: "Connected OpenAI, Claude, or other AI services",
+    category: "integration"
+  },
+  {
+    id: "ml_implementation",
+    title: "Implemented Machine Learning Models",
+    description: "Trained or deployed ML solutions",
+    category: "ai"
   }
 ];
 
