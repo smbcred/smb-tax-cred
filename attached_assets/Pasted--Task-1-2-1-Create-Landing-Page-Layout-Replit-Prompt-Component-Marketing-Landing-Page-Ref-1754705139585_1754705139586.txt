@@ -1,0 +1,251 @@
+# Task 1.2.1: Create Landing Page Layout - Replit Prompt
+
+## Component: Marketing Landing Page
+**Reference**: Copywriting & Positioning Guide.md, user_archetype_profiles.md, R&D Tax Credit Document Generation App - Complete User Experience Flow.md, rd-tax-credit-saas-index.md
+
+### Overview
+Build the main marketing landing page that converts visitors into leads through an interactive calculator. This page serves as the primary entry point for small businesses seeking R&D tax credit documentation services.
+
+### Technical Requirements
+- **Dependencies**: React 18+, Tailwind CSS, react-icons, framer-motion (for animations)
+- **Integrations**: Will connect to InteractiveCalculator component, Google Analytics
+- **Database needs**: None for this component (lead capture handled separately)
+- **Responsive**: Mobile-first design with breakpoints at sm (640px), md (768px), lg (1024px), xl (1280px)
+
+### Implementation Prompt
+
+"Create a high-converting marketing landing page for an R&D Tax Credit documentation service using React and Tailwind CSS. The page should include:
+
+**1. Header/Navigation Section:**
+- Sticky navigation bar with transparent-to-white scroll effect
+- Logo placeholder on left (text: "SMBTaxCredits.com")
+- Navigation items: How It Works, Pricing, FAQ, Resources
+- Primary CTA button: "Start Your Estimate" (scrolls to calculator)
+- Mobile hamburger menu for screens < 768px
+
+**2. Hero Section:**
+- **Headline (H1)**: "Claim your federal R&D tax credit—without the runaround."
+- **Subheadline**: "Flat-fee, self-serve documentation for amended 2022–2024 and current 2025 filings—IRS-aligned and CPA-ready."
+- **Primary CTA**: Large button "Start your free estimate" (green, #10B981)
+- **Secondary CTA**: Text link "See how it works" 
+- Hero image/illustration placeholder on right (abstract tech/innovation theme)
+- Subtle gradient background: white to light gray (#F9FAFB)
+
+**3. Trust Signals Bar:**
+- Horizontal strip with:
+  - "IRS Section 41 Compliant" with shield icon
+  - "256-bit SSL Encrypted" with lock icon
+  - "CPA-Approved Documentation" with checkmark icon
+  - "Built for SMBs using AI and internal innovation"
+- Light background (#F3F4F6) with subtle border
+
+**4. Benefits/Features Grid:**
+- Section heading: "Why SMBs Choose SMBTaxCredits.com"
+- 3x2 grid of benefit cards, each with:
+  - Icon (use react-icons)
+  - Title
+  - 2-3 sentence description
+  
+Benefits to include:
+1. **IRS-Compliant by Design**
+   - Icon: FaShieldAlt
+   - "Section G project summaries, amended-claim exhibits, and complete audit trail included in every package."
+
+2. **Flat-Fee Transparency**
+   - Icon: FaDollarSign
+   - "No percentage cuts or hidden fees. Know your cost upfront based on your credit size."
+
+3. **Fast Turnaround**
+   - Icon: FaClock
+   - "Get your complete documentation package in days, not months. Most clients finish in 20 minutes."
+
+4. **CPA-Friendly Outputs**
+   - Icon: FaFileAlt
+   - "Clean handoff files your accountant needs: Form 6765 data, workpapers, and filing instructions."
+
+5. **Simple Process**
+   - Icon: FaCheckCircle
+   - "Plain-English questions guide you through the four-part test. No tax expertise required."
+
+6. **Secure & Confidential**
+   - Icon: FaLock
+   - "Bank-level encryption, minimal data collection, and automatic deletion after 90 days."
+
+**5. How It Works Section:**
+- Section heading: "Your R&D Credit in 3 Simple Steps"
+- Horizontal process flow (vertical on mobile):
+
+Step 1: **Estimate**
+- Large "1" in circle
+- Icon: FaCalculator
+- "Answer a few questions to size your potential credit"
+- Visual connector to next step
+
+Step 2: **Document**
+- Large "2" in circle  
+- Icon: FaFileSignature
+- "We turn your projects and costs into IRS-ready narratives and forms"
+- Visual connector to next step
+
+Step 3: **File**
+- Large "3" in circle
+- Icon: FaDownload
+- "Download your package and file with your CPA. Need payroll offset? We prep the 8974 data."
+
+**6. Interactive Calculator Preview Section:**
+- Section heading: "Calculate Your R&D Tax Credit"
+- Subheading: "See your potential federal credit in under 2 minutes"
+- Calculator component placeholder with blur effect
+- Overlay message: "Complete all steps to see your estimate"
+- This is where the InteractiveCalculator component will be embedded
+
+**7. Pricing Preview Section:**
+- Section heading: "Transparent, Flat-Fee Pricing"
+- Subheading: "Keep more of your credit. No percentage cuts."
+- Show first 4 tiers in a row with "View All Pricing" link:
+
+Tier 1:
+- "Tier 1" 
+- "Credits < $10K"
+- "$500"
+- "Example: $8K credit = 16x ROI"
+
+Tier 2:
+- "Tier 2"
+- "Credits $10K-$20K"
+- "$750"
+- "Example: $15K credit = 20x ROI"
+
+Tier 3:
+- "Tier 3"
+- "Credits $20K-$30K"
+- "$1,000"
+- "Example: $25K credit = 25x ROI"
+
+Tier 4:
+- "Tier 4"
+- "Credits $30K-$40K"
+- "$1,250"
+- "Example: $35K credit = 28x ROI"
+
+- Note below: "Add another year: $297 per additional year. Federal documentation included in all tiers."
+- Link: "View all 7 pricing tiers →"
+
+**8. FAQ Preview Section:**
+- Section heading: "Common Questions"
+- Expandable FAQ items (show first 5):
+
+1. "Do I even qualify for the R&D credit?"
+   - "If you develop software, use AI, create new products, or improve processes with technology, you likely qualify. Our calculator will help you confirm."
+
+2. "What if I'm not profitable yet?"
+   - "Qualified Small Businesses can claim up to $500K against payroll taxes instead of income taxes. Perfect for startups and growth companies."
+
+3. "Can I claim credits for past years?"
+   - "Yes! You can amend returns for 2022-2024. Each additional year is just $297."
+
+4. "Do you file my taxes?"
+   - "No, we prepare all documentation and forms. You or your CPA files with our comprehensive package."
+
+5. "How long does this take?"
+   - "Most users complete the intake in 15-20 minutes. Documents are ready within 24-48 hours."
+
+- Link: "View all FAQs →"
+
+**9. Final CTA Section:**
+- Background: Gradient (blue to green)
+- Heading: "Ready to Claim Your R&D Credit?"
+- Subheading: "Join thousands of SMBs who've simplified their R&D tax credit claims"
+- Large CTA button: "Start Your Free Estimate"
+- Small text: "No credit card required. Get your estimate in 2 minutes."
+
+**10. Footer:**
+- Dark background (#1F2937)
+- 4 columns (stack on mobile):
+  
+Column 1 - Company:
+- Logo
+- Tagline: "Innovation deserves a refund"
+- Copyright notice
+
+Column 2 - Product:
+- How It Works
+- Pricing
+- Calculator
+- Sample Documents
+
+Column 3 - Resources:
+- R&D Credit Guide
+- Qualifying Activities
+- FAQ
+- Blog
+
+Column 4 - Legal:
+- Privacy Policy
+- Terms of Service
+- Security
+- Contact Us
+
+**Styling Requirements:**
+- Use Tailwind's default color palette
+- Primary green: green-600 (#10B981)
+- Secondary blue: blue-600 (#2563EB)
+- Clean, modern design with plenty of whitespace
+- Smooth scroll behavior
+- Hover effects on all interactive elements
+- Focus states for accessibility
+- Loading skeleton screens for dynamic content
+
+**Animations (using framer-motion):**
+- Fade-in animations on scroll for sections
+- Number counting animation for stats
+- Smooth hover transforms on cards
+- Parallax effect on hero section (subtle)
+
+**Mobile Optimizations:**
+- Touch-friendly button sizes (min 44px)
+- Simplified navigation
+- Stacked layouts for grids
+- Reduced imagery for performance
+- Swipeable testimonials
+
+**Performance Requirements:**
+- Lazy load images below the fold
+- Optimize all images (WebP format)
+- Minify CSS and JavaScript
+- Target 90+ PageSpeed score
+
+CRITICAL: Add comprehensive comments including:
+```javascript
+/**
+ * @file LandingPage.tsx
+ * @description Main marketing landing page for SMBTaxCredits.com R&D Tax Credit documentation service
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @modified 2024-01-15
+ * @dependencies React, Tailwind CSS, framer-motion, react-icons
+ * @knowledgeBase Copywriting & Positioning Guide.md, user_archetype_profiles.md
+ * 
+ * This component serves as the primary conversion point for SMBTaxCredits.com,
+ * featuring trust signals, benefit explanations, and an embedded calculator
+ * to capture leads.
+ */
+
+// INTEGRATION: Calculator component will be imported and embedded in section 6
+// TODO: Connect interactive calculator component once built
+// TODO: Implement Google Analytics event tracking for CTAs
+// TODO: Add A/B testing framework for headline variations
+
+// Business logic: Pricing tiers correspond to federal credit amounts
+// Tier assignment happens dynamically in the calculator component
+// All copy follows IRS-compliant messaging guidelines
+```
+
+Include inline comments for:
+- Conversion optimization points
+- Mobile-specific considerations  
+- Integration points with other components
+- Copy that may need A/B testing
+- Placeholder content that needs real assets
+
+The component should be production-ready with proper error boundaries, loading states, and accessibility features (ARIA labels, keyboard navigation, proper heading hierarchy)."
