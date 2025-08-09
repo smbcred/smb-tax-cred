@@ -31,6 +31,12 @@ import {
 import ResponsiveNav from "@/components/navigation/ResponsiveNav";
 import ResponsiveHero from "@/components/sections/ResponsiveHero";
 import { BenefitsGrid, PricingGrid, ProcessStepsGrid } from "@/components/layout/ResponsiveGrid";
+import { MetaTags } from "@/components/seo/MetaTags";
+import { benefitsContent } from "@/data/benefitsContent";
+import { processSteps } from "@/data/processContent";
+import { pricingContent } from "@/data/pricingContent";
+import { faqContent } from "@/data/faqContent";
+import { HeroContent } from "@/data/heroContent";
 
 // INTEGRATION: Calculator component will be imported and embedded in section 6
 // TODO: Connect interactive calculator component once built
@@ -44,94 +50,36 @@ export default function LandingPage() {
   const { ref: faqRef, inView: faqInView } = useInView({ threshold: 0.1, triggerOnce: true });
   const { ref: ctaRef, inView: ctaInView } = useInView({ threshold: 0.1, triggerOnce: true });
 
-  // Business logic: Pricing tiers correspond to federal credit amounts
-  // Tier assignment happens dynamically in the calculator component
-  const pricingTiers = [
-    { tier: "Tier 1", range: "Credits < $10K", price: "$500", example: "$8K credit = 16x ROI" },
-    { tier: "Tier 2", range: "Credits $10K-$20K", price: "$750", example: "$15K credit = 20x ROI", highlighted: true },
-    { tier: "Tier 3", range: "Credits $20K-$30K", price: "$1,000", example: "$25K credit = 25x ROI" },
-    { tier: "Tier 4", range: "Credits $30K-$40K", price: "$1,250", example: "$35K credit = 28x ROI" },
-  ];
+  // Map icons for benefits grid using imported content
+  const benefits = benefitsContent.map(benefit => ({
+    ...benefit,
+    icon: benefit.iconName === "FaShieldAlt" ? <FaShieldAlt className="text-4xl" /> :
+          benefit.iconName === "FaDollarSign" ? <FaDollarSign className="text-4xl" /> :
+          benefit.iconName === "FaClock" ? <FaClock className="text-4xl" /> :
+          benefit.iconName === "FaFileAlt" ? <FaFileAlt className="text-4xl" /> :
+          benefit.iconName === "FaCheckCircle" ? <FaCheckCircle className="text-4xl" /> :
+          <FaLock className="text-4xl" />
+  }));
 
-  // Benefits data for grid
-  const benefits = [
-    {
-      icon: <FaShieldAlt className="text-4xl" />,
-      title: "IRS-Compliant by Design",
-      description: "Section G project summaries, amended-claim exhibits, and complete audit trail included in every package."
-    },
-    {
-      icon: <FaDollarSign className="text-4xl" />,
-      title: "Flat-Fee Transparency",
-      description: "No percentage cuts or hidden fees. Know your cost upfront based on your credit size."
-    },
-    {
-      icon: <FaClock className="text-4xl" />,
-      title: "Fast Turnaround",
-      description: "Get your complete documentation package in days, not months. Most clients finish in 20 minutes."
-    },
-    {
-      icon: <FaFileAlt className="text-4xl" />,
-      title: "CPA-Friendly Outputs",
-      description: "Clean handoff files your accountant needs: Form 6765 data, workpapers, and filing instructions."
-    },
-    {
-      icon: <FaCheckCircle className="text-4xl" />,
-      title: "Simple Process",
-      description: "Plain-English questions guide you through the four-part test. No tax expertise required."
-    },
-    {
-      icon: <FaLock className="text-4xl" />,
-      title: "Secure & Confidential",
-      description: "Bank-level encryption, minimal data collection, and automatic deletion after 90 days."
-    }
-  ];
+  // Map icons for process steps using imported content
+  const processStepsWithIcons = processSteps.map(step => ({
+    ...step,
+    icon: step.iconName === "FaCalculator" ? <FaCalculator className="text-3xl" /> :
+          step.iconName === "FaFileSignature" ? <FaFileSignature className="text-3xl" /> :
+          <FaDownload className="text-3xl" />
+  }));
 
-  // Process steps data
-  const processSteps = [
-    {
-      number: "1",
-      icon: <FaCalculator className="text-3xl" />,
-      title: "Estimate",
-      description: "Answer a few questions to size your potential credit"
-    },
-    {
-      number: "2",
-      icon: <FaFileSignature className="text-3xl" />,
-      title: "Document",
-      description: "We turn your projects and costs into IRS-ready narratives and forms"
-    },
-    {
-      number: "3",
-      icon: <FaDownload className="text-3xl" />,
-      title: "File",
-      description: "Download your package and file with your CPA. Need payroll offset? We prep the 8974 data."
-    }
-  ];
+  // Use only the first 4 pricing tiers for the preview
+  const pricingTiers = pricingContent.tiers.slice(0, 4).map(tier => ({
+    tier: tier.tier,
+    range: tier.creditRange,
+    price: tier.price,
+    example: tier.example,
+    highlighted: tier.highlighted
+  }));
 
-  // All copy follows IRS-compliant messaging guidelines
-  const faqItems = [
-    {
-      question: "Do I even qualify for the R&D credit?",
-      answer: "If you develop software, use AI, create new products, or improve processes with technology, you likely qualify. Our calculator will help you confirm."
-    },
-    {
-      question: "What if I'm not profitable yet?",
-      answer: "Qualified Small Businesses can claim up to $500K against payroll taxes instead of income taxes. Perfect for startups and growth companies."
-    },
-    {
-      question: "Can I claim credits for past years?",
-      answer: "Yes! You can amend returns for 2022-2024. Each additional year is just $297."
-    },
-    {
-      question: "Do you file my taxes?",
-      answer: "No, we prepare all documentation and forms. You or your CPA files with our comprehensive package."
-    },
-    {
-      question: "How long does this take?",
-      answer: "Most users complete the intake in 15-20 minutes. Documents are ready within 24-48 hours."
-    }
-  ];
+  // Use top 5 FAQs from imported content
+  const faqItems = faqContent.slice(0, 5);
 
   // Conversion optimization point: Scroll to calculator
   const scrollToCalculator = () => {
@@ -140,6 +88,9 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* SEO Meta Tags */}
+      <MetaTags />
+      
       {/* Responsive Navigation Component */}
       <ResponsiveNav />
 
@@ -201,7 +152,7 @@ export default function LandingPage() {
               Why SMBs Choose SMBTaxCredits.com
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Join thousands of businesses that trust us for their R&D tax credit documentation
+              Same IRS-compliant documentation, 10x less cost than traditional consultants
             </p>
           </motion.div>
 
@@ -227,7 +178,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <ProcessStepsGrid steps={processSteps} />
+          <ProcessStepsGrid steps={processStepsWithIcons} />
         </div>
       </section>
 
@@ -289,10 +240,10 @@ export default function LandingPage() {
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Transparent, Flat-Fee Pricing
+              {pricingContent.headline}
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600">
-              Keep more of your credit. No percentage cuts.
+              {pricingContent.subheadline}
             </p>
           </motion.div>
 
@@ -300,12 +251,24 @@ export default function LandingPage() {
 
           <div className="text-center mt-8">
             <p className="text-sm sm:text-base text-gray-600 mb-4">
-              Add another year: $297 per additional year. Federal documentation included in all tiers.
+              {pricingContent.additionalYear.description}: {pricingContent.additionalYear.price}. Federal documentation included in all tiers.
             </p>
             <a href="/pricing" className="text-green-600 hover:text-green-700 font-medium inline-flex items-center gap-2">
               View all 7 pricing tiers 
               <FaChevronRight className="w-4 h-4" />
             </a>
+            
+            {/* Pricing comparison callout */}
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg max-w-md mx-auto">
+              <p className="text-sm font-semibold text-green-800">
+                {pricingContent.comparison.title}
+              </p>
+              <p className="text-sm text-green-700 mt-1">
+                Consultants: {pricingContent.comparison.competitorPrice} • 
+                Us: {pricingContent.comparison.ourPrice} • 
+                <span className="font-bold">{pricingContent.comparison.savings}</span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -390,7 +353,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
-              Ready to Claim Your R&D Credit?
+              {HeroContent.headline.replace("—", "?")}
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Join thousands of SMBs who've simplified their R&D tax credit claims
@@ -404,7 +367,7 @@ export default function LandingPage() {
                        shadow-lg"
               aria-label="Start Your Free Estimate"
             >
-              Start Your Free Estimate
+              {HeroContent.primaryCTA}
             </button>
             <p className="text-xs sm:text-sm text-white/80 mt-4">
               No credit card required. Get your estimate in 2 minutes.
