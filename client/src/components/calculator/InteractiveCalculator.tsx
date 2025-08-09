@@ -4,13 +4,20 @@
  * @knowledgeBase system-architecture-explanation.md - Calculator Component
  */
 
-import { useState, useReducer, useCallback } from 'react';
+import { useState, useReducer, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  Sparkles,
+  HelpCircle,
+  AlertCircle
+} from 'lucide-react';
 import { BusinessTypeStep } from './steps/BusinessTypeStep';
 import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
 import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
-import { CalculatorProgress } from './CalculatorProgress';
+import { ProgressIndicator } from './ProgressIndicator';
 import { CalculatorEngine } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
@@ -104,6 +111,8 @@ export const InteractiveCalculator: React.FC = () => {
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
+  const [stepErrors, setStepErrors] = useState<Record<number, string[]>>({});
 
   // Real-time calculation effect
   const performCalculation = useCallback(() => {
@@ -150,22 +159,75 @@ export const InteractiveCalculator: React.FC = () => {
     }
   }, [state.expenses, state.businessType]);
 
+  // Validation
+  const validateCurrentStep = useCallback((): boolean => {
+    const errors: string[] = [];
+
+    switch (state.currentStep) {
+      case 1:
+        if (!state.businessType) {
+          errors.push('Please select your business type');
+        }
+        break;
+        
+      case 2:
+        if (state.qualifyingActivities.length === 0) {
+          errors.push('Please select at least one innovation activity');
+        }
+        break;
+        
+      case 3:
+        if (state.expenses.technicalEmployees === 0 && state.expenses.contractorCosts === 0) {
+          errors.push('Please enter employee or contractor costs');
+        }
+        if (state.expenses.technicalEmployees > state.expenses.totalEmployees) {
+          errors.push('Technical employees cannot exceed total employees');
+        }
+        break;
+    }
+
+    setStepErrors(prev => ({ ...prev, [state.currentStep]: errors }));
+    return errors.length === 0;
+  }, [state]);
+
   // Navigation handlers
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (state.currentStep === 3) {
       // Calculate before showing results
       performCalculation();
     }
     if (state.currentStep === 4 && !showLeadCapture) {
       setShowLeadCapture(true);
-    } else {
+    } else if (validateCurrentStep()) {
       dispatch({ type: 'NEXT_STEP' });
+      setVisitedSteps(prev => new Set(Array.from(prev).concat(state.currentStep + 1)));
     }
-  };
+  }, [state.currentStep, showLeadCapture, validateCurrentStep, performCalculation]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     dispatch({ type: 'PREV_STEP' });
-  };
+  }, []);
+
+  const handleStepClick = useCallback((step: number) => {
+    if (visitedSteps.has(step) || step === state.currentStep + 1) {
+      dispatch({ type: 'GO_TO_STEP', payload: step });
+      setVisitedSteps(prev => new Set(Array.from(prev).concat(step)));
+    }
+  }, [visitedSteps, state.currentStep]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && state.currentStep < 4 && canProceed()) {
+        handleNext();
+      } else if (e.key === 'Escape' && state.currentStep > 1) {
+        handlePrev();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [state.currentStep, handleNext, handlePrev]);
 
   // Validation for navigation
   const canProceed = () => {
@@ -190,9 +252,11 @@ export const InteractiveCalculator: React.FC = () => {
       </div>
 
       {/* Progress Indicator */}
-      <CalculatorProgress 
+      <ProgressIndicator 
         currentStep={state.currentStep} 
         totalSteps={4}
+        onStepClick={handleStepClick}
+        visitedSteps={visitedSteps}
       />
 
       {/* Step Content */}
@@ -294,6 +358,30 @@ export const InteractiveCalculator: React.FC = () => {
         >
           {state.currentStep === 4 ? 'See Full Results' : 'Next'}
         </button>
+      </div>
+
+      {/* Error display */}
+      {stepErrors[state.currentStep] && stepErrors[state.currentStep].length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+        >
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-red-700">
+            {stepErrors[state.currentStep].map((error, index) => (
+              <p key={index}>{error}</p>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Help text footer */}
+      <div className="mt-8 text-center text-sm text-gray-500">
+        <p>All calculations based on federal R&D tax credit rules (IRS Section 41)</p>
+        <p className="mt-1">
+          Questions? <button className="text-blue-600 hover:underline">Chat with us</button>
+        </p>
       </div>
 
       {/* Lead Capture Modal */}
