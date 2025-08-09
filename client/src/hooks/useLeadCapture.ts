@@ -37,7 +37,7 @@ export function useLeadCapture() {
         calculationData: leadData.calculationResult
       };
       
-      const response = await apiRequest('POST', '/api/leads/capture', requestData);
+      const response = await apiRequest('POST', '/api/leads', requestData);
       
       if (!response.ok) {
         const errorData = await response.json();
