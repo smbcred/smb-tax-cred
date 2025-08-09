@@ -216,7 +216,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">
-                    Your {formatCurrency(federalCredit)} Credit is Ready!
+                    Your ${formatCurrency(federalCredit)} Credit is Ready!
                   </h2>
                   
                   <p className="text-blue-100">

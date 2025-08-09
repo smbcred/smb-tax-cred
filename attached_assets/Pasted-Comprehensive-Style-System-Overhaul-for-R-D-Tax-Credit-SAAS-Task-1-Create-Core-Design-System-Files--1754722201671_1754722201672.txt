@@ -1,0 +1,1624 @@
+Comprehensive Style System Overhaul for R&D Tax Credit SAAS
+Task 1: Create Core Design System Files - Replit Prompt
+Component: Design System Foundation
+KB References:
+
+SMBTaxCredits - Visual Brand Identity Guide.md → Color System, Typography, Spacing
+additional-project-specs.md → Technical Stack Requirements
+system-architecture-explanation.md → Frontend Architecture
+
+Business Context: Establishes a consistent visual language across all UI components, ensuring professional appearance that builds trust for SMBs documenting their AI experimentation for R&D tax credits.
+Replit Prompt
+"Create a comprehensive design system foundation for businesses using AI tools to claim R&D tax credits:
+
+Include examples: clean professional layouts, trust-building design, clear typography
+Use Grade 7-9 reading level, sentences ≤20-22 words
+Show consistent visual hierarchy with proper spacing
+Federal credits only (10-16% of costs)
+Mobile-responsive with Tailwind CSS
+Implement the official brand guide colors and typography
+Create reusable design tokens for consistency
+Ensure AA accessibility compliance
+
+Key example to highlight: Professional service businesses using custom GPTs see design that reflects their innovation while maintaining compliance credibility.
+The component should feel approachable and emphasize that experimentation with everyday AI tools can qualify."
+1. Create Design Tokens System (client/src/styles/design-tokens.ts):
+typescript/**
+ * @file design-tokens.ts
+ * @description Central design system tokens for SMBTaxCredits.com
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This file centralizes all design decisions to ensure consistency
+ * across the application. It implements the official brand guide
+ * specifications for colors, typography, spacing, and effects.
+ * 
+ * EXAMPLES:
+ * - Marketing agency testing ChatGPT prompts sees consistent UI
+ * - E-commerce brand with custom automation gets professional look
+ * - Consultant using AI analysis tools experiences trusted design
+ * 
+ * BUSINESS RULES:
+ * - All colors must meet AA accessibility standards
+ * - Typography must be readable at Grade 7-9 level
+ * - Spacing follows 4pt grid system
+ * 
+ * TODO: Add animation tokens for micro-interactions
+ * TODO: Implement dark mode color mappings
+ */
+
+// Color System - Direct from Brand Guide
+export const colors = {
+  // Core Palette
+  ink: '#0B0C0E',        // Primary text, dark UI
+  graphite: '#1C1E22',   // Headers, dark surfaces
+  slate: '#3B3F45',      // Secondary text
+  ash: '#8A9099',        // Tertiary text, icons
+  cloud: '#F5F7FA',      // Subtle backgrounds
+  paper: '#FFFFFF',      // Main background
+  
+  // Brand Colors
+  blue: {
+    DEFAULT: '#2E5AAC',  // Deep Blue - primary actions
+    50: '#EBF0FA',
+    100: '#D6E0F4',
+    200: '#ADC1E9',
+    300: '#85A3DE',
+    400: '#5C84D3',
+    500: '#2E5AAC',      // Base
+    600: '#254A8C',
+    700: '#1C376B',
+    800: '#13254A',
+    900: '#0A122A',
+  },
+  
+  emerald: {
+    DEFAULT: '#1E8E5A',  // Success, secondary
+    50: '#E8F5EF',
+    100: '#D1EBDF',
+    200: '#A3D7BF',
+    300: '#75C39F',
+    400: '#47AF7F',
+    500: '#1E8E5A',      // Base
+    600: '#187148',
+    700: '#125536',
+    800: '#0C3924',
+    900: '#061C12',
+  },
+  
+  // State Colors
+  info: '#0B6EEF',
+  warn: '#B78103',
+  error: '#B42318',
+  
+  // UI Colors
+  border: '#E4E7EC',
+  divider: '#E4E7EC',
+  
+  // Semantic mappings
+  primary: '#2E5AAC',
+  secondary: '#1E8E5A',
+  success: '#1E8E5A',
+  warning: '#B78103',
+  danger: '#B42318',
+  
+  // Text colors
+  text: {
+    primary: '#0B0C0E',    // Ink
+    secondary: '#3B3F45',  // Slate
+    tertiary: '#8A9099',   // Ash
+    inverse: '#FFFFFF',
+  },
+  
+  // Background colors
+  background: {
+    primary: '#FFFFFF',    // Paper
+    secondary: '#F5F7FA',  // Cloud
+    tertiary: '#E4E7EC',   // Light gray
+  }
+} as const;
+
+// Typography System - Direct from Brand Guide
+export const typography = {
+  // Font families
+  fontFamily: {
+    sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+    mono: ['Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+  },
+  
+  // Font sizes with line heights
+  fontSize: {
+    display: ['3.5rem', { lineHeight: '1.2' }],      // 56px
+    h1: ['2.25rem', { lineHeight: '1.25' }],         // 36px
+    h2: ['1.75rem', { lineHeight: '1.3' }],          // 28px
+    h3: ['1.375rem', { lineHeight: '1.35' }],        // 22px
+    h4: ['1.125rem', { lineHeight: '1.4' }],         // 18px
+    body: ['1rem', { lineHeight: '1.6' }],           // 16px
+    small: ['0.875rem', { lineHeight: '1.5' }],      // 14px
+    micro: ['0.75rem', { lineHeight: '1.4' }],       // 12px
+  },
+  
+  // Font weights
+  fontWeight: {
+    regular: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
+  },
+  
+  // Letter spacing
+  letterSpacing: {
+    tight: '-0.01em',
+    normal: '0',
+    wide: '0.01em',
+    wider: '0.02em',
+  },
+} as const;
+
+// Spacing System - 4pt grid from Brand Guide
+export const spacing = {
+  0: '0',
+  1: '0.25rem',   // 4px
+  2: '0.5rem',    // 8px
+  3: '0.75rem',   // 12px
+  4: '1rem',      // 16px
+  5: '1.25rem',   // 20px
+  6: '1.5rem',    // 24px
+  8: '2rem',      // 32px
+  10: '2.5rem',   // 40px
+  12: '3rem',     // 48px
+  16: '4rem',     // 64px
+  20: '5rem',     // 80px
+  24: '6rem',     // 96px
+  32: '8rem',     // 128px
+} as const;
+
+// Layout System
+export const layout = {
+  maxWidth: {
+    xs: '20rem',      // 320px
+    sm: '24rem',      // 384px
+    md: '28rem',      // 448px
+    lg: '32rem',      // 512px
+    xl: '36rem',      // 576px
+    '2xl': '42rem',   // 672px
+    '3xl': '48rem',   // 768px
+    '4xl': '56rem',   // 896px
+    '5xl': '64rem',   // 1024px
+    '6xl': '72rem',   // 1152px
+    '7xl': '80rem',   // 1280px
+    container: '75rem', // 1200px - from brand guide
+  },
+  
+  gutter: {
+    mobile: '1rem',     // 16px
+    tablet: '1.5rem',   // 24px
+    desktop: '2rem',    // 32px
+  },
+} as const;
+
+// Border Radius - from Brand Guide
+export const borderRadius = {
+  none: '0',
+  sm: '0.5rem',     // 8px
+  DEFAULT: '0.75rem', // 12px - default from guide
+  md: '0.75rem',    // 12px
+  lg: '1rem',       // 16px - for modals
+  xl: '1.25rem',    // 20px
+  full: '9999px',   // pills
+} as const;
+
+// Shadows - Subtle elevation from Brand Guide
+export const shadows = {
+  none: 'none',
+  sm: '0 1px 2px rgba(0, 0, 0, 0.06)',    // Elevation 1
+  DEFAULT: '0 2px 8px rgba(0, 0, 0, 0.08)', // Elevation 2
+  md: '0 2px 8px rgba(0, 0, 0, 0.08)',    // Elevation 2
+  lg: '0 8px 24px rgba(0, 0, 0, 0.10)',   // Elevation 3
+  xl: '0 16px 48px rgba(0, 0, 0, 0.12)',
+  inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
+  focus: '0 0 0 3px rgba(46, 90, 172, 0.25)', // Blue focus
+} as const;
+
+// Transitions - from Brand Guide
+export const transitions = {
+  duration: {
+    fast: '120ms',     // micro interactions
+    DEFAULT: '200ms',  // UI transitions
+    slow: '320ms',     // modals
+  },
+  
+  timing: {
+    DEFAULT: 'cubic-bezier(0.2, 0.6, 0.2, 1)', // ease-out from guide
+    easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+    easeOut: 'cubic-bezier(0.2, 0.6, 0.2, 1)',
+    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+} as const;
+
+// Z-index scale
+export const zIndex = {
+  0: '0',
+  10: '10',
+  20: '20',
+  30: '30',
+  40: '40',
+  50: '50',
+  dropdown: '1000',
+  sticky: '1020',
+  fixed: '1030',
+  modal: '1040',
+  popover: '1050',
+  tooltip: '1060',
+} as const;
+
+// Breakpoints
+export const breakpoints = {
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px',
+} as const;
+
+// Component-specific tokens
+export const components = {
+  button: {
+    height: {
+      sm: '2.25rem',    // 36px
+      DEFAULT: '2.75rem', // 44px - meets touch target
+      lg: '3rem',       // 48px
+    },
+    padding: {
+      sm: '0.75rem 1rem',
+      DEFAULT: '1rem 1.5rem',
+      lg: '1.25rem 2rem',
+    },
+  },
+  
+  input: {
+    height: '2.75rem',  // 44px - from brand guide
+    padding: '0.75rem 1rem',
+    borderWidth: '1px',
+  },
+  
+  card: {
+    padding: {
+      sm: '1rem',       // 16px
+      DEFAULT: '1.5rem', // 24px
+      lg: '2rem',       // 32px - from guide
+    },
+  },
+  
+  navigation: {
+    height: '4rem',     // 64px - from brand guide
+  },
+} as const;
+
+// Icon sizes - from Brand Guide
+export const iconSizes = {
+  xs: '1rem',    // 16px
+  sm: '1.25rem', // 20px
+  md: '1.5rem',  // 24px
+  lg: '2rem',    // 32px
+} as const;
+
+// Export type for TypeScript
+export type DesignTokens = {
+  colors: typeof colors;
+  typography: typeof typography;
+  spacing: typeof spacing;
+  layout: typeof layout;
+  borderRadius: typeof borderRadius;
+  shadows: typeof shadows;
+  transitions: typeof transitions;
+  zIndex: typeof zIndex;
+  breakpoints: typeof breakpoints;
+  components: typeof components;
+  iconSizes: typeof iconSizes;
+};
+
+// Default export for easy access
+const tokens: DesignTokens = {
+  colors,
+  typography,
+  spacing,
+  layout,
+  borderRadius,
+  shadows,
+  transitions,
+  zIndex,
+  breakpoints,
+  components,
+  iconSizes,
+};
+
+export default tokens;
+2. Create Updated Tailwind Configuration (tailwind.config.ts):
+typescript/**
+ * @file tailwind.config.ts
+ * @description Tailwind CSS configuration with brand design tokens
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This configuration maps our design tokens to Tailwind utilities,
+ * ensuring consistent application of the brand guide across all
+ * components while maintaining Tailwind's utility-first approach.
+ * 
+ * BUSINESS RULES:
+ * - Use only brand-approved colors
+ * - Maintain 4pt spacing grid
+ * - Ensure touch targets are 44px minimum
+ * 
+ * TODO: Add custom animation utilities
+ * TODO: Configure print styles
+ */
+
+import type { Config } from 'tailwindcss';
+import { colors, typography, spacing, borderRadius, shadows, transitions, breakpoints, layout, zIndex } from './client/src/styles/design-tokens';
+
+const config: Config = {
+  darkMode: ['class'],
+  content: [
+    './client/index.html',
+    './client/src/**/*.{js,jsx,ts,tsx}',
+  ],
+  theme: {
+    // Replace default colors with brand colors
+    colors: {
+      // Core palette
+      ink: colors.ink,
+      graphite: colors.graphite,
+      slate: colors.slate,
+      ash: colors.ash,
+      cloud: colors.cloud,
+      paper: colors.paper,
+      
+      // Brand colors with shades
+      blue: colors.blue,
+      emerald: colors.emerald,
+      
+      // State colors
+      info: colors.info,
+      warn: colors.warn,
+      error: colors.error,
+      
+      // Semantic aliases
+      primary: colors.blue,
+      secondary: colors.emerald,
+      success: colors.emerald,
+      warning: colors.warn,
+      danger: colors.error,
+      
+      // UI colors
+      border: colors.border,
+      divider: colors.divider,
+      
+      // Special colors
+      transparent: 'transparent',
+      current: 'currentColor',
+      white: '#FFFFFF',
+      black: '#000000',
+    },
+    
+    // Typography
+    fontFamily: typography.fontFamily,
+    fontSize: typography.fontSize,
+    fontWeight: typography.fontWeight,
+    letterSpacing: typography.letterSpacing,
+    
+    // Spacing
+    spacing: spacing,
+    
+    // Layout
+    maxWidth: layout.maxWidth,
+    
+    // Effects
+    borderRadius: borderRadius,
+    boxShadow: shadows,
+    
+    // Z-index
+    zIndex: zIndex,
+    
+    // Breakpoints
+    screens: breakpoints,
+    
+    // Transitions
+    transitionDuration: transitions.duration,
+    transitionTimingFunction: transitions.timing,
+    
+    extend: {
+      // Component-specific heights
+      height: {
+        'button': '2.75rem',      // 44px
+        'button-sm': '2.25rem',   // 36px
+        'button-lg': '3rem',      // 48px
+        'input': '2.75rem',       // 44px
+        'nav': '4rem',            // 64px
+      },
+      
+      // Line heights for better typography
+      lineHeight: {
+        'display': '1.2',
+        'heading': '1.25',
+        'body': '1.6',
+      },
+      
+      // Custom animations
+      animation: {
+        'fade-in': 'fadeIn 200ms ease-out',
+        'slide-up': 'slideUp 200ms ease-out',
+        'slide-down': 'slideDown 200ms ease-out',
+        'scale-in': 'scaleIn 120ms ease-out',
+      },
+      
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+      },
+      
+      // Custom background gradients
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, #2E5AAC 0%, #1E8E5A 100%)',
+        'gradient-hero': 'linear-gradient(135deg, #EBF0FA 0%, #E8F5EF 100%)',
+        'gradient-radial': 'radial-gradient(circle at top left, #EBF0FA 0%, #FFFFFF 50%)',
+      },
+    },
+  },
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+  ],
+} satisfies Config;
+
+export default config;
+3. Create Global CSS with Brand Styles (client/src/styles/globals.css):
+css/**
+ * @file globals.css
+ * @description Global styles implementing brand design system
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This file establishes base styles and utility classes that
+ * implement the brand guide specifications. It works with
+ * Tailwind to provide a consistent visual language.
+ * 
+ * DESIGN PRINCIPLES:
+ * - Minimal, grid-first, lots of white space
+ * - Subtle depth with careful shadow use
+ * - Clear visual hierarchy
+ * - Accessible contrast ratios
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for runtime access */
+@layer base {
+  :root {
+    /* Core Colors */
+    --color-ink: #0B0C0E;
+    --color-graphite: #1C1E22;
+    --color-slate: #3B3F45;
+    --color-ash: #8A9099;
+    --color-cloud: #F5F7FA;
+    --color-paper: #FFFFFF;
+    
+    /* Brand Colors */
+    --color-blue: #2E5AAC;
+    --color-emerald: #1E8E5A;
+    
+    /* State Colors */
+    --color-info: #0B6EEF;
+    --color-warn: #B78103;
+    --color-error: #B42318;
+    
+    /* UI Colors */
+    --color-border: #E4E7EC;
+    
+    /* Spacing */
+    --spacing-unit: 0.25rem;
+    
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+    
+    /* Transitions */
+    --transition-fast: 120ms;
+    --transition-base: 200ms;
+    --transition-slow: 320ms;
+    --transition-timing: cubic-bezier(0.2, 0.6, 0.2, 1);
+  }
+  
+  /* Dark mode variables (future) */
+  .dark {
+    --color-ink: #F5F7FA;
+    --color-paper: #1C1E22;
+    /* Add more dark mode mappings */
+  }
+  
+  /* Base styles */
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-paper text-ink font-sans;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold leading-tight;
+  }
+  
+  h1 { @apply text-h1; }
+  h2 { @apply text-h2; }
+  h3 { @apply text-h3; }
+  h4 { @apply text-h4; }
+  
+  p {
+    @apply leading-relaxed;
+  }
+  
+  /* Focus styles */
+  *:focus {
+    outline: none;
+  }
+  
+  *:focus-visible {
+    @apply ring-2 ring-blue ring-offset-2 ring-offset-paper;
+  }
+  
+  /* Selection */
+  ::selection {
+    @apply bg-blue/20 text-ink;
+  }
+}
+
+/* Component Classes */
+@layer components {
+  /* Buttons - Following Brand Guide specs */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold
+           rounded-md transition-all duration-base
+           h-button px-6 text-body
+           focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-offset-2 disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-blue text-paper hover:bg-blue-600 
+           active:scale-[0.98] shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-paper text-ink border border-border
+           hover:bg-cloud active:scale-[0.98];
+  }
+  
+  .btn-tertiary {
+    @apply btn bg-transparent text-ink hover:underline
+           underline-offset-4 px-0;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error text-paper hover:bg-error/90
+           active:scale-[0.98] shadow-sm;
+  }
+  
+  .btn-success {
+    @apply btn bg-emerald text-paper hover:bg-emerald-600
+           active:scale-[0.98] shadow-sm;
+  }
+  
+  /* Sizes */
+  .btn-sm {
+    @apply h-button-sm px-4 text-small;
+  }
+  
+  .btn-lg {
+    @apply h-button-lg px-8 text-h4;
+  }
+  
+  /* Input styles - Following Brand Guide */
+  .input {
+    @apply h-input px-4 rounded-md border border-border
+           bg-paper text-ink placeholder-ash
+           transition-all duration-base
+           focus:border-blue focus:ring-2 focus:ring-blue/25
+           hover:bg-cloud disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  
+  .input-error {
+    @apply border-error focus:border-error focus:ring-error/25;
+  }
+  
+  .label {
+    @apply block text-small font-medium text-ink mb-2;
+  }
+  
+  .helper-text {
+    @apply text-micro text-slate mt-1;
+  }
+  
+  .error-text {
+    @apply text-micro text-error mt-1;
+  }
+  
+  /* Cards - Following Brand Guide */
+  .card {
+    @apply bg-paper rounded-md border border-border
+           shadow-sm p-6;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-base hover:shadow-md
+           hover:-translate-y-0.5;
+  }
+  
+  /* Alerts with status stripes */
+  .alert {
+    @apply relative rounded-md border bg-paper p-4
+           pl-6 before:absolute before:left-0 before:top-0
+           before:h-full before:w-0.5;
+  }
+  
+  .alert-info {
+    @apply border-info/20 before:bg-info;
+  }
+  
+  .alert-success {
+    @apply border-emerald/20 before:bg-emerald;
+  }
+  
+  .alert-warning {
+    @apply border-warn/20 before:bg-warn;
+  }
+  
+  .alert-error {
+    @apply border-error/20 before:bg-error;
+  }
+  
+  /* Navigation - Following Brand Guide */
+  .nav-link {
+    @apply text-ink hover:text-blue transition-colors
+           duration-base relative;
+  }
+  
+  .nav-link-active {
+    @apply text-blue font-medium after:absolute after:bottom-0
+           after:left-0 after:right-0 after:h-0.5 after:bg-blue;
+  }
+  
+  /* Tables - Following Brand Guide */
+  .table {
+    @apply w-full border-collapse;
+  }
+  
+  .table th {
+    @apply text-micro font-semibold uppercase text-slate
+           bg-cloud px-4 py-3 text-left;
+  }
+  
+  .table td {
+    @apply px-4 py-3 border-t border-border;
+  }
+  
+  .table tr:nth-child(even) {
+    @apply bg-cloud/50;
+  }
+  
+  /* Trust signals */
+  .trust-signal {
+    @apply text-center p-4 bg-paper rounded-md
+           shadow-sm border border-border;
+  }
+  
+  /* Feature cards */
+  .feature-icon {
+    @apply w-12 h-12 rounded-md flex items-center
+           justify-center mb-4;
+  }
+  
+  .feature-icon-primary {
+    @apply bg-blue-100 text-blue;
+  }
+  
+  .feature-icon-secondary {
+    @apply bg-emerald-100 text-emerald;
+  }
+  
+  /* Progress indicators */
+  .progress-bar {
+    @apply h-2 bg-cloud rounded-full overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-blue to-emerald
+           transition-all duration-slow;
+  }
+  
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5
+           rounded-full text-micro font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-blue-100 text-blue-700;
+  }
+  
+  .badge-secondary {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+  
+  .badge-warning {
+    @apply bg-warn/10 text-warn;
+  }
+  
+  /* Dividers */
+  .divider {
+    @apply border-t border-divider my-8;
+  }
+  
+  /* Loading states */
+  .skeleton {
+    @apply animate-pulse bg-cloud rounded;
+  }
+  
+  /* Modal backdrop */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-ink/50 z-modal
+           flex items-center justify-center p-4;
+  }
+  
+  .modal-content {
+    @apply bg-paper rounded-lg shadow-lg
+           max-w-md w-full p-8 relative;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue to-emerald
+           bg-clip-text text-transparent;
+  }
+  
+  /* Responsive text */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Custom scrollbar */
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-blue) var(--color-cloud);
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-track {
+    @apply bg-cloud;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    @apply bg-blue rounded-full;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    @apply bg-blue-600;
+  }
+  
+  /* Aspect ratios */
+  .aspect-golden {
+    aspect-ratio: 1.618;
+  }
+  
+  /* Grid lines for development */
+  .grid-overlay {
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(46, 90, 172, 0.1) 0px, transparent 1px, transparent 8px, rgba(46, 90, 172, 0.1) 8px),
+      repeating-linear-gradient(90deg, rgba(46, 90, 172, 0.1) 0px, transparent 1px, transparent 8px, rgba(46, 90, 172, 0.1) 8px);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    @apply text-black bg-white;
+  }
+  
+  .card {
+    @apply border-gray-300 shadow-none;
+  }
+}
+
+/* Animation utilities */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn-primary,
+  .btn-success,
+  .btn-danger {
+    @apply border-2;
+  }
+  
+  .input {
+    @apply border-2;
+  }
+}
+4. Create Component Style Guide (client/src/styles/component-styles.ts):
+typescript/**
+ * @file component-styles.ts
+ * @description Centralized component style definitions
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This file provides consistent style objects for all components,
+ * ensuring brand compliance and reducing inline style definitions.
+ * Use these classes instead of arbitrary Tailwind utilities.
+ * 
+ * EXAMPLES:
+ * - E-commerce stores see consistent button styles
+ * - Marketing agencies get professional form inputs
+ * - Service businesses experience cohesive cards
+ * 
+ * BUSINESS RULES:
+ * - All interactive elements must be 44px+ for touch
+ * - Focus states must be clearly visible
+ * - Maintain brand color usage ratios
+ * 
+ * TODO: Add component animation presets
+ * TODO: Create style variants for each component
+ */
+
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// Utility function for merging classes
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// Button styles
+export const buttonStyles = {
+  base: 'btn',
+  variants: {
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    tertiary: 'btn-tertiary',
+    danger: 'btn-danger',
+    success: 'btn-success',
+  },
+  sizes: {
+    sm: 'btn-sm',
+    md: '', // default
+    lg: 'btn-lg',
+  },
+  fullWidth: 'w-full',
+  disabled: 'disabled:opacity-50 disabled:cursor-not-allowed',
+} as const;
+
+// Input styles
+export const inputStyles = {
+  base: 'input',
+  error: 'input-error',
+  label: 'label',
+  helperText: 'helper-text',
+  errorText: 'error-text',
+  wrapper: 'space-y-1',
+} as const;
+
+// Card styles
+export const cardStyles = {
+  base: 'card',
+  hover: 'card-hover',
+  noPadding: 'p-0',
+  compact: 'p-4',
+  sections: {
+    header: 'pb-4 border-b border-divider',
+    body: 'py-4',
+    footer: 'pt-4 border-t border-divider',
+  },
+} as const;
+
+// Typography styles
+export const typographyStyles = {
+  h1: 'text-h1 font-bold text-ink',
+  h2: 'text-h2 font-semibold text-ink',
+  h3: 'text-h3 font-semibold text-ink',
+  h4: 'text-h4 font-semibold text-ink',
+  body: 'text-body text-ink',
+  small: 'text-small text-slate',
+  micro: 'text-micro text-ash',
+  lead: 'text-h4 text-slate leading-relaxed',
+  gradient: 'text-gradient',
+} as const;
+
+// Layout styles
+export const layoutStyles = {
+  container: 'max-w-container mx-auto px-4 sm:px-6 lg:px-8',
+  section: 'py-12 md:py-16 lg:py-20',
+  grid: {
+    cols2: 'grid grid-cols-1 md:grid-cols-2 gap-6',
+    cols3: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+    cols4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6',
+  },
+  stack: 'space-y-4',
+  flex: {
+    center: 'flex items-center justify-center',
+    between: 'flex items-center justify-between',
+    start: 'flex items-start',
+    end: 'flex items-center justify-end',
+  },
+} as const;
+
+// Navigation styles
+export const navigationStyles = {
+  wrapper: 'h-nav bg-paper border-b border-divider sticky top-0 z-sticky',
+  container: 'max-w-container mx-auto px-4 sm:px-6 lg:px-8 h-full',
+  content: 'flex items-center justify-between h-full',
+  logo: 'flex items-center space-x-3',
+  menu: 'hidden md:flex items-center space-x-8',
+  mobileMenu: 'md:hidden',
+  link: 'nav-link',
+  activeLink: 'nav-link-active',
+  button: 'btn-primary btn-sm',
+} as const;
+
+// Form styles
+export const formStyles = {
+  wrapper: 'space-y-6',
+  group: 'space-y-2',
+  row: 'grid grid-cols-1 md:grid-cols-2 gap-6',
+  actions: 'flex items-center justify-end space-x-4 pt-6',
+  error: 'alert alert-error',
+  fieldset: 'space-y-4',
+  legend: 'text-h4 font-semibold text-ink mb-4',
+} as const;
+
+// Modal styles
+export const modalStyles = {
+  backdrop: 'modal-backdrop',
+  content: 'modal-content',
+  header: 'mb-6',
+  title: 'text-h3 font-semibold text-ink',
+  body: 'space-y-4',
+  footer: 'mt-8 flex items-center justify-end space-x-4',
+  close: 'absolute top-4 right-4 text-ash hover:text-ink transition-colors',
+} as const;
+
+// Alert styles
+export const alertStyles = {
+  base: 'alert',
+  variants: {
+    info: 'alert-info',
+    success: 'alert-success',
+    warning: 'alert-warning',
+    error: 'alert-error',
+  },
+  icon: 'flex-shrink-0 mr-3',
+  content: 'flex-1',
+  title: 'font-semibold mb-1',
+  close: 'ml-4 text-ash hover:text-ink transition-colors',
+} as const;
+
+// Badge styles
+export const badgeStyles = {
+  base: 'badge',
+  variants: {
+    primary: 'badge-primary',
+    secondary: 'badge-secondary',
+    warning: 'badge-warning',
+    neutral: 'bg-cloud text-slate',
+  },
+} as const;
+
+// Table styles
+export const tableStyles = {
+  wrapper: 'overflow-x-auto -mx-4 sm:mx-0',
+  table: 'table',
+  thead: 'bg-cloud',
+  th: 'text-micro font-semibold uppercase text-slate px-4 py-3',
+  td: 'px-4 py-3',
+  row: 'hover:bg-cloud/50 transition-colors',
+} as const;
+
+// Progress styles
+export const progressStyles = {
+  wrapper: 'space-y-2',
+  label: 'flex items-center justify-between text-small',
+  bar: 'progress-bar',
+  fill: 'progress-fill',
+  steps: {
+    wrapper: 'flex items-center justify-between',
+    step: 'flex items-center',
+    active: 'text-blue',
+    completed: 'text-emerald',
+    line: 'flex-1 h-0.5 bg-cloud mx-2',
+    lineActive: 'bg-blue',
+    lineCompleted: 'bg-emerald',
+  },
+} as const;
+
+// Animation classes
+export const animationStyles = {
+  fadeIn: 'animate-fade-in',
+  slideUp: 'animate-slide-up',
+  slideDown: 'animate-slide-down',
+  scaleIn: 'animate-scale-in',
+  pulse: 'animate-pulse',
+  spin: 'animate-spin',
+  shimmer: 'animate-shimmer',
+} as const;
+
+// Utility styles
+export const utilityStyles = {
+  srOnly: 'sr-only',
+  noScroll: 'overflow-hidden',
+  truncate: 'truncate',
+  backdrop: 'backdrop-blur-sm',
+  divider: 'divider',
+  skeleton: 'skeleton',
+  focusRing: 'focus:ring-2 focus:ring-blue focus:ring-offset-2',
+} as const;
+
+// Export all styles
+export const styles = {
+  button: buttonStyles,
+  input: inputStyles,
+  card: cardStyles,
+  typography: typographyStyles,
+  layout: layoutStyles,
+  navigation: navigationStyles,
+  form: formStyles,
+  modal: modalStyles,
+  alert: alertStyles,
+  badge: badgeStyles,
+  table: tableStyles,
+  progress: progressStyles,
+  animation: animationStyles,
+  utility: utilityStyles,
+} as const;
+
+// Type exports
+export type ButtonVariant = keyof typeof buttonStyles.variants;
+export type ButtonSize = keyof typeof buttonStyles.sizes;
+export type AlertVariant = keyof typeof alertStyles.variants;
+export type BadgeVariant = keyof typeof badgeStyles.variants;
+5. Create Icon System (client/src/components/ui/Icon.tsx):
+typescript/**
+ * @file Icon.tsx
+ * @description Consistent icon component using Lucide React
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This component standardizes icon usage across the application,
+ * ensuring consistent sizing, colors, and styling per brand guide.
+ * 
+ * EXAMPLES:
+ * - Calculator icon for financial features
+ * - Check icon for completed steps
+ * - Alert icon for important messages
+ * 
+ * BUSINESS RULES:
+ * - Use Lucide icons exclusively (no FontAwesome)
+ * - Maintain 1.5px stroke weight
+ * - Icons should be monochrome
+ * 
+ * TODO: Add icon animation variants
+ * TODO: Create icon sprite for performance
+ */
+
+import React from 'react';
+import * as Icons from 'lucide-react';
+import { cn } from '@/styles/component-styles';
+import { iconSizes } from '@/styles/design-tokens';
+
+export type IconName = keyof typeof Icons;
+
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
+  name: IconName;
+  size?: keyof typeof iconSizes;
+  className?: string;
+}
+
+export const Icon: React.FC<IconProps> = ({
+  name,
+  size = 'md',
+  className,
+  ...props
+}) => {
+  const IconComponent = Icons[name] as React.FC<React.SVGProps<SVGSVGElement>>;
+  
+  if (!IconComponent) {
+    console.warn(`Icon "${name}" not found in Lucide icons`);
+    return null;
+  }
+  
+  const sizeValue = iconSizes[size];
+  
+  return (
+    <IconComponent
+      width={sizeValue}
+      height={sizeValue}
+      strokeWidth={1.5}
+      className={cn('flex-shrink-0', className)}
+      {...props}
+    />
+  );
+};
+
+// Commonly used icons with semantic names
+export const CommonIcons = {
+  // Navigation
+  Menu: 'Menu' as IconName,
+  Close: 'X' as IconName,
+  ChevronDown: 'ChevronDown' as IconName,
+  ChevronRight: 'ChevronRight' as IconName,
+  ChevronLeft: 'ChevronLeft' as IconName,
+  ArrowRight: 'ArrowRight' as IconName,
+  
+  // Actions
+  Plus: 'Plus' as IconName,
+  Edit: 'Edit' as IconName,
+  Delete: 'Trash2' as IconName,
+  Save: 'Save' as IconName,
+  Download: 'Download' as IconName,
+  Upload: 'Upload' as IconName,
+  Copy: 'Copy' as IconName,
+  
+  // Status
+  Check: 'Check' as IconName,
+  CheckCircle: 'CheckCircle' as IconName,
+  Info: 'Info' as IconName,
+  AlertCircle: 'AlertCircle' as IconName,
+  AlertTriangle: 'AlertTriangle' as IconName,
+  XCircle: 'XCircle' as IconName,
+  
+  // Business
+  Calculator: 'Calculator' as IconName,
+  DollarSign: 'DollarSign' as IconName,
+  TrendingUp: 'TrendingUp' as IconName,
+  FileText: 'FileText' as IconName,
+  Building: 'Building' as IconName,
+  Users: 'Users' as IconName,
+  
+  // AI/Tech
+  Cpu: 'Cpu' as IconName,
+  Zap: 'Zap' as IconName,
+  Activity: 'Activity' as IconName,
+  GitBranch: 'GitBranch' as IconName,
+  
+  // UI
+  Search: 'Search' as IconName,
+  Filter: 'Filter' as IconName,
+  Settings: 'Settings' as IconName,
+  User: 'User' as IconName,
+  LogOut: 'LogOut' as IconName,
+  Eye: 'Eye' as IconName,
+  EyeOff: 'EyeOff' as IconName,
+  
+  // Communication
+  Mail: 'Mail' as IconName,
+  Phone: 'Phone' as IconName,
+  MessageSquare: 'MessageSquare' as IconName,
+  
+  // Time
+  Calendar: 'Calendar' as IconName,
+  Clock: 'Clock' as IconName,
+} as const;
+
+export default Icon;
+6. Create Updated Button Component (client/src/components/ui/Button.tsx):
+typescript/**
+ * @file Button.tsx
+ * @description Consistent button component following brand guide
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase SMBTaxCredits - Visual Brand Identity Guide.md
+ * 
+ * This component replaces the inconsistent button implementations
+ * with a single, brand-compliant button that works everywhere.
+ * 
+ * EXAMPLES:
+ * - Primary CTA: "Calculate My Credits"
+ * - Secondary action: "Save Draft"
+ * - Tertiary link: "Learn More"
+ * 
+ * BUSINESS RULES:
+ * - Minimum 44px height for touch targets
+ * - Clear hover and focus states
+ * - Loading states for async actions
+ * 
+ * TODO: Add icon button variants
+ * TODO: Create button group component
+ */
+
+import React from 'react';
+import { cn, buttonStyles } from '@/styles/component-styles';
+import { Icon, type IconName } from './Icon';
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: keyof typeof buttonStyles.variants;
+  size?: keyof typeof buttonStyles.sizes;
+  fullWidth?: boolean;
+  loading?: boolean;
+  leftIcon?: IconName;
+  rightIcon?: IconName;
+  children: React.ReactNode;
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      fullWidth = false,
+      loading = false,
+      leftIcon,
+      rightIcon,
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || loading}
+        className={cn(
+          buttonStyles.base,
+          buttonStyles.variants[variant],
+          size && buttonStyles.sizes[size],
+          fullWidth && buttonStyles.fullWidth,
+          buttonStyles.disabled,
+          className
+        )}
+        {...props}
+      >
+        {loading ? (
+          <>
+            <Icon name="Loader2" size="sm" className="animate-spin mr-2" />
+            <span>Loading...</span>
+          </>
+        ) : (
+          <>
+            {leftIcon && <Icon name={leftIcon} size="sm" className="mr-2" />}
+            {children}
+            {rightIcon && <Icon name={rightIcon} size="sm" className="ml-2" />}
+          </>
+        )}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+// Convenience exports
+export const PrimaryButton: React.FC<Omit<ButtonProps, 'variant'>> = (props) => (
+  <Button variant="primary" {...props} />
+);
+
+export const SecondaryButton: React.FC<Omit<ButtonProps, 'variant'>> = (props) => (
+  <Button variant="secondary" {...props} />
+);
+
+export const DangerButton: React.FC<Omit<ButtonProps, 'variant'>> = (props) => (
+  <Button variant="danger" {...props} />
+);
+
+export default Button;
+7. Create Style Migration Guide (docs/STYLE_MIGRATION_GUIDE.md):
+markdown# Style System Migration Guide
+
+## Overview
+This guide helps migrate existing components to the new brand-compliant style system.
+
+## Migration Checklist
+
+### 1. Update Color References
+```tsx
+// ❌ OLD
+className="bg-blue-500 text-white"
+className="border-green-600"
+className="text-red-500"
+
+// ✅ NEW
+className="bg-blue text-paper"
+className="border-emerald"
+className="text-error"
+2. Replace Button Classes
+tsx// ❌ OLD
+className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+className="btn-primary" // old custom class
+
+// ✅ NEW
+import { Button } from '@/components/ui/Button';
+<Button variant="primary">Click me</Button>
+3. Update Form Inputs
+tsx// ❌ OLD
+className="form-input border-gray-300 focus:border-blue-500"
+
+// ✅ NEW
+className="input"
+className="input input-error" // for errors
+4. Fix Typography
+tsx// ❌ OLD
+className="text-3xl font-bold"
+className="text-sm text-gray-600"
+
+// ✅ NEW
+import { typographyStyles } from '@/styles/component-styles';
+className={typographyStyles.h1}
+className={typographyStyles.small}
+5. Update Icons
+tsx// ❌ OLD
+<i className="fas fa-calculator"></i>
+
+// ✅ NEW
+import { Icon } from '@/components/ui/Icon';
+<Icon name="Calculator" size="md" />
+6. Fix Spacing
+tsx// ❌ OLD
+className="p-4 m-2" // arbitrary values
+className="space-y-3"
+
+// ✅ NEW
+className="p-4 m-2" // use scale: 1=4px, 2=8px, etc.
+className="space-y-4" // stick to scale
+7. Update Shadows
+tsx// ❌ OLD
+className="shadow-lg"
+style={{ boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+
+// ✅ NEW
+className="shadow-sm" // elevation 1
+className="shadow-md" // elevation 2
+className="shadow-lg" // elevation 3
+Component-Specific Migrations
+Navigation
+tsx// ❌ OLD
+<nav className="bg-white shadow">
+  <a className="text-blue-600 font-medium">Link</a>
+</nav>
+
+// ✅ NEW
+import { navigationStyles } from '@/styles/component-styles';
+<nav className={navigationStyles.wrapper}>
+  <a className={navigationStyles.activeLink}>Link</a>
+</nav>
+Cards
+tsx// ❌ OLD
+<div className="bg-white p-6 rounded-lg shadow">
+
+// ✅ NEW
+<div className="card">
+// or with hover
+<div className="card card-hover">
+Modals
+tsx// ❌ OLD
+<div className="fixed inset-0 bg-black bg-opacity-50">
+  <div className="bg-white rounded-lg p-8">
+
+// ✅ NEW
+import { modalStyles } from '@/styles/component-styles';
+<div className={modalStyles.backdrop}>
+  <div className={modalStyles.content}>
+Testing Your Migration
+
+Visual Regression
+
+Screenshot before/after
+Check all interactive states
+Verify responsive behavior
+
+
+Accessibility
+
+Ensure focus states work
+Check color contrast
+Test with keyboard
+
+
+Performance
+
+Bundle size should decrease
+Fewer unique classes
+Better tree-shaking
+
+
+
+Common Pitfalls
+
+Don't mix systems
+tsx// ❌ BAD
+className="btn-primary bg-blue-600"
+
+// ✅ GOOD
+className="btn-primary"
+
+Use semantic colors
+tsx// ❌ BAD
+className="text-green-500" // for success
+
+// ✅ GOOD
+className="text-emerald" // or text-success
+
+Respect the scale
+tsx// ❌ BAD
+className="p-5" // not in scale
+
+// ✅ GOOD
+className="p-6" // 24px in scale
+
+
+Gradual Migration Strategy
+
+Phase 1: Update colors and typography
+Phase 2: Replace buttons and forms
+Phase 3: Update layout components
+Phase 4: Polish with consistent spacing
+
+Getting Help
+
+Check design-tokens.ts for all values
+Use component-styles.ts for presets
+Refer to brand guide for rationale
+Ask in #design-system channel
+
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * Style System Architecture
+ * 
+ * DESIGN TOKENS:
+ * - Single source of truth in design-tokens.ts
+ * - Mapped to Tailwind in tailwind.config.ts
+ * - Applied via component-styles.ts
+ * 
+ * COLOR SYSTEM:
+ * - Brand colors: Deep Blue (#2E5AAC) and Emerald (#1E8E5A)
+ * - Neutral palette: Ink to Paper
+ * - State colors for feedback
+ * 
+ * TYPOGRAPHY:
+ * - Inter font family exclusively
+ * - Defined scale from display to micro
+ * - Consistent line heights
+ * 
+ * SPACING:
+ * - 4pt grid (4px base unit)
+ * - Scale from 0 to 32 (0 to 128px)
+ * - Consistent throughout
+ * 
+ * COMPONENTS:
+ * - All use predefined classes
+ * - No arbitrary values
+ * - Consistent hover/focus states
+ * 
+ * ACCESSIBILITY:
+ * - AA contrast minimum
+ * - 44px touch targets
+ * - Clear focus indicators
+ * 
+ * PERFORMANCE:
+ * - Reduced CSS bundle size
+ * - Better class reuse
+ * - Optimized for production
+ * 
+ * TODO: Implement component library docs
+ * TODO: Add Storybook for component showcase
+ * TODO: Create Figma design system file
+ */
+This comprehensive style system overhaul:
+
+Centralizes all design decisions in design-tokens.ts
+Maps brand colors properly to Tailwind config
+Creates reusable component classes in global CSS
+Provides typed style objects in component-styles.ts
+Standardizes icons with Lucide React only
+Updates core components like Button to use new system
+Includes migration guide for updating existing code
+
+The system ensures:
+
+Brand compliance with official colors/typography
+Consistency across all components
+Accessibility with proper contrast/sizing
+Performance with optimized class usage
+Developer experience with clear patterns
