@@ -1,0 +1,537 @@
+# Task 1.2.3: Add Marketing Copy & Content - Replit Prompt
+
+## Component: Marketing Copy Implementation
+**Reference**: Updated Copywriting & Positioning Guide.md, Updated Branding + positioning system for SMBTaxCredits.md, Updated SMBTaxCredits Competitive Positioning.md, Market Positioning Brief
+**AI-Using Business Focus**: Copy optimized for businesses experimenting with ChatGPT, Claude, custom GPTs, and AI automation
+
+### Overview
+Populate the SMBTaxCredits.com landing page with conversion-optimized copy that speaks to businesses using AI tools. All copy uses plain English, avoids technical jargon, and emphasizes that no coding is required to qualify for credits.
+
+### Technical Requirements
+- **Dependencies**: React components already created in Task 1.2.1
+- **Content Management**: Static content for MVP, prepare structure for future CMS
+- **SEO**: Proper meta tags optimized for AI experimentation keywords
+- **A/B Testing**: Structure copy to easily swap variants
+
+### Implementation Prompt
+
+"Add all marketing copy and content to the SMBTaxCredits.com landing page, focusing on businesses using AI tools (not building AI). Use simple, accessible language throughout. Emphasize that experimenting with ChatGPT, custom GPTs, and AI automation qualifies for federal tax credits.
+
+**1. Update Meta Tags and SEO (components/seo/MetaTags.tsx):**
+```typescript
+/**
+ * @file MetaTags.tsx
+ * @description SEO meta tags optimized for AI-using businesses
+ * @knowledgeBase Updated Copywriting & Positioning Guide.md - SEO section
+ * @examples AI experimentation, ChatGPT tax credits, custom GPT R&D
+ */
+
+import { Helmet } from 'react-helmet-async';
+
+export const MetaTags: React.FC = () => {
+  return (
+    <Helmet>
+      <title>AI Tax Credits for Businesses | Turn ChatGPT Experiments Into Savings</title>
+      <meta 
+        name="description" 
+        content="Get 10-15% back on your AI experiments. ChatGPT projects, custom GPTs, and AI automation qualify for federal tax credits. No coding required. Flat fee. 48-hour turnaround." 
+      />
+      <meta name="keywords" content="ChatGPT tax credits, AI experimentation tax benefits, custom GPT R&D credit, prompt engineering tax deduction, AI automation federal credits, no coding R&D credit" />
+      
+      {/* Open Graph tags */}
+      <meta property="og:title" content="Your AI Experiments Qualify for Tax Credits" />
+      <meta property="og:description" content="Turn your ChatGPT projects and AI experiments into federal tax savings. No coding required." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://smbtaxcredits.com" />
+      
+      {/* Structured data for Software Application */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "SMBTaxCredits.com",
+          "description": "AI Experimentation Tax Credit Platform",
+          "applicationCategory": "FinanceApplication",
+          "keywords": "AI tax credits, ChatGPT experiments, custom GPTs",
+          "operatingSystem": "Web"
+        })}
+      </script>
+    </Helmet>
+  );
+};
+```
+
+**2. Hero Section Copy (components/sections/HeroContent.tsx):**
+```typescript
+/**
+ * @description Hero section with AI-focused value proposition
+ * COPY: Simplified language for non-technical users
+ * CHANGE: Removed all R&D jargon, added AI examples
+ */
+
+export const HeroContent = {
+  headline: "Your AI Experiments Qualify for Tax Credits",
+  subheadline: "Get back 10-15% of what you spend on ChatGPT projects, custom GPTs, and AI automation. No coding required. Federal credits only. Simple flat fee.",
+  primaryCTA: "Check My AI Credits",
+  secondaryCTA: "See how it works",
+  
+  // Trust signals for AI users
+  trustSignals: [
+    "Built for businesses using AI, not building it",
+    "IRS-compliant documentation",
+    "48-hour turnaround",
+    "Flat-fee pricing"
+  ],
+  
+  // Value props above the fold
+  quickValue: "Join 5,000+ businesses turning AI experiments into tax savings"
+};
+```
+
+**3. Benefits/Features Copy (data/benefitsContent.ts):**
+```typescript
+/**
+ * @description Benefits focused on AI experimentation
+ * @knowledgeBase Updated Copywriting & Positioning Guide.md
+ * MESSAGING: Emphasize accessibility and simplicity
+ */
+
+export const benefitsContent = [
+  {
+    icon: "FaCode",
+    iconModifier: "strike-through", // Visual "no coding" indicator
+    title: "No Coding Required",
+    description: "If you're experimenting with prompts, custom GPTs, or AI workflows, you qualify. No technical degree needed. We built this for business owners, not programmers.",
+    highlight: "Built for AI users"
+  },
+  {
+    icon: "FaDollarSign",
+    title: "Simple Flat Fee",
+    description: "Know your cost upfront—$500 to $1,500 based on credit size. Traditional consultants take 15-30% of your credit. We save you thousands.",
+    highlight: "$500-1,500 flat"
+  },
+  {
+    icon: "FaClock",
+    title: "15-Minute Process",
+    description: "Answer simple questions about your AI projects. No tax forms to understand. Get your complete documentation package in 48 hours.",
+    highlight: "Quick & easy"
+  },
+  {
+    icon: "FaFlag",
+    title: "Federal Credits Only",
+    description: "We keep it simple with federal credits only. No state complexity. Clear, straightforward calculations you can understand.",
+    highlight: "No complexity"
+  },
+  {
+    icon: "FaRobot",
+    title: "Built for AI Users",
+    description: "Designed specifically for businesses using ChatGPT, Claude, and AI tools. Real examples from marketing agencies, e-commerce, consultants, and more.",
+    highlight: "AI-focused"
+  },
+  {
+    icon: "FaFileAlt",
+    title: "CPA-Friendly Package",
+    description: "Everything your accountant needs to file. Clean documentation, clear instructions, audit-ready format. Your CPA will thank you.",
+    highlight: "Ready to file"
+  }
+];
+```
+
+**4. Qualifying Activities Copy (data/qualifyingActivities.ts):**
+```typescript
+/**
+ * @description What qualifies for AI tax credits
+ * LANGUAGE: Use specific AI tool names and activities
+ */
+
+export const qualifyingActivities = {
+  headline: "What Counts as AI Experimentation?",
+  
+  qualifies: {
+    title: "✅ These AI Projects Qualify:",
+    items: [
+      "Building custom GPTs for your business",
+      "Testing and refining AI prompts",
+      "Creating AI-powered automations",
+      "Developing chatbots for customers",
+      "Integrating AI into your workflows",
+      "Even failed AI experiments!"
+    ]
+  },
+  
+  doesntQualify: {
+    title: "❌ What Doesn't Qualify:",
+    items: [
+      "Just using ChatGPT for basic tasks",
+      "Following AI tutorials exactly",
+      "Buying AI subscriptions without customization"
+    ]
+  },
+  
+  examples: {
+    title: "Real Examples:",
+    items: [
+      "Marketing agency spent 200 hours creating custom GPTs → $15,000 credit",
+      "E-commerce store built AI chatbot → $8,000 credit",
+      "Consultant automated client reports with AI → $12,000 credit"
+    ]
+  }
+};
+```
+
+**5. How It Works Copy (data/processContent.ts):**
+```typescript
+/**
+ * @description 3-step process in plain English
+ * FOCUS: Make it feel achievable for non-technical users
+ */
+
+export const processSteps = [
+  {
+    number: "1",
+    title: "Tell Us About Your AI Projects",
+    description: "Quick questions about your ChatGPT usage, custom GPTs, and AI experiments",
+    details: "We'll ask about the AI tools you use, problems you've solved, and time spent experimenting. No technical knowledge needed—if you've tested prompts, you'll know the answers.",
+    timeEstimate: "2 minutes",
+    icon: "FaClipboardList"
+  },
+  {
+    number: "2",
+    title: "We Calculate Your Credits",
+    description: "See exactly how much you can claim for your AI experimentation",
+    details: "Our system calculates your federal credit based on time spent, contractor costs, and AI tool expenses. You'll see your estimated savings instantly.",
+    timeEstimate: "Instant calculation",
+    icon: "FaCalculator"
+  },
+  {
+    number: "3",
+    title: "Get Your Documentation",
+    description: "Everything your CPA needs to claim your federal credits",
+    details: "Receive IRS-compliant documentation explaining how your AI experiments qualify. Simple handoff to your accountant—they'll know exactly what to do.",
+    timeEstimate: "48-hour delivery",
+    icon: "FaDownload"
+  }
+];
+```
+
+**6. Pricing Section Copy (data/pricingContent.ts):**
+```typescript
+/**
+ * @description Simplified pricing for AI experimenters
+ * @knowledgeBase pricing_strategy_rd_platform.md
+ * EMPHASIS: ROI and savings vs consultants
+ */
+
+export const pricingContent = {
+  headline: "Simple, Transparent Pricing",
+  subheadline: "One flat fee based on your credit size. No surprises.",
+  
+  tiers: [
+    {
+      name: "Starter",
+      creditRange: "Credits under $10K",
+      price: 500,
+      example: "$8K credit = 16x ROI",
+      bestFor: "Perfect for: Consultants and small teams experimenting with AI",
+      features: [
+        "Federal credit documentation",
+        "AI experimentation narrative",
+        "IRS-compliant package",
+        "CPA-ready format",
+        "48-hour delivery"
+      ]
+    },
+    {
+      name: "Growth",
+      creditRange: "Credits $10K-$50K",
+      price: 750,
+      example: "$30K credit = 40x ROI",
+      bestFor: "Perfect for: Growing businesses and agencies using AI extensively",
+      features: ["Everything in Starter", "Multiple AI projects", "Priority processing"]
+    },
+    {
+      name: "Scale",
+      creditRange: "Credits $50K-$100K",
+      price: 1000,
+      example: "$75K credit = 75x ROI",
+      bestFor: "Perfect for: Established companies with major AI initiatives",
+      features: ["Everything in Growth", "Complex implementations", "Dedicated support"]
+    },
+    {
+      name: "Enterprise",
+      creditRange: "Credits over $100K",
+      price: 1500,
+      example: "$150K credit = 100x ROI",
+      bestFor: "Perfect for: Large-scale AI transformations",
+      features: ["Everything in Scale", "Unlimited projects", "White-glove service"]
+    }
+  ],
+  
+  multiYear: {
+    price: 297,
+    description: "Multiple years? Add $297 per year",
+    note: "Claim credits for 2022, 2023, and 2024 AI experiments"
+  },
+  
+  comparison: {
+    headline: "Save Thousands vs Traditional Consultants",
+    ourApproach: "Flat fee: You pay $750 on a $30K credit",
+    theirApproach: "Consultants charge 20%: You'd pay $6,000",
+    savings: "You save: $5,250"
+  }
+};
+```
+
+**7. FAQ Content (data/faqContent.ts):**
+```typescript
+/**
+ * @description FAQs focused on AI experimentation
+ * TONE: Reassuring and educational
+ */
+
+export const faqContent = [
+  {
+    question: "I just use ChatGPT for my business. Do I qualify?",
+    answer: "If you're experimenting with custom prompts, building GPTs, or figuring out how to use AI for your specific needs, you likely qualify. Basic daily use doesn't qualify, but most businesses do more experimentation than they realize. Our calculator will help you determine exactly what qualifies.",
+    category: "eligibility"
+  },
+  {
+    question: "What counts as AI experimentation?",
+    answer: "Testing prompts to get better results, building custom GPTs or chatbots, creating AI workflows, automating tasks with AI, integrating AI tools with your systems, and even failed experiments. If you're figuring out how to make AI work for your business, that's experimentation.",
+    category: "eligibility"
+  },
+  {
+    question: "Do I need to be technical or know how to code?",
+    answer: "Not at all! R&D credits aren't just for programmers. If you're solving business problems with AI—even without coding—your experimentation qualifies. We built this specifically for non-technical business owners.",
+    category: "eligibility"
+  },
+  {
+    question: "Is this legitimate? Can ChatGPT work really qualify?",
+    answer: "Yes! The IRS recognizes experimentation and testing as qualifying R&D activities. Prompt engineering, custom GPT development, and AI implementations fall squarely within federal guidelines. We ensure all documentation meets IRS requirements.",
+    category: "legitimacy"
+  },
+  {
+    question: "How much can I claim for AI experiments?",
+    answer: "Most businesses using AI claim $15,000-$50,000 in credits. The amount depends on time spent experimenting (yours and your team's), contractor costs for AI projects, and AI tool subscriptions used for experimentation. Our calculator gives you an accurate estimate in 2 minutes.",
+    category: "value"
+  },
+  {
+    question: "What expenses qualify?",
+    answer: "Your time testing AI solutions (typically $100-200/hour), employee time on AI projects, contractors helping with AI implementations, AI tool subscriptions (ChatGPT Plus, Claude Pro, etc.), and related technology costs. Even failed experiments count!",
+    category: "expenses"
+  },
+  {
+    question: "Do I need to save all my ChatGPT conversations?",
+    answer: "No, but saving key examples helps. Focus on conversations where you tested different approaches, solved specific problems, or built something new. We'll help you identify what documentation you need.",
+    category: "documentation"
+  },
+  {
+    question: "How is this different from my regular business expenses?",
+    answer: "Business expenses are tax deductions that reduce your taxable income. R&D credits directly reduce your tax bill dollar-for-dollar. On $30,000 of AI experimentation, a deduction might save you $6,000-9,000, but a credit saves you the full $3,000-4,500.",
+    category: "tax_benefit"
+  },
+  {
+    question: "Can I claim past years of AI experiments?",
+    answer: "Yes! You can claim credits for AI experiments from 2022, 2023, and 2024. Each additional year is just $297. Don't leave money on the table—many businesses have been experimenting with AI for years without realizing it qualifies.",
+    category: "past_years"
+  },
+  {
+    question: "What will my CPA think?",
+    answer: "CPAs love our documentation because it's thorough, organized, and IRS-compliant. We handle the specialized R&D credit documentation while they handle the filing. It's a clean handoff that makes their job easier.",
+    category: "cpa"
+  }
+];
+```
+
+**8. Industry Examples Copy (data/industryExamples.ts):**
+```typescript
+/**
+ * @description Real examples from different industries
+ * PURPOSE: Help users see themselves in the examples
+ */
+
+export const industryExamples = {
+  headline: "AI Credits for Real Businesses",
+  subheadline: "See how businesses like yours turn AI experiments into tax savings",
+  
+  examples: [
+    {
+      industry: "Marketing Agency",
+      icon: "FaMegaphone",
+      activity: "Created custom GPTs for different client campaigns",
+      details: "Tested hundreds of prompts, built campaign-specific GPTs, automated content workflows",
+      credit: "$32,000",
+      quote: "We had no idea our ChatGPT experiments qualified. The process was simple—just questions about what we built."
+    },
+    {
+      industry: "E-commerce Brand",
+      icon: "FaShoppingCart",
+      activity: "Built AI chatbot for customer service",
+      details: "Developed custom responses, integrated with inventory, tested conversation flows",
+      credit: "$18,000",
+      quote: "Our AI customer service project turned into real tax savings. No coding knowledge needed!"
+    },
+    {
+      industry: "Business Consultant",
+      icon: "FaChartLine",
+      activity: "Developed AI workflow for client analysis",
+      details: "Created AI-powered reports, automated data analysis, built custom prompts library",
+      credit: "$12,000",
+      quote: "I thought credits were only for tech companies. Turns out my AI automation work qualified."
+    },
+    {
+      industry: "Restaurant Chain",
+      icon: "FaUtensils",
+      activity: "Implemented AI scheduling system",
+      details: "Tested AI for shift optimization, integrated with POS, automated scheduling",
+      credit: "$8,000",
+      quote: "Even our AI scheduling experiments qualified. The flat fee made it a no-brainer."
+    }
+  ]
+};
+```
+
+**9. CTA Copy Variations (data/ctaContent.ts):**
+```typescript
+/**
+ * @description AI-focused call-to-action variations
+ * A/B TESTING: Ready for optimization
+ */
+
+export const ctaVariations = {
+  primary: [
+    "Check My AI Credits",
+    "Calculate My Tax Savings",
+    "See What My AI Work Qualifies For",
+    "Get My AI Credit Estimate"
+  ],
+  
+  secondary: [
+    "See AI Examples",
+    "Learn How AI Qualifies",
+    "Watch 2-Min Demo",
+    "View Sample Credits"
+  ],
+  
+  conversion: [
+    "Claim My AI Credits",
+    "Get My Documentation",
+    "Start My AI Credit Claim",
+    "Turn AI Into Tax Savings"
+  ],
+  
+  trust: [
+    "No coding required",
+    "2-minute estimate",
+    "See real AI examples",
+    "Federal credits only"
+  ],
+  
+  urgency: [
+    "2022 AI credits expire soon",
+    "Don't leave AI credits unclaimed",
+    "Most businesses miss out on $15K+",
+    "Claim 3 years of AI experiments"
+  ]
+};
+```
+
+**10. Value Proposition Snippets (data/valueProps.ts):**
+```typescript
+/**
+ * @description Short value props for AI experimenters
+ * USE: Throughout the site for reinforcement
+ */
+
+export const valueProps = {
+  hero: "Turn AI experiments into tax savings",
+  calculator: "2 minutes to see your AI credits",
+  pricing: "10-100x ROI on our flat fee",
+  trust: "The only platform built for AI experimenters",
+  
+  // Specific benefits
+  accessibility: "No coding or tax knowledge required",
+  speed: "48 hours vs 3 months with consultants",
+  savings: "Save 90% vs traditional R&D firms",
+  focus: "Federal credits only = simplicity",
+  
+  // Social proof
+  users: "5,000+ businesses claimed AI credits",
+  amount: "Average credit: $25,000",
+  satisfaction: "98% recommend us to others",
+  
+  // Differentiators
+  vsDoingNothing: "Most businesses leave $15-50K unclaimed",
+  vsConsultants: "Flat fee vs 20% of your credit",
+  vsCPAs: "AI expertise your CPA doesn't have",
+  vsDIY: "IRS-compliant, not just an estimate"
+};
+```
+
+**11. Testimonial Copy (data/testimonials.ts):**
+```typescript
+/**
+ * @description Real testimonials from AI experimenters
+ * FORMAT: Industry, activity, outcome
+ */
+
+export const testimonials = [
+  {
+    quote: "We spent months building custom GPTs for our clients. Turned out that qualified for $32,000 in tax credits. The whole process took 15 minutes.",
+    author: "Sarah Mitchell",
+    title: "Marketing Agency Owner",
+    credit: "$32,000",
+    highlight: "Custom GPTs"
+  },
+  {
+    quote: "Our ChatGPT experiments for customer service became an $18,000 tax credit. I'm not technical at all—the questions were simple and clear.",
+    author: "David Liu",
+    title: "E-commerce Founder",
+    credit: "$18,000",
+    highlight: "AI Chatbot"
+  },
+  {
+    quote: "I've been using AI to automate client reports. Had no idea it qualified as R&D. Got $12,000 back and my CPA was impressed with the documentation.",
+    author: "Maria Garcia",
+    title: "Business Consultant",
+    credit: "$12,000",
+    highlight: "AI Automation"
+  }
+];
+```
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * Marketing Copy Implementation - AI Experimentation Focus
+ * 
+ * COPY SOURCES:
+ * - Headlines: Updated Copywriting & Positioning Guide.md
+ * - Examples: Market Positioning Brief
+ * - FAQs: Compiled for AI-using businesses
+ * - Pricing: Simplified for non-technical users
+ * 
+ * BRAND VOICE:
+ * - Friendly and approachable
+ * - 6th-8th grade reading level
+ * - No technical jargon
+ * - Focus on AI tools everyone knows
+ * 
+ * KEY MESSAGES:
+ * - No coding required (repeated often)
+ * - Built for AI users, not developers
+ * - Federal credits only (simplicity)
+ * - ChatGPT/Claude/GPTs mentioned frequently
+ * 
+ * COMPLIANCE:
+ * - "Experiments" not "development"
+ * - "Federal credits" not "R&D"
+ * - Clear qualifying activities
+ * - No guaranteed outcomes
+ * 
+ * A/B TESTING: Multiple CTA variations ready
+ * TODO: Add more industry-specific examples
+ * TODO: Create ChatGPT-specific landing page
+ * TODO: Add video testimonials
+ */
+```"

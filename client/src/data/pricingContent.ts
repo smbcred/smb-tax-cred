@@ -5,104 +5,84 @@
  */
 
 export const pricingContent = {
-  headline: "Transparent, Flat-Fee Pricing",
-  subheadline: "Keep more of your credit. No percentage cuts.",
+  headline: "Simple, Transparent Pricing",
+  subheadline: "One flat fee based on your credit size. No surprises.",
   
   tiers: [
     {
-      tier: "Tier 1",
-      creditRange: "Credits < $10K",
+      tier: "Starter",
+      creditRange: "Credits under $10K",
       price: "$500",
       example: "$8K credit = 16x ROI",
       features: [
-        "Federal R&D Credit Forms",
-        "Technical Narrative (4-8 pages)",
-        "Section 174A Deduction",
-        "Compliance Memo",
-        "90-day Document Access"
+        "Federal credit documentation",
+        "AI experimentation narrative",
+        "IRS-compliant package",
+        "CPA-ready format",
+        "48-hour delivery"
       ],
-      highlighted: false
+      highlighted: false,
+      bestFor: "Perfect for: Consultants and small teams experimenting with AI"
     },
     {
-      tier: "Tier 2",
-      creditRange: "Credits $10K-$20K",
+      tier: "Growth",
+      creditRange: "Credits $10K-$50K",
       price: "$750",
-      example: "$15K credit = 20x ROI",
+      example: "$30K credit = 40x ROI",
       features: [
-        "Everything in Tier 1",
-        "Enhanced narrative detail",
-        "Priority support",
-        "Multi-year guidance",
-        "QSB payroll offset prep"
+        "Everything in Starter",
+        "Multiple AI projects",
+        "Priority processing",
+        "Email support",
+        "Complex implementations"
       ],
-      highlighted: true
+      highlighted: true,
+      bestFor: "Perfect for: Growing businesses and agencies using AI extensively"
     },
     {
-      tier: "Tier 3",
-      creditRange: "Credits $20K-$30K",
+      tier: "Scale",
+      creditRange: "Credits $50K-$100K",
       price: "$1,000",
-      example: "$25K credit = 25x ROI",
+      example: "$75K credit = 75x ROI",
       features: [
-        "Everything in Tier 2",
-        "Multi-project support",
-        "Expedited processing",
-        "Executive summary",
-        "State credit guidance"
+        "Everything in Growth",
+        "Unlimited AI projects",
+        "Multi-year documentation",
+        "Phone support",
+        "Dedicated assistance"
       ],
-      highlighted: false
+      highlighted: false,
+      bestFor: "Perfect for: Established companies with major AI initiatives"
     },
     {
-      tier: "Tier 4",
-      creditRange: "Credits $30K-$40K",
-      price: "$1,250",
-      example: "$35K credit = 28x ROI",
-      features: [
-        "Everything in Tier 3",
-        "Complex project structures",
-        "Department-level breakdowns",
-        "Custom narratives",
-        "Priority phone support"
-      ],
-      highlighted: false
-    },
-    {
-      tier: "Tier 5",
-      creditRange: "Credits $40K-$50K",
+      tier: "Enterprise",
+      creditRange: "Credits over $100K",
       price: "$1,500",
-      example: "$45K credit = 30x ROI",
-      features: ["Everything in Tier 4", "Dedicated support specialist"],
-      highlighted: false
-    },
-    {
-      tier: "Tier 6",
-      creditRange: "Credits $50K-$60K",
-      price: "$1,750",
-      example: "$55K credit = 31x ROI",
-      features: ["Everything in Tier 5", "Rush processing available"],
-      highlighted: false
-    },
-    {
-      tier: "Tier 7",
-      creditRange: "Credits > $60K",
-      price: "Custom",
-      example: "Contact for enterprise pricing",
-      features: ["White-glove service", "Custom solutions"],
-      highlighted: false
+      example: "$150K credit = 100x ROI",
+      features: [
+        "Everything in Scale",
+        "Custom documentation",
+        "White-glove service",
+        "Audit defense prep",
+        "Priority handling"
+      ],
+      highlighted: false,
+      bestFor: "Perfect for: Large-scale AI transformations"
     }
   ],
   
   additionalYear: {
     price: "$297",
-    description: "Add another year",
-    note: "Same comprehensive documentation for each additional tax year"
+    description: "Multiple years? Add $297 per year",
+    note: "Claim credits for 2022, 2023, and 2024 AI experiments"
   },
   
   comparison: {
-    title: "Compare vs. Traditional Consultants",
-    competitor: "20% contingency fee on $50K credit",
-    competitorPrice: "$10,000",
-    ourPrice: "$1,000",
-    savings: "You save $9,000"
+    title: "Save Thousands vs Traditional Consultants",
+    competitor: "Consultants charge 20% on $30K credit",
+    competitorPrice: "$6,000",
+    ourPrice: "$750",
+    savings: "You save $5,250"
   },
 
   guarantee: "If your final credit is lower than estimated, we automatically refund the difference in pricing tiers."

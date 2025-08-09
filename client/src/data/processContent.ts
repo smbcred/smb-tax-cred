@@ -1,31 +1,32 @@
 /**
  * @file processContent.ts
- * @description 3-step process explanation
+ * @description 3-step process in plain English
+ * FOCUS: Make it feel achievable for non-technical users
  */
 
 export const processSteps = [
   {
     number: "1",
-    title: "Estimate",
-    description: "Answer a few questions to size your credit",
-    details: "Quick questionnaire about your business type, R&D activities, and expenses. Get an instant estimate of your federal credit amount and see your ROI.",
+    title: "Tell Us About Your AI Projects",
+    description: "Quick questions about your ChatGPT usage, custom GPTs, and AI experiments",
+    details: "We'll ask about the AI tools you use, problems you've solved, and time spent experimenting. No technical knowledge needed—if you've tested prompts, you'll know the answers.",
     timeEstimate: "2 minutes",
-    iconName: "FaCalculator"
+    iconName: "FaClipboardList"
   },
   {
     number: "2",
-    title: "Document",
-    description: "We turn your projects and costs into IRS-ready narratives and forms",
-    details: "Our AI generates Section G summaries, technical narratives, and QRE categorization. Everything maps to the four-part test and IRS requirements.",
-    timeEstimate: "15-20 minutes",
-    iconName: "FaFileSignature"
+    title: "We Calculate Your Credits",
+    description: "See exactly how much you can claim for your AI experimentation",
+    details: "Our system calculates your federal credit based on time spent, contractor costs, and AI tool expenses. You'll see your estimated savings instantly.",
+    timeEstimate: "Instant calculation",
+    iconName: "FaCalculator"
   },
   {
     number: "3",
-    title: "File",
-    description: "Download your package and file with your CPA",
-    details: "Get Form 6765 data, amended-return exhibits, and workpapers. Need payroll offset? We prep the Form 8974 data. Clean handoff to your tax preparer.",
-    timeEstimate: "Ready in 1-3 days",
+    title: "Get Your Documentation",
+    description: "Everything your CPA needs to claim your federal credits",
+    details: "Receive IRS-compliant documentation explaining how your AI experiments qualify. Simple handoff to your accountant—they'll know exactly what to do.",
+    timeEstimate: "48-hour delivery",
     iconName: "FaDownload"
   }
 ];
