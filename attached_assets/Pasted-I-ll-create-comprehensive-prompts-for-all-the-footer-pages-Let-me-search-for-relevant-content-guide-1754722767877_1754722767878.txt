@@ -1,0 +1,877 @@
+I'll create comprehensive prompts for all the footer pages. Let me search for relevant content guidelines first.Now let me search for more specific content for the pages.I'll now create comprehensive prompts for all the footer pages. These prompts will help you create content-rich pages that serve both SEO and user needs.
+
+# Complete Footer Pages Creation Prompts
+
+## Product Section Pages
+
+### Task: Create "How It Works" Page - Replit Prompt
+
+**Component: How It Works Page**
+**KB References**: 
+- Complete User Experience Flow.md → Process Overview
+- system-architecture-explanation.md → User Journey
+- Copywriting & Positioning Guide.md → Value Props
+
+**Business Context**: Shows SMBs exactly how the platform turns their AI experimentation into R&D tax credit documentation through a simple 3-step process.
+
+```
+Create a comprehensive "How It Works" page that explains the R&D tax credit documentation process:
+
+1. Use simple visual timeline showing: Estimate → Pay → Document → Download
+2. Include time estimates: 2-min calculator, 15-20 min intake, 24-48 hour delivery
+3. Show example screenshots at each step with annotations
+4. Add trust signals: "IRS-compliant", "CPA-ready", "Section G aligned"
+5. Include animated progress indicators and interactive elements
+6. Federal credits only messaging throughout
+7. Mobile-responsive design with card-based layout
+
+Content sections needed:
+- Hero: "Get Your R&D Tax Credits in 3 Simple Steps"
+- Step 1: Quick Estimate (show calculator preview)
+- Step 2: Secure Payment (show pricing tiers)
+- Step 3: Smart Intake (show form sections)
+- Step 4: Professional Documents (show sample outputs)
+- FAQs specific to process
+- CTA: "Start Your Free Estimate"
+
+Include these AI examples:
+- Marketing agency testing ChatGPT prompts
+- E-commerce store building custom product recommendations
+- Service business automating customer communications
+
+Page should emphasize speed, simplicity, and professionalism.
+```
+
+### Task: Create "Pricing" Page - Replit Prompt
+
+**Component: Pricing Page**
+**KB References**: 
+- pricing_strategy_rd_platform.md → All Pricing Tiers
+- SMBTaxCredits Competitive Positioning.md → Pricing Narrative
+- Complete User Experience Flow.md → Checkout Process
+
+**Business Context**: Transparent flat-fee pricing that saves SMBs 80-90% compared to contingency-based consultants while documenting their AI experiments.
+
+```
+Create a comprehensive pricing page with all 7 tiers for R&D tax credit documentation:
+
+Visual requirements:
+1. Pricing table with all tiers: Starter ($299) through Enterprise ($3,999)
+2. Highlight "Most Popular" tier (Growth at $999)
+3. Show credit ranges for each tier clearly
+4. Include "What's Included" checklist for all tiers
+5. Add pricing calculator widget to estimate tier
+6. Comparison section vs consultants (show 10x savings)
+7. Trust badges and guarantees
+
+Content structure:
+- Hero: "Simple, Flat-Fee Pricing. No Surprises."
+- Subhead: "Pay once. Save thousands vs percentage-based consultants."
+- Pricing table with 7 tiers showing:
+  - Tier name and price
+  - Credit range covered
+  - Included features (all get same service)
+  - CTA button per tier
+- Savings comparison calculator
+- FAQ section about pricing
+- Money-back guarantee section
+- Multi-year discount information
+
+Key messaging:
+- "Consultants charge 20-25%. We charge a flat fee."
+- "Same documentation quality at every tier"
+- "Price based on your credit size, not percentage"
+- Examples: "$50K credit = $10K consultant fee vs $999 our fee"
+
+Include trust elements:
+- Price-match promise
+- 90-day download access
+- Secure payment badges
+- Customer testimonials about savings
+```
+
+### Task: Create "Sample Documents" Page - Replit Prompt
+
+**Component: Sample Documents Page**
+**KB References**: 
+- filing_package_manifest.md → Document Types
+- narrative_templates.md → Template Examples
+- form_8974_spec.md → Form Samples
+
+**Business Context**: Shows SMBs exactly what professional R&D documentation looks like, building confidence that their AI experimentation will be properly documented.
+
+```
+Create a sample documents showcase page with downloadable examples:
+
+Page structure:
+1. Hero section explaining document quality
+2. Document gallery with preview cards
+3. Downloadable PDF samples (watermarked)
+4. Interactive document viewer
+5. Detailed explanations of each document type
+6. Trust signals about IRS compliance
+
+Sample documents to include:
+- Form 6765 (completed example)
+- Technical Narrative (AI chatbot project)
+- QRE Calculation Worksheet
+- Four-Part Test Documentation
+- Section G Summary
+- Amended Return Cover Letter
+- Executive Summary Report
+
+For each document:
+- Preview thumbnail
+- Description of purpose
+- "What's Included" list
+- Download button
+- Page count and format info
+
+Add sections for:
+- "Why Documentation Matters" (audit protection)
+- "What Makes Our Documents Different"
+- Customer testimonials about document quality
+- CPA feedback quotes
+- IRS compliance checkmarks
+
+Interactive elements:
+- Document zoom viewer
+- PDF flip-through preview
+- Download counter
+- Email gate for downloads (optional)
+
+CTA throughout: "Get Your Custom Documents"
+```
+
+## Resources Section Pages
+
+### Task: Create "R&D Credit Guide" Page - Replit Prompt
+
+**Component: R&D Tax Credit Guide**
+**KB References**: 
+- R&D_Credit_Knowledge_Base_SMB.md → Complete Guide
+- Federal R&D Tax Credit Rules and 2025 Updates.md → Current Rules
+- documentation-standards.md → Requirements
+
+**Business Context**: Comprehensive guide helping SMBs understand how their AI experimentation and innovation qualifies for federal R&D tax credits.
+
+```
+Create an in-depth R&D tax credit guide optimized for SMBs using AI:
+
+Content structure with these sections:
+
+1. Introduction
+   - "Your AI Experiments Could Be Worth Thousands"
+   - Federal credits worth 10-16% of qualified expenses
+   - Why most SMBs miss out (complexity, jargon, consultants)
+
+2. What Qualifies (AI-Forward Examples)
+   - Prompt engineering and testing
+   - Custom GPT development
+   - Automation workflow creation
+   - AI tool integration projects
+   - Failed experiments count too!
+
+3. The Four-Part Test (Plain English)
+   - Business purpose: Improving your operations
+   - Technical nature: Using AI/software tools
+   - Uncertainty: Not sure it would work
+   - Experimentation: Testing different approaches
+
+4. Qualifying Expenses
+   - Employee time spent experimenting
+   - Contractor costs for AI projects
+   - Cloud/API costs for testing
+   - Software subscriptions used in R&D
+
+5. Real SMB Examples
+   - Marketing agency: Prompt library development
+   - E-commerce: AI recommendation engine
+   - Services: Automated customer support
+   - Manufacturing: Quality control AI
+
+6. How to Document
+   - Time tracking tips
+   - Project notes templates
+   - Success metrics to track
+   - Common mistakes to avoid
+
+7. Filing Process
+   - Amended returns for 2022-2024
+   - Current year 2025 filing
+   - Working with your CPA
+   - Timeline expectations
+
+8. FAQs
+   - "I'm not a tech company, do I qualify?"
+   - "What if my experiments failed?"
+   - "How much can I claim?"
+   - "What records do I need?"
+
+Include:
+- Downloadable checklist
+- Time tracking template
+- Calculator widget embeds
+- Case study callouts
+- IRS publication links
+- Navigation sidebar
+- Progress indicator
+- Email capture for PDF version
+
+Tone: Educational but approachable, like explaining to a smart friend.
+```
+
+### Task: Create "Qualifying Activities" Page - Replit Prompt
+
+**Component: Qualifying Activities Database**
+**KB References**: 
+- R&D_Credit_Knowledge_Base_SMB.md → Activity Examples
+- additional-project-specs.md → Activity Categories
+- user_archetype_profiles.md → Industry Examples
+
+**Business Context**: Interactive database of specific R&D activities relevant to SMBs using AI, helping them identify their qualifying work.
+
+```
+Create an interactive qualifying activities page with filterable examples:
+
+Page features:
+1. Activity search/filter tool
+2. Industry category filters
+3. Technology type filters
+4. Detailed activity cards
+5. "Does this qualify?" quiz
+6. Custom activity submission form
+
+Categories to include:
+- AI & Automation
+- Software Development
+- Process Improvement
+- Product Development
+- Data & Analytics
+- Customer Experience
+
+For each activity, show:
+- Activity name and description
+- Industry relevance tags
+- Specific qualifying aspects
+- Example time/cost ranges
+- Related activities
+- Success metrics examples
+
+Sample activities (30-40 total):
+- "Developing Custom ChatGPT Prompts"
+- "Building Automated Email Workflows"
+- "Creating AI-Powered Chatbots"
+- "Integrating Multiple Software Tools"
+- "Testing Product Recommendation Algorithms"
+- "Automating Data Entry Processes"
+- "Building Custom Reporting Dashboards"
+- "Developing Quality Control Systems"
+
+Interactive elements:
+- Filter by industry/size/tech
+- Search functionality
+- "Save to my list" feature
+- Print-friendly view
+- Share specific activities
+- Related activities suggestions
+
+Include sections:
+- "Activities That DON'T Qualify"
+- "Gray Area Activities"
+- "How to Document Your Activities"
+- "Building Your Project List"
+
+CTAs throughout:
+- "Calculate Your Credit"
+- "Start Documentation"
+- "Download Activity Checklist"
+```
+
+### Task: Create "FAQ" Page - Replit Prompt
+
+**Component: Comprehensive FAQ Page**
+**KB References**: 
+- edge_case_copy_logic.md → Common Questions
+- Copywriting & Positioning Guide.md → Objection Handling
+- Complete User Experience Flow.md → User Concerns
+
+**Business Context**: Addresses all common questions SMBs have about R&D tax credits and the documentation process, reducing support burden.
+
+```
+Create a comprehensive FAQ page with smart organization:
+
+Structure:
+1. Search bar at top
+2. Category navigation
+3. Expandable question/answer format
+4. Related questions suggestions
+5. Contact support option
+6. Feedback mechanism
+
+Categories:
+- Getting Started
+- Eligibility & Qualification  
+- Pricing & Payment
+- Documentation Process
+- Working with Your CPA
+- Technical Questions
+- Security & Privacy
+
+Top 20 Questions to Include:
+
+Eligibility:
+- "We just use ChatGPT and other AI tools - do we qualify?"
+- "What if our experiments didn't work?"
+- "We're not a tech company - can we still claim?"
+- "How many hours/expenses do we need?"
+- "Can we claim for past years?"
+
+Process:
+- "How long does the whole process take?"
+- "What information do I need to provide?"
+- "Do you file the forms for us?"
+- "What if I need to make changes?"
+- "Can multiple people access our account?"
+
+Pricing:
+- "Why is your pricing so much lower than consultants?"
+- "What if my credit estimate changes?"
+- "Are there any hidden fees?"
+- "Do you offer payment plans?"
+- "What's your refund policy?"
+
+CPAs:
+- "Will my CPA accept your documents?"
+- "Do you work directly with CPAs?"
+- "What if my CPA has questions?"
+- "Can you recommend a CPA?"
+
+Technical:
+- "Is my data secure?"
+- "How do you calculate the credit?"
+- "What is Section G?"
+- "What about state credits?"
+
+Add for each answer:
+- Clear, concise response
+- Links to relevant pages
+- Examples where helpful
+- Next steps/CTAs
+- Helpfulness rating
+
+Bottom section:
+- "Didn't find your answer?"
+- Contact form
+- Live chat option
+- Phone number
+- Email support
+```
+
+### Task: Create "Blog" Landing Page - Replit Prompt
+
+**Component: Blog/Resource Center**
+**KB References**: 
+- Marketing content and messaging templates → Blog Topics
+- R&D_Credit_Knowledge_Base_SMB.md → Educational Content
+- user_archetype_profiles.md → Reader Personas
+
+**Business Context**: Educational content hub that attracts SMBs searching for R&D tax credit information while showcasing AI experimentation examples.
+
+```
+Create a modern blog/resource center layout:
+
+Page structure:
+1. Featured article hero section
+2. Category filter navigation
+3. Article grid with preview cards
+4. Newsletter signup sidebar
+5. Popular articles section
+6. Search functionality
+
+Categories:
+- AI & Innovation
+- Tax Credit Basics
+- Case Studies
+- Industry Guides
+- Documentation Tips
+- News & Updates
+
+Initial article titles (create 12):
+1. "How Your ChatGPT Experiments Qualify for R&D Credits"
+2. "5 AI Projects That Saved SMBs Thousands in Taxes"
+3. "The Marketing Agency's Guide to R&D Tax Credits"
+4. "Failed Experiments? They Still Count for R&D"
+5. "E-commerce R&D: Beyond Basic Operations"
+6. "Documenting Your AI Journey for Tax Credits"
+7. "R&D Credits for Non-Tech Companies"
+8. "2025 Federal R&D Credit Updates"
+9. "From Idea to Innovation: Tracking Your R&D"
+10. "Custom GPTs and R&D Tax Credits"
+11. "Building Your First R&D Project List"
+12. "Common R&D Credit Mistakes to Avoid"
+
+For each article card:
+- Eye-catching thumbnail
+- Title and excerpt
+- Author and date
+- Read time estimate
+- Category tags
+- Share buttons
+
+Sidebar elements:
+- Newsletter signup
+- Free guide download
+- Calculator CTA
+- Recent articles
+- Popular tags cloud
+
+SEO features:
+- Meta descriptions
+- Schema markup
+- XML sitemap
+- Category pages
+- Tag pages
+- Author pages
+
+CTAs throughout:
+- "Calculate Your Credit"
+- "Download Free Guide"
+- "Start Your Documentation"
+```
+
+## Legal Section Pages
+
+### Task: Create "Privacy Policy" Page - Replit Prompt
+
+**Component: Privacy Policy**
+**KB References**: 
+- disclaimer_copy.md → Privacy Notices
+- additional-project-specs.md → Data Handling
+- Complete User Experience Flow.md → Data Collection Points
+
+**Business Context**: Comprehensive privacy policy that builds trust while complying with regulations for SMBs sharing sensitive financial data.
+
+```
+Create a complete privacy policy page following GDPR/CCPA requirements:
+
+Sections to include:
+
+1. Introduction
+   - Effective date
+   - Plain English summary
+   - Contact information
+
+2. Information We Collect
+   - Account information (name, email, company)
+   - Business data (EIN, revenue, expenses)
+   - Project information (R&D activities)
+   - Usage data (analytics, cookies)
+   - Payment information (via Stripe)
+
+3. How We Use Information
+   - Generate tax documentation
+   - Calculate credit estimates
+   - Improve our services
+   - Communicate about your account
+   - Comply with legal obligations
+
+4. Information Sharing
+   - We DON'T sell your data
+   - Service providers (AWS, Stripe)
+   - Legal requirements
+   - Business transfers
+   - Aggregated analytics
+
+5. Data Security
+   - Encryption at rest and in transit
+   - Access controls
+   - Regular security audits
+   - Incident response procedures
+   - Data breach notifications
+
+6. Your Rights
+   - Access your data
+   - Correct inaccuracies
+   - Delete your account
+   - Export your data
+   - Opt-out of marketing
+
+7. Data Retention
+   - Active accounts: Duration of service
+   - Closed accounts: 90 days
+   - Legal holds: As required
+   - Anonymized data: Indefinitely
+
+8. Cookies & Tracking
+   - Essential cookies
+   - Analytics (Google Analytics)
+   - Marketing pixels
+   - How to control cookies
+
+9. Children's Privacy
+   - Not for users under 18
+   - No knowing collection
+
+10. International Transfers
+    - US-based processing
+    - EU-US framework
+    - Standard contractual clauses
+
+11. Updates to Policy
+    - How we notify changes
+    - Continued use = acceptance
+
+12. Contact Us
+    - Privacy officer email
+    - Mailing address
+    - Response timeline
+
+Formatting:
+- Table of contents with anchor links
+- Expandable sections
+- Print-friendly version
+- Last updated date
+- Version history
+- Plain English explanations
+- Legal terminology where required
+```
+
+### Task: Create "Terms of Service" Page - Replit Prompt
+
+**Component: Terms of Service**
+**KB References**: 
+- disclaimer_copy.md → Legal Disclaimers
+- pricing_strategy_rd_platform.md → Service Terms
+- additional-project-specs.md → Platform Rules
+
+**Business Context**: Clear terms that protect the platform while setting proper expectations for SMBs about the R&D documentation service.
+
+```
+Create comprehensive Terms of Service with user-friendly formatting:
+
+Sections needed:
+
+1. Acceptance of Terms
+   - By using = accepting
+   - Age requirements (18+)
+   - Authority to bind company
+
+2. Service Description
+   - R&D tax credit documentation
+   - NOT tax/legal advice
+   - Educational tools only
+   - User responsibilities
+
+3. Account Terms
+   - Accurate information required
+   - One account per company
+   - Security responsibilities
+   - Termination rights
+
+4. Payment Terms
+   - Flat-fee pricing
+   - Payment processing (Stripe)
+   - Refund policy (30-day)
+   - Price match guarantee
+   - Multi-year discounts
+
+5. Intellectual Property
+   - Your data remains yours
+   - Our platform/tools protected
+   - License to use your data
+   - Feedback rights
+
+6. User Responsibilities
+   - Accurate data entry
+   - Consult tax professionals
+   - Maintain records
+   - Comply with tax laws
+   - Not misuse platform
+
+7. Disclaimers
+   - NO TAX ADVICE
+   - NO GUARANTEE OF CREDITS
+   - NO AUDIT DEFENSE
+   - AS-IS SERVICE
+   - Result variations
+
+8. Limitation of Liability
+   - No consequential damages
+   - Cap at fees paid
+   - Exclusions
+   - Indemnification
+
+9. Data & Privacy
+   - Link to Privacy Policy
+   - Data security measures
+   - Breach notifications
+   - Your data rights
+
+10. Prohibited Uses
+    - Illegal activities
+    - False information
+    - System abuse
+    - Competitive research
+    - Automated access
+
+11. Termination
+    - Either party rights
+    - Effect of termination
+    - Data export period
+    - Survival clauses
+
+12. Dispute Resolution
+    - Good faith discussion
+    - Arbitration agreement
+    - Class action waiver
+    - Governing law (Delaware)
+
+13. General Terms
+    - Entire agreement
+    - Severability
+    - No waiver
+    - Assignment
+    - Force majeure
+
+14. Contact Information
+    - Legal notices email
+    - Mailing address
+    - Support channels
+
+Format with:
+- Clickable table of contents
+- Section summaries in plain English
+- Highlighted important terms
+- Examples where helpful
+- FAQ sidebar
+- Print/PDF version
+- Acceptance tracking
+```
+
+### Task: Create "Security" Page - Replit Prompt
+
+**Component: Security & Compliance Page**
+**KB References**: 
+- additional-project-specs.md → Security Features
+- disclaimer_copy.md → Security Notices
+- Complete User Experience Flow.md → Data Protection
+
+**Business Context**: Detailed security page that assures SMBs their sensitive financial and R&D data is protected with enterprise-grade security.
+
+```
+Create a comprehensive security page that builds trust:
+
+Page sections:
+
+1. Hero Section
+   - "Your Data is Our Top Priority"
+   - Key security badges/certifications
+   - Trust statistics
+
+2. Data Encryption
+   - 256-bit SSL in transit
+   - AES-256 encryption at rest
+   - End-to-end encryption
+   - Key management practices
+
+3. Infrastructure Security
+   - AWS hosting
+   - Geographic redundancy
+   - DDoS protection
+   - Regular backups
+   - Disaster recovery
+
+4. Access Controls
+   - Role-based permissions
+   - Multi-factor authentication
+   - Session management
+   - IP restrictions available
+   - Audit logging
+
+5. Compliance & Certifications
+   - SOC 2 Type II
+   - GDPR compliant
+   - CCPA compliant
+   - PCI DSS Level 1
+   - Annual audits
+
+6. Security Practices
+   - Regular penetration testing
+   - Vulnerability scanning
+   - Security training
+   - Incident response plan
+   - Bug bounty program
+
+7. Data Handling
+   - Minimal data collection
+   - 90-day retention
+   - Secure deletion
+   - No data selling
+   - Purpose limitation
+
+8. Third-Party Security
+   - Vendor assessments
+   - Stripe for payments
+   - AWS infrastructure
+   - Limited integrations
+   - Contractual safeguards
+
+9. Your Security Responsibilities
+   - Strong passwords
+   - Account security
+   - Accurate information
+   - Access management
+   - Incident reporting
+
+10. Incident Response
+    - 72-hour notification
+    - Incident team
+    - Communication plan
+    - Remediation steps
+    - Lessons learned
+
+11. Security FAQ
+    - Common concerns
+    - Best practices
+    - How to report issues
+    - Contact security team
+
+Visual elements:
+- Security architecture diagram
+- Compliance badges
+- Uptime statistics
+- Security timeline
+- Trust indicators
+
+CTAs:
+- "Download Security Whitepaper"
+- "Contact Security Team"
+- "Report a Vulnerability"
+```
+
+### Task: Create "Contact Us" Page - Replit Prompt
+
+**Component: Contact Page**
+**KB References**: 
+- Complete User Experience Flow.md → Support Channels
+- additional-project-specs.md → Contact Methods
+- user_archetype_profiles.md → User Needs
+
+**Business Context**: Multi-channel contact page that routes SMB inquiries efficiently while maintaining self-service preference.
+
+```
+Create a helpful contact page with smart routing:
+
+Page structure:
+
+1. Hero Section
+   - "How Can We Help?"
+   - Quick links to common needs
+   - Expected response times
+
+2. Self-Service First
+   - Link to FAQ
+   - Knowledge base search
+   - Video tutorials
+   - Calculator access
+
+3. Contact Options Grid
+
+   Sales Inquiries:
+   - For: Pricing, features, demos
+   - Email: sales@smbtaxcredits.com
+   - Response: Within 1 business day
+   - Live chat: Business hours
+
+   Technical Support:
+   - For: Platform issues, access problems
+   - Email: support@smbtaxcredits.com
+   - Response: Within 4 hours
+   - Include: Screenshot, browser, error
+
+   Documentation Questions:
+   - For: R&D credit questions, forms
+   - Email: tax@smbtaxcredits.com
+   - Response: Within 1 business day
+   - Note: "We can't provide tax advice"
+
+   CPA/Professional:
+   - For: CPAs with client questions
+   - Email: pro@smbtaxcredits.com
+   - Response: Priority within 2 hours
+   - Special resources available
+
+   Security/Privacy:
+   - For: Data concerns, security
+   - Email: security@smbtaxcredits.com
+   - Response: Within 24 hours
+   - Encrypted communication available
+
+   Media/Press:
+   - For: Press inquiries, interviews
+   - Email: press@smbtaxcredits.com
+   - Press kit available
+
+4. Contact Form
+   - Name and email
+   - Company name
+   - Inquiry type dropdown
+   - Message field
+   - File attachment option
+   - CAPTCHA
+
+5. Other Ways to Reach Us
+   - Mailing address
+   - Phone (business hours only)
+   - Social media links
+   - Live chat widget
+
+6. What to Expect
+   - Response time by type
+   - Business hours (EST)
+   - Holiday schedule
+   - Escalation process
+
+7. Before You Contact Us
+   - Common issues/solutions
+   - Required information checklist
+   - Best practices for fast help
+
+Visual elements:
+- Response time indicators
+- Team photos (optional)
+- Office location map
+- Time zone converter
+- Status page link
+
+Footer:
+- Emergency contact
+- System status
+- Newsletter signup
+```
+
+## Implementation Notes
+
+For each page:
+1. Use the new design system tokens
+2. Implement proper SEO meta tags
+3. Add schema markup
+4. Include internal linking
+5. Track analytics events
+6. Optimize for page speed
+7. Test on mobile devices
+8. Add accessibility features
+9. Include email capture where appropriate
+10. A/B test headlines and CTAs
+
+All pages should maintain consistent:
+- Navigation structure
+- Visual hierarchy  
+- Brand voice
+- Trust signals
+- Call-to-action strategy
+- Mobile responsiveness
+- Loading performance
+
+Would you like me to create any additional page prompts or elaborate on specific sections?

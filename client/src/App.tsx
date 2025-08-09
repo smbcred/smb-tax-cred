@@ -7,6 +7,10 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Checkout from "@/pages/checkout";
+import HowItWorks from "@/pages/how-it-works";
+import PricingPage from "@/pages/pricing";
+import FAQPage from "@/pages/faq";
+import SampleDocuments from "@/pages/sample-documents";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -26,12 +30,20 @@ function Router() {
         <>
           <Route path="/" component={Landing} />
           <Route path="/checkout" component={Checkout} />
+          <Route path="/how-it-works" component={HowItWorks} />
+          <Route path="/pricing" component={PricingPage} />
+          <Route path="/faq" component={FAQPage} />
+          <Route path="/sample-documents" component={SampleDocuments} />
         </>
       ) : (
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/checkout" component={Checkout} />
+          <Route path="/how-it-works" component={HowItWorks} />
+          <Route path="/pricing" component={PricingPage} />
+          <Route path="/faq" component={FAQPage} />
+          <Route path="/sample-documents" component={SampleDocuments} />
         </>
       )}
       <Route component={NotFound} />

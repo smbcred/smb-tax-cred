@@ -262,6 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const intakeFormData = {
         userId: req.user.id,
         companyId: req.body.companyId,
+        taxYear: req.body.taxYear || new Date().getFullYear(),
         formData: req.body.formData || {},
         currentSection: req.body.currentSection || "company_info",
       };
