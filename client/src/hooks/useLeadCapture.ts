@@ -29,11 +29,8 @@ export function useLeadCapture() {
       // Transform data to match backend expectations
       const requestData = {
         email: leadData.email,
-        firstName: leadData.firstName, 
-        lastName: leadData.lastName,
-        company: leadData.companyName,
-        phone: leadData.phone || '',
-        source: leadData.source,
+        companyName: leadData.companyName,
+        phoneNumber: leadData.phone || '',
         calculationData: leadData.calculationResult
       };
       
