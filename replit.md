@@ -12,6 +12,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### R&D Tax Credit ASC Calculation Engine (January 9, 2025)
+- Implemented comprehensive Alternative Simplified Credit (ASC) calculation method
+- Added support for first-time filers (6% rate) vs. experienced filers (14% rate)
+- Created proper QRE breakdown with 65% contractor limitation per IRS Section 41
+- Integrated prior year QRE support for base amount calculations
+- Built pricing tier system ($500-$2500) based on credit amounts
+- Added ROI calculations showing service value proposition
+- Implemented detailed validation with constructive business guidance
+- Enhanced supply QRE calculations including cloud and software costs
+- Fixed modal blur effect to properly show/hide results during email capture
+- Resolved form submission redirect issue for smooth user experience
+
 ### Innovation Tax Credit Calculator Implementation (January 9, 2025)
 - Pivoted from AI-specific to broader innovation tax credit focus
 - Built InnovationCalculatorEngine with 10-14% federal credit rates

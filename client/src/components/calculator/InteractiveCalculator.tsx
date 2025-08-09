@@ -11,8 +11,7 @@ import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
 import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { CalculatorProgress } from './CalculatorProgress';
-import { calculateRDCredit } from '@/utils/calculations';
-import { assignPricingTier } from '@/utils/pricing';
+import { CalculatorEngine } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
 interface CalculatorState {
@@ -111,21 +110,45 @@ export const InteractiveCalculator: React.FC = () => {
     if (state.expenses.technicalEmployees > 0 && state.expenses.averageTechnicalSalary > 0) {
       setIsCalculating(true);
       
-      // Calculate QRE and credits
-      const calculation = calculateRDCredit(state.expenses);
-      const tier = assignPricingTier(calculation.federalCredit);
+      try {
+        // Use the new ASC method calculator
+        const calculationResult = CalculatorEngine.calculate({
+          businessType: state.businessType || 'professional_services',
+          totalEmployees: state.expenses.totalEmployees,
+          technicalEmployees: state.expenses.technicalEmployees,
+          averageTechnicalSalary: state.expenses.averageTechnicalSalary,
+          rdAllocationPercentage: 100, // Default to 100% for now
+          contractorCosts: state.expenses.contractorCosts,
+          suppliesCosts: 0,
+          softwareCosts: state.expenses.softwareCosts,
+          cloudCosts: state.expenses.cloudCosts,
+          isFirstTimeFiler: true // Default to first-time filer for better initial estimates
+        });
+        
+        const results = {
+          totalQRE: calculationResult.qreBreakdown.total,
+          federalCredit: calculationResult.federalCredit,
+          stateCredit: 0, // No state credits for now
+          totalBenefit: calculationResult.federalCredit,
+          pricingTier: calculationResult.pricingTier.price,
+          tierInfo: calculationResult.pricingTier,
+          roi: calculationResult.roi.roiMultiple,
+          breakdown: {
+            wages: calculationResult.qreBreakdown.wages,
+            contractors: calculationResult.qreBreakdown.contractors,
+            supplies: calculationResult.qreBreakdown.supplies,
+            cloud: calculationResult.qreBreakdown.cloudAndAI
+          }
+        };
+        
+        dispatch({ type: 'CALCULATE_RESULTS', payload: results });
+      } catch (error) {
+        console.error('Calculation error:', error);
+      }
       
-      const results = {
-        ...calculation,
-        pricingTier: tier.tier,
-        tierInfo: tier,
-        roi: Math.round((calculation.federalCredit / tier.price))
-      };
-      
-      dispatch({ type: 'CALCULATE_RESULTS', payload: results });
       setIsCalculating(false);
     }
-  }, [state.expenses]);
+  }, [state.expenses, state.businessType]);
 
   // Navigation handlers
   const handleNext = () => {

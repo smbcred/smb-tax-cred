@@ -73,10 +73,10 @@ export const ResultsDisplayStep: React.FC<ResultsDisplayStepProps> = ({
       <div className={isBlurred ? 'filter blur-md' : ''}>
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            Your AI R&D Tax Credit Estimate
+            Your Innovation Tax Credit Estimate
           </h3>
           <p className="text-gray-600">
-            Based on your AI development activities, here's your potential tax savings
+            Based on your innovation and experimentation activities, here's your potential tax savings
           </p>
         </div>
 
@@ -88,13 +88,13 @@ export const ResultsDisplayStep: React.FC<ResultsDisplayStepProps> = ({
         >
           <div className="text-center">
             <p className="text-sm uppercase tracking-wide opacity-90 mb-2">
-              Total Federal R&D Tax Credit
+              Total Federal Innovation Tax Credit
             </p>
             <div className="text-5xl font-bold mb-2">
               {formatCurrency(results.federalCredit)}
             </div>
             <p className="text-sm opacity-90">
-              Potential annual tax savings
+              Potential annual tax savings using ASC method
             </p>
           </div>
         </motion.div>

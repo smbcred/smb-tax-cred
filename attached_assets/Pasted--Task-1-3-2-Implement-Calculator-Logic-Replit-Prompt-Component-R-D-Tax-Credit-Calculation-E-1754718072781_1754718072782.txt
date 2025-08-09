@@ -1,0 +1,1061 @@
+# Task 1.3.2: Implement Calculator Logic - Replit Prompt
+
+## Component: R&D Tax Credit Calculation Engine
+**KB References**: 
+- system-architecture-explanation.md → Calculator Component
+- additional-project-specs.md → Calculation Rules & Form 6765 Specs
+- expense-calculation-rules.md → QRE Categories & Limits
+- form_6765_tech_specs.md → ASC Calculation Method
+- pricing_strategy_rd_platform.md → Pricing Tiers
+
+**Business Context**: Helps SMBs who experiment with AI tools (custom GPTs, chatbot tuning, automation workflows) calculate their potential R&D tax credits based on qualified expenses and demonstrate the ROI of documenting their test-and-learn cycles.
+
+### Replit Prompt
+
+"Create a comprehensive R&D tax credit calculation engine for businesses using AI tools to claim R&D tax credits:
+
+1. Include examples: prompt engineering iterations, chatbot customization metrics, automation testing cycles
+2. Use Grade 7-9 reading level, sentences ≤20-22 words
+3. Show test-and-learn scenarios with before/after metrics
+4. Federal credits only (10-16% of costs) using ASC method
+5. Real-time calculation updates with debouncing
+6. Mobile-responsive with input validation
+7. Connect to pricing tiers based on credit amount
+8. Handle edge cases (single employee, all contractors, etc.)
+
+Key example to highlight: Marketing agency that refined a custom GPT for proposal writing, reducing edit time by 30% through prompt versioning
+
+The calculator should feel approachable and emphasize that everyday AI experimentation qualifies for valuable tax credits."
+
+**1. Create Core Calculation Service (services/calculation/calculator.engine.ts):**
+```typescript
+/**
+ * @file calculator.engine.ts
+ * @description Core R&D tax credit calculation engine for AI-forward SMBs
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase 
+ * - system-architecture-explanation.md
+ * - expense-calculation-rules.md
+ * - form_6765_tech_specs.md
+ * - additional-project-specs.md
+ * 
+ * This engine calculates federal R&D tax credits for businesses that experiment
+ * with AI tools, custom GPTs, chatbots, and automation workflows. It implements
+ * the Alternative Simplified Credit (ASC) method for simplicity.
+ * 
+ * EXAMPLES:
+ * - Agency refined proposal-writing GPT: 20 hours at $75/hr = $1,500 QRE
+ * - E-commerce tuned product chatbot: 3 employees, 2 weeks = $12,000 QRE  
+ * - Clinic improved intake bot accuracy: contractor + testing = $8,000 QRE
+ * 
+ * BUSINESS RULES:
+ * - Only wages directly related to experimentation qualify (not routine use)
+ * - Contractor costs limited to 65% per IRS Section 41
+ * - Cloud computing/AI subscriptions count as supplies for software R&D
+ * - Must show iterative testing and improvement, not one-time setup
+ * 
+ * TODO: Add support for multi-year calculations
+ * TODO: Implement state credit estimations (future phase)
+ */
+
+import { 
+  CalculationInput, 
+  CalculationResult, 
+  QREBreakdown,
+  ValidationResult,
+  BusinessType,
+  PricingTier 
+} from '../../types/calculation.types';
+
+export class CalculatorEngine {
+  // ASC Method Constants (simplified for SMBs)
+  private static readonly ASC_RATE = 0.14;
+  private static readonly ASC_RATE_NO_PRIOR = 0.06;
+  private static readonly ASC_BASE_PERCENTAGE = 0.50;
+  private static readonly CONTRACTOR_LIMIT = 0.65;
+  
+  // Pricing tier thresholds aligned with pricing_strategy_rd_platform.md
+  private static readonly PRICING_TIERS = {
+    TIER_1: { max: 10000, price: 500 },
+    TIER_2: { max: 20000, price: 750 },
+    TIER_3: { max: 30000, price: 1000 },
+    TIER_4: { max: 40000, price: 1250 },
+    TIER_5: { max: 50000, price: 1500 },
+    TIER_6: { max: 60000, price: 1750 },
+    ENTERPRISE: { max: Infinity, price: 2500 }
+  };
+
+  /**
+   * Main calculation entry point
+   * Processes inputs from businesses testing AI tools and automation
+   * @param input User-provided data about their AI experimentation
+   * @returns Complete calculation with federal credit and pricing
+   */
+  public static calculate(input: CalculationInput): CalculationResult {
+    // Step 1: Validate all inputs
+    const validation = this.validateInputs(input);
+    if (!validation.isValid) {
+      throw new Error(`Invalid input: ${validation.errors.join(', ')}`);
+    }
+
+    // Step 2: Calculate Qualified Research Expenses (QREs)
+    const qreBreakdown = this.calculateQREs(input);
+    
+    // Step 3: Apply ASC method to get federal credit
+    const federalCredit = this.calculateASC(qreBreakdown, input);
+    
+    // Step 4: Determine service pricing based on credit amount
+    const pricingTier = this.determinePricingTier(federalCredit);
+    
+    // Step 5: Calculate ROI and prepare results
+    const roi = this.calculateROI(federalCredit, pricingTier.price);
+    
+    return {
+      qreBreakdown,
+      federalCredit,
+      creditRate: federalCredit / qreBreakdown.total,
+      pricingTier,
+      roi,
+      totalBenefit: federalCredit, // Federal only for now
+      timestamp: new Date().toISOString(),
+      assumptions: this.getAssumptions(input)
+    };
+  }
+
+  /**
+   * Calculate Qualified Research Expenses by category
+   * Focuses on AI experimentation activities like prompt tuning, bot testing
+   */
+  private static calculateQREs(input: CalculationInput): QREBreakdown {
+    // Wage QREs - Time spent on experimentation
+    const wageQRE = this.calculateWageQRE(input);
+    
+    // Contractor QREs - External help for AI projects (65% limit)
+    const contractorQRE = this.calculateContractorQRE(input);
+    
+    // Supply QREs - Cloud, AI subscriptions, testing tools
+    const supplyQRE = this.calculateSupplyQRE(input);
+    
+    // Total QREs
+    const total = wageQRE + contractorQRE + supplyQRE;
+    
+    // Build detailed breakdown
+    return {
+      wages: Math.round(wageQRE),
+      contractors: Math.round(contractorQRE),
+      supplies: Math.round(supplyQRE),
+      cloudAndAI: Math.round(input.cloudCosts || 0), // Subset of supplies
+      total: Math.round(total),
+      byCategory: {
+        wages: { 
+          amount: wageQRE, 
+          percentage: total > 0 ? wageQRE / total : 0,
+          description: 'Employee time on AI experiments'
+        },
+        contractors: { 
+          amount: contractorQRE, 
+          percentage: total > 0 ? contractorQRE / total : 0,
+          description: 'External help (65% eligible)'
+        },
+        supplies: { 
+          amount: supplyQRE, 
+          percentage: total > 0 ? supplyQRE / total : 0,
+          description: 'Cloud, AI tools, testing costs'
+        }
+      }
+    };
+  }
+
+  /**
+   * Calculate wage-based QREs
+   * Example: 2 employees spent 50% time tuning chatbot responses
+   */
+  private static calculateWageQRE(input: CalculationInput): number {
+    const { 
+      technicalEmployees = 0, 
+      averageTechnicalSalary = 0,
+      rdAllocationPercentage = 100 
+    } = input;
+
+    // Only count wages for time spent experimenting
+    // Not routine chatbot use, but testing and improving
+    const effectiveAllocation = Math.min(100, Math.max(0, rdAllocationPercentage));
+    const annualWages = technicalEmployees * averageTechnicalSalary;
+    
+    return annualWages * (effectiveAllocation / 100);
+  }
+
+  /**
+   * Calculate contractor QREs with 65% limitation
+   * Example: Hired expert to build custom GPT, only 65% counts
+   */
+  private static calculateContractorQRE(input: CalculationInput): number {
+    const contractorCosts = input.contractorCosts || 0;
+    
+    // IRS limits contractor expenses to 65% of amount paid
+    return contractorCosts * this.CONTRACTOR_LIMIT;
+  }
+
+  /**
+   * Calculate supply QREs including cloud and AI subscriptions
+   * Example: ChatGPT Plus, Claude Pro, AWS costs for testing
+   */
+  private static calculateSupplyQRE(input: CalculationInput): number {
+    const { 
+      suppliesCosts = 0, 
+      cloudCosts = 0, 
+      softwareCosts = 0,
+      businessType 
+    } = input;
+
+    let totalSupplies = suppliesCosts;
+    
+    // Cloud and AI subscriptions qualify for software/tech businesses
+    if (this.isAIEligibleBusiness(businessType)) {
+      totalSupplies += cloudCosts;
+      totalSupplies += softwareCosts * 0.8; // Assume 80% R&D use
+    }
+    
+    return totalSupplies;
+  }
+
+  /**
+   * Alternative Simplified Credit calculation
+   * Simpler method preferred by SMBs - 14% of excess QREs
+   */
+  private static calculateASC(qre: QREBreakdown, input: CalculationInput): number {
+    const currentYearQRE = qre.total;
+    
+    // Check if this is their first year claiming
+    if (!input.priorYearQREs || input.priorYearQREs.length === 0) {
+      // First-time claimants get 6% of all QREs
+      return Math.round(currentYearQRE * this.ASC_RATE_NO_PRIOR);
+    }
+    
+    // Calculate 3-year average of prior QREs
+    const priorAverage = this.calculatePriorAverage(input.priorYearQREs);
+    
+    // Base amount is 50% of prior average
+    const baseAmount = priorAverage * this.ASC_BASE_PERCENTAGE;
+    
+    // Credit is 14% of QREs exceeding base
+    const excess = Math.max(0, currentYearQRE - baseAmount);
+    
+    return Math.round(excess * this.ASC_RATE);
+  }
+
+  /**
+   * Calculate average of up to 3 prior years
+   */
+  private static calculatePriorAverage(priorYears: number[]): number {
+    if (!priorYears || priorYears.length === 0) return 0;
+    
+    // Take most recent 3 years
+    const recentYears = priorYears.slice(-3);
+    const sum = recentYears.reduce((total, year) => total + year, 0);
+    
+    return sum / recentYears.length;
+  }
+
+  /**
+   * Determine pricing tier based on estimated credit
+   * Aligns with flat-fee pricing strategy
+   */
+  private static determinePricingTier(creditAmount: number): PricingTier {
+    for (const [key, tier] of Object.entries(this.PRICING_TIERS)) {
+      if (creditAmount <= tier.max) {
+        return {
+          name: key,
+          creditRange: { 
+            min: key === 'TIER_1' ? 0 : this.PRICING_TIERS[this.getPreviousTier(key)]?.max || 0,
+            max: tier.max 
+          },
+          price: tier.price,
+          description: this.getTierDescription(key)
+        };
+      }
+    }
+    
+    // Default to enterprise tier
+    return {
+      name: 'ENTERPRISE',
+      creditRange: { min: 60000, max: Infinity },
+      price: this.PRICING_TIERS.ENTERPRISE.price,
+      description: 'Custom pricing for large credits'
+    };
+  }
+
+  /**
+   * Input validation with business rules
+   * Ensures data makes sense for AI experimentation context
+   */
+  private static validateInputs(input: CalculationInput): ValidationResult {
+    const errors: string[] = [];
+
+    // Basic data validation
+    if (input.technicalEmployees < 0) {
+      errors.push('Technical employees cannot be negative');
+    }
+
+    if (input.technicalEmployees > input.totalEmployees) {
+      errors.push('Technical employees cannot exceed total employees');
+    }
+
+    if (input.averageTechnicalSalary < 20000) {
+      errors.push('Average salary seems too low');
+    }
+
+    if (input.averageTechnicalSalary > 500000) {
+      errors.push('Average salary seems unusually high');
+    }
+
+    // Allocation percentage validation
+    const allocation = input.rdAllocationPercentage || 100;
+    if (allocation < 0 || allocation > 100) {
+      errors.push('R&D allocation must be between 0-100%');
+    }
+
+    // Ensure at least some qualifying expenses
+    const hasExpenses = 
+      (input.technicalEmployees > 0 && input.averageTechnicalSalary > 0) ||
+      input.contractorCosts > 0 ||
+      input.suppliesCosts > 0 ||
+      input.cloudCosts > 0;
+
+    if (!hasExpenses) {
+      errors.push('Must have qualifying expenses to calculate credit');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+   * Calculate ROI metrics for marketing display
+   * Shows value proposition of the service
+   */
+  private static calculateROI(creditAmount: number, serviceCost: number): any {
+    const netBenefit = creditAmount - serviceCost;
+    const roiMultiple = creditAmount / serviceCost;
+    
+    return {
+      creditAmount,
+      serviceCost,
+      netBenefit,
+      roiMultiple: Math.round(roiMultiple * 10) / 10,
+      breakEvenDays: Math.round(365 / roiMultiple),
+      firstYearReturn: netBenefit
+    };
+  }
+
+  /**
+   * Business types that commonly experiment with AI
+   */
+  private static isAIEligibleBusiness(type: BusinessType): boolean {
+    const aiEligibleTypes = [
+      'saas', 'software', 'ecommerce', 'agency', 
+      'consulting', 'healthcare', 'services'
+    ];
+    
+    return aiEligibleTypes.includes(type);
+  }
+
+  /**
+   * Helper to get previous pricing tier
+   */
+  private static getPreviousTier(currentTier: string): string {
+    const tiers = Object.keys(this.PRICING_TIERS);
+    const index = tiers.indexOf(currentTier);
+    return index > 0 ? tiers[index - 1] : 'TIER_1';
+  }
+
+  /**
+   * Human-readable tier descriptions
+   */
+  private static getTierDescription(tier: string): string {
+    const descriptions: Record<string, string> = {
+      TIER_1: 'Starter - Perfect for small AI experiments',
+      TIER_2: 'Growth - Ideal for growing chatbot projects',
+      TIER_3: 'Professional - For serious automation work',
+      TIER_4: 'Advanced - Multiple AI initiatives',
+      TIER_5: 'Premium - Comprehensive R&D programs',
+      TIER_6: 'Elite - Large-scale experimentation',
+      ENTERPRISE: 'Enterprise - Custom solution'
+    };
+    
+    return descriptions[tier] || 'Custom tier';
+  }
+
+  /**
+   * Generate assumption text for transparency
+   */
+  private static getAssumptions(input: CalculationInput): string[] {
+    const assumptions = [
+      'Calculations based on federal R&D tax credit only',
+      'Using Alternative Simplified Credit (ASC) method',
+      'Contractor costs limited to 65% per IRS rules'
+    ];
+
+    if (!input.priorYearQREs || input.priorYearQREs.length === 0) {
+      assumptions.push('First-time credit rate of 6% applied');
+    } else {
+      assumptions.push('14% credit rate on excess QREs');
+    }
+
+    if (input.cloudCosts > 0) {
+      assumptions.push('Cloud and AI tool costs included as supplies');
+    }
+
+    return assumptions;
+  }
+}
+```
+
+**2. Create Real-Time Calculation Hook (hooks/useRealTimeCalculation.ts):**
+```typescript
+/**
+ * @file useRealTimeCalculation.ts
+ * @description React hook for real-time calculation updates
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase system-architecture-explanation.md
+ * 
+ * Provides debounced real-time calculations as users type.
+ * Prevents excessive recalculations while maintaining responsiveness.
+ * 
+ * PERFORMANCE:
+ * - 500ms debounce prevents calculation spam
+ * - Memoized results reduce re-renders
+ * - Loading states for better UX
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { debounce } from 'lodash';
+import { CalculatorEngine } from '../services/calculation/calculator.engine';
+import { CalculationInput, CalculationResult } from '../types/calculation.types';
+
+interface UseRealTimeCalculationOptions {
+  debounceMs?: number;
+  onCalculate?: (result: CalculationResult) => void;
+  onError?: (error: Error) => void;
+}
+
+export const useRealTimeCalculation = (
+  initialInput: Partial<CalculationInput>,
+  options: UseRealTimeCalculationOptions = {}
+) => {
+  const {
+    debounceMs = 500,
+    onCalculate,
+    onError
+  } = options;
+
+  // State management
+  const [input, setInput] = useState<CalculationInput>({
+    businessType: 'software',
+    totalEmployees: 0,
+    technicalEmployees: 0,
+    averageTechnicalSalary: 0,
+    rdAllocationPercentage: 100,
+    contractorCosts: 0,
+    suppliesCosts: 0,
+    cloudCosts: 0,
+    softwareCosts: 0,
+    qualifyingActivities: [],
+    ...initialInput
+  });
+
+  const [result, setResult] = useState<CalculationResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Core calculation function
+  const calculate = useCallback((calcInput: CalculationInput) => {
+    setIsCalculating(true);
+    setError(null);
+
+    try {
+      const calcResult = CalculatorEngine.calculate(calcInput);
+      setResult(calcResult);
+      
+      if (onCalculate) {
+        onCalculate(calcResult);
+      }
+    } catch (err) {
+      const error = err as Error;
+      setError(error);
+      setResult(null);
+      
+      if (onError) {
+        onError(error);
+      }
+    } finally {
+      setIsCalculating(false);
+    }
+  }, [onCalculate, onError]);
+
+  // Debounced calculation for real-time updates
+  const debouncedCalculate = useMemo(
+    () => debounce(calculate, debounceMs),
+    [calculate, debounceMs]
+  );
+
+  // Update input and trigger calculation
+  const updateInput = useCallback((updates: Partial<CalculationInput>) => {
+    setInput(prev => {
+      const newInput = { ...prev, ...updates };
+      debouncedCalculate(newInput);
+      return newInput;
+    });
+  }, [debouncedCalculate]);
+
+  // Update single field
+  const updateField = useCallback((
+    field: keyof CalculationInput, 
+    value: any
+  ) => {
+    updateInput({ [field]: value });
+  }, [updateInput]);
+
+  // Initial calculation on mount
+  useEffect(() => {
+    // Only calculate if we have some data
+    if (input.technicalEmployees > 0 || input.contractorCosts > 0) {
+      calculate(input);
+    }
+  }, []); // Only on mount
+
+  // Cleanup debounced function
+  useEffect(() => {
+    return () => {
+      debouncedCalculate.cancel();
+    };
+  }, [debouncedCalculate]);
+
+  return {
+    input,
+    result,
+    isCalculating,
+    error,
+    updateInput,
+    updateField,
+    recalculate: () => calculate(input),
+    hasQualifyingExpenses: (input.technicalEmployees > 0 && input.averageTechnicalSalary > 0) || 
+                           input.contractorCosts > 0 || 
+                           input.suppliesCosts > 0
+  };
+};
+```
+
+**3. Create Calculation Types (types/calculation.types.ts):**
+```typescript
+/**
+ * @file calculation.types.ts
+ * @description TypeScript types for R&D tax credit calculations
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase additional-project-specs.md
+ */
+
+// Business types that commonly use AI tools
+export type BusinessType = 
+  | 'saas'
+  | 'software'
+  | 'ecommerce'
+  | 'agency'
+  | 'consulting'
+  | 'healthcare'
+  | 'restaurant'
+  | 'manufacturing'
+  | 'services'
+  | 'other';
+
+// AI experimentation activities
+export type QualifyingActivity = 
+  | 'custom_gpt'        // Built custom GPTs for specific tasks
+  | 'prompt_engineering' // Iterative prompt refinement
+  | 'chatbot_tuning'    // Improving chatbot responses
+  | 'workflow_automation' // Zapier/Make AI workflows
+  | 'data_analysis'     // AI-powered analysis tools
+  | 'content_generation' // Systematic content experiments
+  | 'process_improvement'; // AI-driven process optimization
+
+export interface CalculationInput {
+  // Company basics
+  businessType: BusinessType;
+  totalEmployees: number;
+  
+  // R&D personnel
+  technicalEmployees: number;
+  averageTechnicalSalary: number;
+  rdAllocationPercentage: number; // 0-100
+  
+  // Expenses
+  contractorCosts: number;
+  suppliesCosts: number;
+  cloudCosts: number; // AWS, Azure, etc.
+  softwareCosts: number; // AI subscriptions
+  
+  // Activities (for qualification check)
+  qualifyingActivities: QualifyingActivity[];
+  
+  // Prior year data (optional)
+  priorYearQREs?: number[];
+}
+
+export interface QREBreakdown {
+  wages: number;
+  contractors: number;
+  supplies: number;
+  cloudAndAI: number;
+  total: number;
+  byCategory: {
+    [key: string]: {
+      amount: number;
+      percentage: number;
+      description: string;
+    };
+  };
+}
+
+export interface PricingTier {
+  name: string;
+  creditRange: {
+    min: number;
+    max: number;
+  };
+  price: number;
+  description: string;
+}
+
+export interface CalculationResult {
+  qreBreakdown: QREBreakdown;
+  federalCredit: number;
+  creditRate: number; // Effective percentage
+  pricingTier: PricingTier;
+  roi: {
+    creditAmount: number;
+    serviceCost: number;
+    netBenefit: number;
+    roiMultiple: number;
+    breakEvenDays: number;
+    firstYearReturn: number;
+  };
+  totalBenefit: number;
+  timestamp: string;
+  assumptions: string[];
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+```
+
+**4. Create Calculation Utilities (utils/calculation.utils.ts):**
+```typescript
+/**
+ * @file calculation.utils.ts
+ * @description Helper utilities for calculations and formatting
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ */
+
+/**
+ * Format currency for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+/**
+ * Format percentage for display
+ */
+export const formatPercentage = (value: number, decimals: number = 1): string => {
+  return `${(value * 100).toFixed(decimals)}%`;
+};
+
+/**
+ * Safely parse numeric input
+ */
+export const parseNumericInput = (value: string): number => {
+  // Remove commas and dollar signs
+  const cleaned = value.replace(/[$,]/g, '');
+  const parsed = parseFloat(cleaned);
+  
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+/**
+ * Validate email for lead capture
+ */
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+/**
+ * Get human-readable activity descriptions
+ */
+export const getActivityDescription = (activity: string): string => {
+  const descriptions: Record<string, string> = {
+    custom_gpt: 'Built custom GPTs for specific business tasks',
+    prompt_engineering: 'Refined prompts through iterative testing',
+    chatbot_tuning: 'Improved chatbot accuracy and responses',
+    workflow_automation: 'Created AI-powered automation workflows',
+    data_analysis: 'Developed AI analysis tools and dashboards',
+    content_generation: 'Tested AI content generation systems',
+    process_improvement: 'Used AI to optimize business processes'
+  };
+  
+  return descriptions[activity] || activity;
+};
+
+/**
+ * Animation helper for number counting
+ */
+export const animateValue = (
+  start: number,
+  end: number,
+  duration: number,
+  callback: (value: number) => void
+): void => {
+  const startTime = Date.now();
+  const endTime = startTime + duration;
+  
+  const update = () => {
+    const now = Date.now();
+    const progress = Math.min((now - startTime) / duration, 1);
+    
+    // Easing function for smooth animation
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = start + (end - start) * easeProgress;
+    
+    callback(Math.round(currentValue));
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  };
+  
+  requestAnimationFrame(update);
+};
+```
+
+**5. Create Validation Service (services/calculation/validation.service.ts):**
+```typescript
+/**
+ * @file validation.service.ts
+ * @description Advanced validation for calculation inputs
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * 
+ * Ensures data quality and provides helpful error messages
+ * for SMBs entering their AI experimentation data.
+ */
+
+import { CalculationInput, BusinessType } from '../../types/calculation.types';
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  severity: 'error' | 'warning';
+}
+
+export class ValidationService {
+  /**
+   * Comprehensive input validation
+   */
+  public static validateCalculationInput(
+    input: CalculationInput
+  ): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    // Employee validation
+    this.validateEmployees(input, errors);
+    
+    // Salary validation
+    this.validateSalaries(input, errors);
+    
+    // Expense validation
+    this.validateExpenses(input, errors);
+    
+    // Activity validation
+    this.validateActivities(input, errors);
+    
+    // Business logic validation
+    this.validateBusinessLogic(input, errors);
+
+    return errors;
+  }
+
+  /**
+   * Validate employee counts
+   */
+  private static validateEmployees(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    if (input.totalEmployees < 0) {
+      errors.push({
+        field: 'totalEmployees',
+        message: 'Total employees cannot be negative',
+        severity: 'error'
+      });
+    }
+
+    if (input.technicalEmployees < 0) {
+      errors.push({
+        field: 'technicalEmployees',
+        message: 'Technical employees cannot be negative',
+        severity: 'error'
+      });
+    }
+
+    if (input.technicalEmployees > input.totalEmployees) {
+      errors.push({
+        field: 'technicalEmployees',
+        message: 'Technical employees cannot exceed total employees',
+        severity: 'error'
+      });
+    }
+
+    // Warning for high R&D percentage
+    if (input.totalEmployees > 0) {
+      const rdPercentage = input.technicalEmployees / input.totalEmployees;
+      if (rdPercentage > 0.8) {
+        errors.push({
+          field: 'technicalEmployees',
+          message: 'Over 80% R&D employees is unusual - verify this is correct',
+          severity: 'warning'
+        });
+      }
+    }
+  }
+
+  /**
+   * Validate salary inputs
+   */
+  private static validateSalaries(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    if (input.averageTechnicalSalary < 0) {
+      errors.push({
+        field: 'averageTechnicalSalary',
+        message: 'Average salary cannot be negative',
+        severity: 'error'
+      });
+    }
+
+    // Minimum wage check (roughly $20k/year)
+    if (input.averageTechnicalSalary > 0 && input.averageTechnicalSalary < 20000) {
+      errors.push({
+        field: 'averageTechnicalSalary',
+        message: 'Average salary seems too low - use annual salary',
+        severity: 'warning'
+      });
+    }
+
+    // Unrealistic salary check
+    if (input.averageTechnicalSalary > 500000) {
+      errors.push({
+        field: 'averageTechnicalSalary',
+        message: 'Average salary over $500k is unusual - verify amount',
+        severity: 'warning'
+      });
+    }
+  }
+
+  /**
+   * Validate expense inputs
+   */
+  private static validateExpenses(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    // Negative expense checks
+    const expenseFields = [
+      'contractorCosts',
+      'suppliesCosts',
+      'cloudCosts',
+      'softwareCosts'
+    ] as const;
+
+    expenseFields.forEach(field => {
+      if (input[field] < 0) {
+        errors.push({
+          field,
+          message: `${this.getFieldLabel(field)} cannot be negative`,
+          severity: 'error'
+        });
+      }
+    });
+
+    // Large contractor warning
+    if (input.contractorCosts > 500000) {
+      errors.push({
+        field: 'contractorCosts',
+        message: 'Large contractor costs - ensure proper documentation',
+        severity: 'warning'
+      });
+    }
+  }
+
+  /**
+   * Validate qualifying activities
+   */
+  private static validateActivities(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    if (input.qualifyingActivities.length === 0) {
+      errors.push({
+        field: 'qualifyingActivities',
+        message: 'Select at least one qualifying AI experimentation activity',
+        severity: 'warning'
+      });
+    }
+  }
+
+  /**
+   * Validate business logic and relationships
+   */
+  private static validateBusinessLogic(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    // Must have some qualifying expenses
+    const hasWages = input.technicalEmployees > 0 && input.averageTechnicalSalary > 0;
+    const hasContractors = input.contractorCosts > 0;
+    const hasSupplies = input.suppliesCosts > 0 || input.cloudCosts > 0;
+
+    if (!hasWages && !hasContractors && !hasSupplies) {
+      errors.push({
+        field: 'general',
+        message: 'Must have qualifying expenses (wages, contractors, or supplies)',
+        severity: 'error'
+      });
+    }
+
+    // R&D allocation check
+    if (input.rdAllocationPercentage < 0 || input.rdAllocationPercentage > 100) {
+      errors.push({
+        field: 'rdAllocationPercentage',
+        message: 'R&D allocation must be between 0-100%',
+        severity: 'error'
+      });
+    }
+
+    // Business type specific validations
+    this.validateBusinessTypeLogic(input, errors);
+  }
+
+  /**
+   * Business-type specific validations
+   */
+  private static validateBusinessTypeLogic(
+    input: CalculationInput,
+    errors: ValidationError[]
+  ): void {
+    // Manufacturing typically has lower cloud costs
+    if (input.businessType === 'manufacturing' && input.cloudCosts > 100000) {
+      errors.push({
+        field: 'cloudCosts',
+        message: 'High cloud costs unusual for manufacturing - verify amount',
+        severity: 'warning'
+      });
+    }
+
+    // Software companies typically have cloud costs
+    if (input.businessType === 'software' && input.cloudCosts === 0) {
+      errors.push({
+        field: 'cloudCosts',
+        message: 'Consider including cloud/AI tool costs if applicable',
+        severity: 'warning'
+      });
+    }
+  }
+
+  /**
+   * Get user-friendly field labels
+   */
+  private static getFieldLabel(field: string): string {
+    const labels: Record<string, string> = {
+      contractorCosts: 'Contractor costs',
+      suppliesCosts: 'Supply costs',
+      cloudCosts: 'Cloud costs',
+      softwareCosts: 'Software costs'
+    };
+    
+    return labels[field] || field;
+  }
+
+  /**
+   * Check if input has critical errors
+   */
+  public static hasCriticalErrors(errors: ValidationError[]): boolean {
+    return errors.some(error => error.severity === 'error');
+  }
+
+  /**
+   * Get errors for specific field
+   */
+  public static getFieldErrors(
+    errors: ValidationError[],
+    field: string
+  ): ValidationError[] {
+    return errors.filter(error => error.field === field);
+  }
+}
+```
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * R&D Tax Credit Calculator Architecture
+ * 
+ * CALCULATION METHOD:
+ * - Uses Alternative Simplified Credit (ASC) for simplicity
+ * - 14% of QREs exceeding 50% of 3-year average
+ * - 6% for first-time claimants with no prior QREs
+ * - Federal credit only (no state calculations)
+ * 
+ * QUALIFYING EXPENSES:
+ * - Employee wages: Only time spent on experimentation
+ * - Contractor costs: Limited to 65% per IRS Section 41
+ * - Supplies: Including cloud and AI tool subscriptions
+ * - Must show iterative testing, not one-time setup
+ * 
+ * BUSINESS LOGIC:
+ * - Focuses on SMBs using AI tools (not building AI)
+ * - Examples: prompt tuning, chatbot testing, automation
+ * - Real-time calculations with 500ms debounce
+ * - Automatic pricing tier assignment
+ * 
+ * FEDERAL FOCUS:
+ * - No state credits calculated or displayed
+ * - Simplifies user experience and compliance
+ * 
+ * PERFORMANCE:
+ * - Debounced calculations prevent UI lag
+ * - Memoized results reduce re-renders
+ * - Validates inputs without blocking UI
+ * 
+ * INTEGRATION: 
+ * - Calculator UI uses useRealTimeCalculation hook
+ * - Results feed into lead capture and pricing display
+ * - Data saved to database after lead capture
+ * 
+ * TODO: Add multi-year calculation support
+ * TODO: Implement QSB payroll tax offset calculations
+ */
+```
