@@ -103,6 +103,7 @@ function calculatorReducer(state: CalculatorState, action: Action): CalculatorSt
 export const InteractiveCalculator: React.FC = () => {
   const [state, dispatch] = useReducer(calculatorReducer, initialState);
   const [showLeadCapture, setShowLeadCapture] = useState(false);
+  const [emailCaptured, setEmailCaptured] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
 
   // Real-time calculation effect
@@ -233,7 +234,7 @@ export const InteractiveCalculator: React.FC = () => {
             >
               <ResultsDisplayStep
                 results={state.results}
-                isBlurred={!showLeadCapture}
+                isBlurred={!emailCaptured}
                 onCTAClick={() => setShowLeadCapture(true)}
               />
             </motion.div>
@@ -272,7 +273,7 @@ export const InteractiveCalculator: React.FC = () => {
         </button>
       </div>
 
-      {/* Lead Capture Modal - Placeholder for now */}
+      {/* Lead Capture Modal */}
       {showLeadCapture && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <motion.div 
@@ -284,10 +285,26 @@ export const InteractiveCalculator: React.FC = () => {
             <p className="text-gray-600 mb-6">
               Enter your email to unlock your complete R&D credit estimate and pricing.
             </p>
-            <form className="space-y-4">
+            <form 
+              className="space-y-4" 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const email = formData.get('email') as string;
+                if (email) {
+                  // Store email for later use (you can send to backend here)
+                  console.log('Email captured:', email);
+                  setEmailCaptured(true);
+                  setShowLeadCapture(false);
+                  // Optionally show a success message or send to backend
+                }
+              }}
+            >
               <input
                 type="email"
+                name="email"
                 placeholder="your@email.com"
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
               <button 
