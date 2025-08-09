@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+:root {
+  --background: hsl(210, 20%, 98%);
+  --foreground: hsl(210, 25%, 7.8431%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 25%, 7.8431%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 25%, 7.8431%);
+  --primary: hsl(220, 91%, 41%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(159, 78%, 42%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(210, 40%, 94%);
+  --muted-foreground: hsl(210, 15%, 50%);
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --ring: hsl(220, 91%, 41%);
+  --chart-1: hsl(220, 91%, 41%);
+  --chart-2: hsl(159, 78%, 42%);
+  --chart-3: hsl(42, 93%, 56%);
+  --chart-4: hsl(147, 78%, 42%);
+  --chart-5: hsl(341, 75%, 51%);
+  
+  /* R&D Tax Credit specific colors */
+  --rd-primary-50: hsl(214, 100%, 97%);
+  --rd-primary-100: hsl(214, 95%, 93%);
+  --rd-primary-200: hsl(213, 97%, 87%);
+  --rd-primary-500: hsl(220, 91%, 41%);
+  --rd-primary-600: hsl(220, 91%, 37%);
+  --rd-primary-700: hsl(220, 91%, 33%);
+  --rd-secondary-100: hsl(159, 78%, 92%);
+  --rd-secondary-200: hsl(159, 78%, 85%);
+  --rd-secondary-500: hsl(159, 78%, 42%);
+  --rd-secondary-600: hsl(159, 78%, 38%);
+  --rd-primary-700: hsl(220, 91%, 33%);
+  --rd-secondary-50: hsl(158, 64%, 96%);
+  --rd-secondary-500: hsl(159, 78%, 42%);
+  --rd-secondary-600: hsl(159, 78%, 38%);
+  --rd-success: hsl(159, 78%, 38%);
+  --rd-warning: hsl(42, 93%, 44%);
+  --rd-error: hsl(0, 84%, 60%);
+  
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --popover: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(222, 84%, 5%);
+  --secondary: hsl(159, 78%, 42%);
+  --secondary-foreground: hsl(222, 84%, 5%);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(222, 84%, 5%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --ring: hsl(217, 91%, 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-inter);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  /* R&D Tax Credit color utilities */
+  .bg-rd-primary-50 { background-color: hsl(214, 100%, 97%); }
+  .bg-rd-primary-100 { background-color: hsl(214, 95%, 93%); }
+  .bg-rd-primary-200 { background-color: hsl(213, 97%, 87%); }
+  .bg-rd-primary-500 { background-color: hsl(220, 91%, 41%); }
+  .bg-rd-primary-600 { background-color: hsl(220, 91%, 37%); }
+  .bg-rd-primary-700 { background-color: hsl(220, 91%, 33%); }
+  
+  .text-rd-primary-500 { color: hsl(220, 91%, 41%); }
+  .text-rd-primary-600 { color: hsl(220, 91%, 37%); }
+  .text-rd-primary-700 { color: hsl(220, 91%, 33%); }
+  
+  .bg-rd-secondary-50 { background-color: hsl(158, 64%, 96%); }
+  .bg-rd-secondary-100 { background-color: hsl(159, 78%, 92%); }
+  .bg-rd-secondary-200 { background-color: hsl(159, 78%, 85%); }
+  .bg-rd-secondary-300 { background-color: hsl(159, 78%, 75%); }
+  .bg-rd-secondary-500 { background-color: hsl(159, 78%, 42%); }
+  .bg-rd-secondary-600 { background-color: hsl(159, 78%, 38%); }
+  
+  .text-rd-secondary-500 { color: hsl(159, 78%, 42%); }
+  .text-rd-secondary-600 { color: hsl(159, 78%, 38%); }
+  
+  .border-rd-primary-200 { border-color: hsl(213, 97%, 87%); }
+  .border-rd-primary-300 { border-color: hsl(213, 97%, 80%); }
+  .border-rd-primary-500 { border-color: hsl(220, 91%, 41%); }
+  .border-rd-secondary-200 { border-color: hsl(159, 78%, 85%); }
+  .hover\:border-rd-primary-300:hover { border-color: hsl(213, 97%, 80%); }
+  
+  .focus\:ring-rd-primary-500:focus { 
+    --tw-ring-color: hsl(220, 91%, 41%); 
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  .focus\:border-rd-primary-500:focus { border-color: hsl(220, 91%, 41%); }
+  .hover\:bg-rd-primary-50:hover { background-color: hsl(214, 100%, 97%); }
+
+  .btn-primary {
+    @apply bg-rd-primary-500 hover:bg-rd-primary-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply bg-rd-secondary-500 hover:bg-rd-secondary-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-rd-primary-500 text-rd-primary-500 hover:bg-rd-primary-50 font-semibold px-6 py-3 rounded-lg transition-colors;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-lg hover:-translate-y-1 transition-all duration-200;
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(220, 91%, 41%) 0%, hsl(159, 78%, 42%) 100%);
+  }
+  
+  .gradient-hero {
+    background: linear-gradient(135deg, hsl(214, 100%, 97%) 0%, hsl(158, 64%, 96%) 100%);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(220, 91%, 41%) 0%, hsl(159, 78%, 42%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .calculator-step {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .calculator-step.hidden {
+    @apply opacity-0 pointer-events-none;
+  }
+  
+  .progress-bar {
+    background: linear-gradient(90deg, hsl(220, 91%, 41%) 0%, hsl(159, 78%, 42%) 100%);
+    @apply h-2 rounded-full transition-all duration-500;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-slate-700 mb-2;
+  }
+  
+  .trust-signal {
+    @apply text-center p-4 bg-white rounded-lg shadow-sm border border-slate-200;
+  }
+  
+  .trust-signal-value {
+    @apply text-2xl font-bold mb-1;
+  }
+  
+  .trust-signal-primary {
+    @apply text-rd-primary-500;
+  }
+  
+  .trust-signal-secondary {
+    @apply text-rd-secondary-500;
+  }
+  
+  .trust-signal-accent {
+    @apply text-rd-accent;
+  }
+  
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4;
+  }
+  
+  .modal-content {
+    @apply bg-white rounded-xl max-w-md w-full p-8 relative shadow-2xl;
+  }
+  
+  .progress-step {
+    @apply flex items-center space-x-3 p-3 rounded-lg border transition-colors;
+  }
+  
+  .progress-step-complete {
+    @apply bg-rd-secondary-50 border-rd-secondary-200;
+  }
+  
+  .progress-step-current {
+    @apply bg-rd-primary-50 border-rd-primary-200 border-2;
+  }
+  
+  .progress-step-pending {
+    @apply bg-slate-50 border-slate-200 opacity-60;
+  }
+  
+  .dashboard-card {
+    @apply bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow;
+  }
+  
+  .feature-icon {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center mb-6;
+  }
+  
+  .feature-icon-primary {
+    @apply bg-rd-primary-100 text-rd-primary-500;
+  }
+  
+  .feature-icon-secondary {
+    @apply bg-rd-secondary-100 text-rd-secondary-500;
+  }
+  
+  .feature-icon-accent {
+    @apply bg-blue-100 text-blue-600;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .animate-count-up {
+    animation: countUp 2s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(210, 40%, 94%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(220, 91%, 41%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(220, 91%, 37%);
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
