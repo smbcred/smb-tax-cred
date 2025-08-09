@@ -178,37 +178,39 @@ export const ProcessStepsGrid: React.FC<{ steps: ProcessStep[] }> = ({ steps }) 
       </div>
 
       {/* Desktop: Horizontal layout with connectors */}
-      <div className="hidden lg:grid lg:grid-cols-3 gap-8">
-        {steps.map((step, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: index * 0.2 }}
-            className="relative"
-          >
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-600 rounded-full flex items-center 
-                            justify-center mx-auto mb-4 text-white font-bold text-2xl">
-                {step.number}
-              </div>
-              <div className="bg-white rounded-lg p-6 shadow-md">
-                <div className="text-green-600 text-3xl mb-4 flex justify-center">
-                  {step.icon}
+      <div className="hidden lg:block">
+        <div className="grid grid-cols-3 gap-8 relative">
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+              className="relative z-10"
+            >
+              <div className="text-center">
+                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center 
+                              justify-center mx-auto mb-4 text-white font-bold text-2xl relative z-20">
+                  {step.number}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600">{step.description}</p>
+                <div className="bg-white rounded-lg p-6 shadow-md">
+                  <div className="text-green-600 text-3xl mb-4 flex justify-center">
+                    {step.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600">{step.description}</p>
+                </div>
               </div>
-            </div>
-            {index < steps.length - 1 && (
-              <div className="hidden lg:block absolute top-10 left-full w-full">
-                <div className="w-full h-0.5 bg-gradient-to-r from-green-600 to-green-400"></div>
-              </div>
-            )}
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
+          {/* Connector lines positioned absolutely behind the circles */}
+          <div className="absolute top-10 left-0 right-0 flex items-center justify-between px-20 pointer-events-none">
+            <div className="flex-1 h-0.5 bg-gradient-to-r from-green-600 to-green-400 mx-8"></div>
+            <div className="flex-1 h-0.5 bg-gradient-to-r from-green-400 to-green-600 mx-8"></div>
+          </div>
+        </div>
       </div>
     </div>
   );

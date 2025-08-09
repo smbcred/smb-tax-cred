@@ -328,12 +328,13 @@ export default function LandingPage() {
 
       {/* Final CTA Section - Responsive Conversion optimization point */}
       <section className="py-12 sm:py-16 bg-gradient-to-r from-green-600 to-blue-600">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4">
           <motion.div
             ref={ctaRef}
             initial={{ opacity: 0, y: 20 }}
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
+            className="text-center"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
               {HeroContent.headline.replace("—", "?")}
