@@ -1,0 +1,1131 @@
+# Task 1.3.1: Build Calculator UI Component - Replit Prompt
+
+## Component: Interactive R&D Tax Credit Calculator
+**Reference**: R&D Tax Credit Document Generation App - Complete User Experience Flow.md, system-architecture-explanation.md, final-missing-specs.md, form_8974_spec.md
+
+### Overview
+Build the core 4-step interactive calculator that qualifies leads and demonstrates value through real-time credit calculations. This calculator is the primary conversion tool for SMBTaxCredits.com, featuring dynamic pricing tier assignment and lead capture integration.
+
+### Technical Requirements
+- **Dependencies**: React 18+, TypeScript, Tailwind CSS, framer-motion, react-hook-form
+- **State Management**: React hooks (useState, useReducer) for multi-step form
+- **Animations**: Smooth transitions between steps, number counting animations
+- **Performance**: Real-time calculation updates without lag
+- **Integration Points**: Lead capture modal trigger, pricing tier assignment
+
+### Implementation Prompt
+
+"Create a sophisticated 4-step R&D tax credit calculator component using React, TypeScript, and Tailwind CSS. The calculator should guide users through business type selection, qualifying activities, expense inputs, and display real-time results with dynamic pricing.
+
+**1. Create Calculator Container Component (components/calculator/InteractiveCalculator.tsx):**
+```typescript
+/**
+ * @file InteractiveCalculator.tsx
+ * @description 4-step R&D tax credit calculator with real-time calculations
+ * @author SMBTaxCredits.com Team
+ * @date 2024-01-15
+ * @knowledgeBase system-architecture-explanation.md - Calculator Component
+ * 
+ * This component serves as the main lead generation tool, calculating
+ * potential R&D credits and assigning pricing tiers dynamically.
+ * 
+ * INTEGRATION: Triggers LeadCaptureModal after completion
+ * BUSINESS LOGIC: Uses simplified ASC method (14% of QREs)
+ * TODO: Add state credit calculations
+ * TODO: Implement QSB eligibility check
+ */
+
+import React, { useState, useReducer, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BusinessTypeStep } from './steps/BusinessTypeStep';
+import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
+import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
+import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
+import { CalculatorProgress } from './CalculatorProgress';
+import { calculateRDCredit } from '../../utils/calculations';
+import { assignPricingTier } from '../../utils/pricing';
+
+// Calculator state interface
+interface CalculatorState {
+  currentStep: number;
+  businessType: string | null;
+  qualifyingActivities: string[];
+  expenses: {
+    totalEmployees: number;
+    technicalEmployees: number;
+    averageTechnicalSalary: number;
+    contractorCosts: number;
+    softwareCosts: number;
+    cloudCosts: number;
+  };
+  results: {
+    totalQRE: number;
+    federalCredit: number;
+    stateCredit: number;
+    totalBenefit: number;
+    pricingTier: number;
+    tierInfo: any;
+    roi: number;
+  } | null;
+  isValid: boolean;
+}
+
+// Initial state
+const initialState: CalculatorState = {
+  currentStep: 1,
+  businessType: null,
+  qualifyingActivities: [],
+  expenses: {
+    totalEmployees: 0,
+    technicalEmployees: 0,
+    averageTechnicalSalary: 0,
+    contractorCosts: 0,
+    softwareCosts: 0,
+    cloudCosts: 0
+  },
+  results: null,
+  isValid: false
+};
+
+// Reducer for state management
+function calculatorReducer(state: CalculatorState, action: any) {
+  switch (action.type) {
+    case 'SET_BUSINESS_TYPE':
+      return { ...state, businessType: action.payload };
+    case 'SET_ACTIVITIES':
+      return { ...state, qualifyingActivities: action.payload };
+    case 'UPDATE_EXPENSES':
+      return { 
+        ...state, 
+        expenses: { ...state.expenses, ...action.payload } 
+      };
+    case 'CALCULATE_RESULTS':
+      return { ...state, results: action.payload };
+    case 'NEXT_STEP':
+      return { ...state, currentStep: Math.min(4, state.currentStep + 1) };
+    case 'PREV_STEP':
+      return { ...state, currentStep: Math.max(1, state.currentStep - 1) };
+    case 'GO_TO_STEP':
+      return { ...state, currentStep: action.payload };
+    default:
+      return state;
+  }
+}
+
+export const InteractiveCalculator: React.FC = () => {
+  const [state, dispatch] = useReducer(calculatorReducer, initialState);
+  const [showLeadCapture, setShowLeadCapture] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  // Real-time calculation effect
+  const performCalculation = useCallback(() => {
+    if (state.expenses.technicalEmployees > 0) {
+      setIsCalculating(true);
+      
+      // Calculate QRE and credits
+      const calculation = calculateRDCredit(state.expenses);
+      const tier = assignPricingTier(calculation.federalCredit);
+      
+      const results = {
+        ...calculation,
+        pricingTier: tier.tier,
+        tierInfo: tier,
+        roi: Math.round((calculation.federalCredit / tier.price) * 100)
+      };
+      
+      dispatch({ type: 'CALCULATE_RESULTS', payload: results });
+      setIsCalculating(false);
+    }
+  }, [state.expenses]);
+
+  // Navigation handlers
+  const handleNext = () => {
+    if (state.currentStep === 4 && !showLeadCapture) {
+      setShowLeadCapture(true);
+    } else {
+      dispatch({ type: 'NEXT_STEP' });
+    }
+  };
+
+  const handlePrev = () => {
+    dispatch({ type: 'PREV_STEP' });
+  };
+
+  // Validation for navigation
+  const canProceed = () => {
+    switch (state.currentStep) {
+      case 1: return state.businessType !== null;
+      case 2: return state.qualifyingActivities.length > 0;
+      case 3: return state.expenses.technicalEmployees > 0;
+      default: return true;
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      {/* Header */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 text-center">
+          Calculate Your R&D Tax Credit
+        </h2>
+        <p className="text-gray-600 text-center mt-2">
+          See your potential federal credit in under 2 minutes
+        </p>
+      </div>
+
+      {/* Progress Indicator */}
+      <CalculatorProgress 
+        currentStep={state.currentStep} 
+        totalSteps={4}
+      />
+
+      {/* Step Content */}
+      <div className="mt-8 min-h-[400px]">
+        <AnimatePresence mode="wait">
+          {state.currentStep === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <BusinessTypeStep
+                selectedType={state.businessType}
+                onSelect={(type) => dispatch({ type: 'SET_BUSINESS_TYPE', payload: type })}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <QualifyingActivitiesStep
+                selectedActivities={state.qualifyingActivities}
+                onUpdate={(activities) => dispatch({ type: 'SET_ACTIVITIES', payload: activities })}
+                businessType={state.businessType}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ExpenseInputsStep
+                expenses={state.expenses}
+                onUpdate={(updates) => {
+                  dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
+                  performCalculation();
+                }}
+                businessType={state.businessType}
+              />
+            </motion.div>
+          )}
+
+          {state.currentStep === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ResultsDisplayStep
+                results={state.results}
+                isBlurred={!showLeadCapture}
+                onCTAClick={() => setShowLeadCapture(true)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between mt-8">
+        <button
+          onClick={handlePrev}
+          disabled={state.currentStep === 1}
+          className={`
+            px-6 py-3 rounded-lg font-medium transition-all
+            ${state.currentStep === 1 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }
+          `}
+        >
+          Back
+        </button>
+
+        <button
+          onClick={handleNext}
+          disabled={!canProceed()}
+          className={`
+            px-8 py-3 rounded-lg font-medium transition-all
+            ${canProceed()
+              ? 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }
+          `}
+        >
+          {state.currentStep === 4 ? 'See Full Results' : 'Next'}
+        </button>
+      </div>
+
+      {/* Lead Capture Modal will be implemented in Task 1.4.1 */}
+      {/* For now, just log the state */}
+      {showLeadCapture && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white p-8 rounded-lg max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-4">See Your Full Results</h3>
+            <p className="text-gray-600 mb-6">
+              Enter your email to unlock your complete R&D credit estimate and pricing.
+            </p>
+            {/* Lead capture form will go here */}
+            <button 
+              onClick={() => console.log('Lead capture:', state)}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+            >
+              Continue (Placeholder)
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+**2. Create Progress Indicator Component (components/calculator/CalculatorProgress.tsx):**
+```typescript
+/**
+ * @description Visual progress indicator for calculator steps
+ */
+
+interface ProgressProps {
+  currentStep: number;
+  totalSteps: number;
+}
+
+export const CalculatorProgress: React.FC<ProgressProps> = ({ 
+  currentStep, 
+  totalSteps 
+}) => {
+  const steps = [
+    'Business Type',
+    'Activities',
+    'Expenses',
+    'Results'
+  ];
+
+  return (
+    <div className="w-full">
+      {/* Progress Bar */}
+      <div className="relative">
+        <div className="absolute top-5 left-0 w-full h-1 bg-gray-200" />
+        <div 
+          className="absolute top-5 left-0 h-1 bg-blue-600 transition-all duration-500"
+          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+        />
+        
+        {/* Step Indicators */}
+        <div className="relative flex justify-between">
+          {steps.map((step, index) => {
+            const stepNumber = index + 1;
+            const isActive = stepNumber === currentStep;
+            const isCompleted = stepNumber < currentStep;
+            
+            return (
+              <div key={step} className="flex flex-col items-center">
+                <div
+                  className={`
+                    w-10 h-10 rounded-full flex items-center justify-center
+                    transition-all duration-300 relative z-10
+                    ${isActive 
+                      ? 'bg-blue-600 text-white scale-110' 
+                      : isCompleted 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-200 text-gray-500'
+                    }
+                  `}
+                >
+                  {isCompleted ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    stepNumber
+                  )}
+                </div>
+                <span className={`
+                  mt-2 text-sm font-medium
+                  ${isActive ? 'text-blue-600' : 'text-gray-500'}
+                `}>
+                  {step}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+**3. Create Business Type Selection Step (components/calculator/steps/BusinessTypeStep.tsx):**
+```typescript
+/**
+ * @description Step 1: Business type selection with visual grid
+ */
+
+interface BusinessTypeStepProps {
+  selectedType: string | null;
+  onSelect: (type: string) => void;
+}
+
+const businessTypes = [
+  {
+    value: 'agency',
+    label: 'Marketing/Creative Agency',
+    icon: '🎨',
+    description: 'Using AI for content, campaigns, automation'
+  },
+  {
+    value: 'ecommerce',
+    label: 'E-commerce Brand',
+    icon: '🛍️',
+    description: 'AI for customer service, personalization'
+  },
+  {
+    value: 'consultant',
+    label: 'Consultant/Coach',
+    icon: '💼',
+    description: 'AI tools for client deliverables, analysis'
+  },
+  {
+    value: 'service',
+    label: 'Service Business',
+    icon: '🛠️',
+    description: 'AI for operations, scheduling, quotes'
+  }
+];
+
+export const BusinessTypeStep: React.FC<BusinessTypeStepProps> = ({ 
+  selectedType, 
+  onSelect 
+}) => {
+  return (
+    <div>
+      <h3 className="text-2xl font-bold mb-2">What type of business do you run?</h3>
+      <p className="text-gray-600 mb-8">
+        Select the option that best describes your primary business activity
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {businessTypes.map((type) => (
+          <motion.button
+            key={type.value}
+            onClick={() => onSelect(type.value)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`
+              p-6 rounded-xl border-2 text-left transition-all
+              ${selectedType === type.value
+                ? 'border-blue-600 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300 bg-white'
+              }
+            `}
+          >
+            <div className="flex items-start space-x-4">
+              <span className="text-3xl">{type.icon}</span>
+              <div>
+                <h4 className="font-semibold text-lg">{type.label}</h4>
+                <p className="text-sm text-gray-600 mt-1">{type.description}</p>
+              </div>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Additional option */}
+      <button
+        onClick={() => onSelect('other')}
+        className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
+      >
+        My business doesn't fit these categories →
+      </button>
+    </div>
+  );
+};
+```
+
+**4. Create Qualifying Activities Step (components/calculator/steps/QualifyingActivitiesStep.tsx):**
+```typescript
+/**
+ * @description Step 2: Check qualifying R&D activities
+ * BUSINESS LOGIC: Maps to IRS four-part test
+ */
+
+interface QualifyingActivitiesStepProps {
+  selectedActivities: string[];
+  onUpdate: (activities: string[]) => void;
+  businessType: string | null;
+}
+
+// Dynamic activities based on business type
+const getActivitiesForType = (type: string | null) => {
+  const baseActivities = [
+    {
+      id: 'custom_ai_tools',
+      label: 'Build custom GPTs or AI assistants',
+      description: 'Creating specialized AI tools for your business'
+    },
+    {
+      id: 'ai_automation',
+      label: 'Develop AI-powered automations',
+      description: 'Using AI to automate workflows and processes'
+    },
+    {
+      id: 'prompt_engineering',
+      label: 'Design and test AI prompts',
+      description: 'Creating effective prompts for consistent results'
+    },
+    {
+      id: 'ai_integration',
+      label: 'Integrate AI into existing systems',
+      description: 'Connecting AI tools with your business software'
+    }
+  ];
+
+  // Add type-specific activities
+  const typeSpecific: Record<string, any[]> = {
+    agency: [
+      {
+        id: 'content_ai',
+        label: 'Create AI content generation systems',
+        description: 'Building repeatable AI content workflows'
+      },
+      {
+        id: 'client_chatbots',
+        label: 'Develop chatbots for clients',
+        description: 'Custom conversational AI solutions'
+      }
+    ],
+    ecommerce: [
+      {
+        id: 'customer_service_ai',
+        label: 'Build AI customer service tools',
+        description: 'Chatbots, email responders, FAQ systems'
+      },
+      {
+        id: 'personalization_ai',
+        label: 'Create AI personalization systems',
+        description: 'Product recommendations, dynamic content'
+      }
+    ],
+    consultant: [
+      {
+        id: 'analysis_tools',
+        label: 'Develop AI analysis tools',
+        description: 'Custom tools for data analysis and insights'
+      },
+      {
+        id: 'ai_frameworks',
+        label: 'Create AI-powered frameworks',
+        description: 'Reusable AI systems for client work'
+      }
+    ],
+    service: [
+      {
+        id: 'scheduling_ai',
+        label: 'Build AI scheduling systems',
+        description: 'Automated booking and calendar management'
+      },
+      {
+        id: 'quote_generation',
+        label: 'Create AI quoting tools',
+        description: 'Automated estimates and proposals'
+      }
+    ]
+  };
+
+  return [...baseActivities, ...(typeSpecific[type || ''] || [])];
+};
+
+export const QualifyingActivitiesStep: React.FC<QualifyingActivitiesStepProps> = ({
+  selectedActivities,
+  onUpdate,
+  businessType
+}) => {
+  const activities = getActivitiesForType(businessType);
+
+  const toggleActivity = (activityId: string) => {
+    if (selectedActivities.includes(activityId)) {
+      onUpdate(selectedActivities.filter(id => id !== activityId));
+    } else {
+      onUpdate([...selectedActivities, activityId]);
+    }
+  };
+
+  return (
+    <div>
+      <h3 className="text-2xl font-bold mb-2">
+        Which of these activities does your business do?
+      </h3>
+      <p className="text-gray-600 mb-8">
+        Select all that apply. These help determine if your work qualifies for R&D credits.
+      </p>
+
+      <div className="space-y-3">
+        {activities.map((activity) => {
+          const isSelected = selectedActivities.includes(activity.id);
+          
+          return (
+            <motion.div
+              key={activity.id}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              <label
+                className={`
+                  block p-4 rounded-lg border-2 cursor-pointer transition-all
+                  ${isSelected
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }
+                `}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleActivity(activity.id)}
+                    className="mt-1 mr-4 h-5 w-5 text-blue-600 rounded"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">
+                      {activity.label}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {activity.description}
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {selectedActivities.length === 0 && (
+        <p className="mt-4 text-amber-600 text-sm">
+          ⚠️ Select at least one activity to continue
+        </p>
+      )}
+    </div>
+  );
+};
+```
+
+**5. Create Expense Inputs Step (components/calculator/steps/ExpenseInputsStep.tsx):**
+```typescript
+/**
+ * @description Step 3: Collect expense data for credit calculation
+ * CALCULATION: Real-time updates trigger recalculation
+ */
+
+interface ExpenseInputsStepProps {
+  expenses: any;
+  onUpdate: (updates: any) => void;
+  businessType: string | null;
+}
+
+export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
+  expenses,
+  onUpdate,
+  businessType
+}) => {
+  // Format number with commas
+  const formatNumber = (num: number) => {
+    return num.toLocaleString('en-US');
+  };
+
+  // Parse formatted number
+  const parseNumber = (str: string) => {
+    return parseInt(str.replace(/,/g, '')) || 0;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    const numValue = parseNumber(value);
+    onUpdate({ [field]: numValue });
+  };
+
+  return (
+    <div>
+      <h3 className="text-2xl font-bold mb-2">Tell us about your expenses</h3>
+      <p className="text-gray-600 mb-8">
+        We'll calculate your potential credit based on qualified research expenses (QREs)
+      </p>
+
+      <div className="space-y-6">
+        {/* Employee Information */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h4 className="font-semibold text-lg mb-4">Employee Information</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Total Employees
+              </label>
+              <input
+                type="text"
+                value={formatNumber(expenses.totalEmployees)}
+                onChange={(e) => handleInputChange('totalEmployees', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Technical Employees
+                <span className="text-gray-500 text-xs ml-2">
+                  (developers, engineers, etc.)
+                </span>
+              </label>
+              <input
+                type="text"
+                value={formatNumber(expenses.technicalEmployees)}
+                onChange={(e) => handleInputChange('technicalEmployees', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Average Technical Employee Salary
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2 text-gray-500">$</span>
+              <input
+                type="text"
+                value={formatNumber(expenses.averageTechnicalSalary)}
+                onChange={(e) => handleInputChange('averageTechnicalSalary', e.target.value)}
+                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Other Expenses */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h4 className="font-semibold text-lg mb-4">Other R&D Expenses</h4>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Annual Contractor/Consultant Costs
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                <input
+                  type="text"
+                  value={formatNumber(expenses.contractorCosts)}
+                  onChange={(e) => handleInputChange('contractorCosts', e.target.value)}
+                  className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Software & Cloud Services
+                <span className="text-gray-500 text-xs ml-2">
+                  (AWS, development tools, etc.)
+                </span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                <input
+                  type="text"
+                  value={formatNumber(expenses.softwareCosts + expenses.cloudCosts)}
+                  onChange={(e) => {
+                    const total = parseNumber(e.target.value);
+                    onUpdate({ 
+                      softwareCosts: Math.floor(total * 0.6),
+                      cloudCosts: Math.floor(total * 0.4)
+                    });
+                  }}
+                  className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Real-time Calculation Preview */}
+        {expenses.technicalEmployees > 0 && (
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-blue-900">
+                Calculating your potential credit...
+              </span>
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+```
+
+**6. Create Calculation Utilities (utils/calculations.ts):**
+```typescript
+/**
+ * @file calculations.ts
+ * @description R&D credit calculation engine
+ * @knowledgeBase additional-project-specs.md - Calculation formulas
+ * 
+ * CALCULATION METHOD: Simplified ASC (14% of QREs)
+ * CONTRACTOR LIMITATION: 65% of contractor costs qualify
+ */
+
+interface CalculationInput {
+  totalEmployees: number;
+  technicalEmployees: number;
+  averageTechnicalSalary: number;
+  contractorCosts: number;
+  softwareCosts: number;
+  cloudCosts: number;
+}
+
+interface CalculationResult {
+  wages: number;
+  contractorQRE: number;
+  suppliesQRE: number;
+  totalQRE: number;
+  federalCredit: number;
+  stateCredit: number;
+  totalBenefit: number;
+}
+
+export const calculateRDCredit = (input: CalculationInput): CalculationResult => {
+  // Calculate wage QREs
+  const wages = input.technicalEmployees * input.averageTechnicalSalary;
+  
+  // Contractor costs (limited to 65% per IRC Section 41)
+  const contractorQRE = input.contractorCosts * 0.65;
+  
+  // Supplies (software and cloud)
+  const suppliesQRE = input.softwareCosts + input.cloudCosts;
+  
+  // Total QRE
+  const totalQRE = wages + contractorQRE + suppliesQRE;
+  
+  // Federal credit (simplified ASC method - 14%)
+  const federalCredit = Math.round(totalQRE * 0.14);
+  
+  // State credit (simplified - 5% average)
+  // TODO: Implement state-specific calculations
+  const stateCredit = Math.round(totalQRE * 0.05);
+  
+  // Total benefit
+  const totalBenefit = federalCredit + stateCredit;
+  
+  return {
+    wages,
+    contractorQRE,
+    suppliesQRE,
+    totalQRE,
+    federalCredit,
+    stateCredit,
+    totalBenefit
+  };
+};
+
+// QSB eligibility check
+export const checkQSBEligibility = (
+  grossReceipts: number,
+  yearsInBusiness: number
+): boolean => {
+  // Gross receipts test: < $5M
+  // Age test: < 5 years since first gross receipts
+  return grossReceipts < 5000000 && yearsInBusiness < 5;
+};
+```
+
+**7. Create Pricing Tier Assignment (utils/pricing.ts):**
+```typescript
+/**
+ * @file pricing.ts
+ * @description Dynamic pricing tier assignment based on credit amount
+ * @knowledgeBase pricing_strategy_rd_platform.md
+ */
+
+interface PricingTier {
+  tier: number;
+  creditRange: { min: number; max: number };
+  price: number;
+  name: string;
+  features: string[];
+}
+
+const PRICING_TIERS: PricingTier[] = [
+  {
+    tier: 1,
+    creditRange: { min: 0, max: 10000 },
+    price: 500,
+    name: "Tier 1",
+    features: ["Federal R&D Credit Forms", "Technical Narrative", "90-day Access"]
+  },
+  {
+    tier: 2,
+    creditRange: { min: 10000, max: 20000 },
+    price: 750,
+    name: "Tier 2",
+    features: ["Everything in Tier 1", "Enhanced Detail", "Priority Support"]
+  },
+  {
+    tier: 3,
+    creditRange: { min: 20000, max: 30000 },
+    price: 1000,
+    name: "Tier 3",
+    features: ["Everything in Tier 2", "Multi-project Support", "Expedited"]
+  },
+  {
+    tier: 4,
+    creditRange: { min: 30000, max: 40000 },
+    price: 1250,
+    name: "Tier 4",
+    features: ["Everything in Tier 3", "Complex Structures", "Executive Summary"]
+  },
+  {
+    tier: 5,
+    creditRange: { min: 40000, max: 50000 },
+    price: 1500,
+    name: "Tier 5",
+    features: ["Everything in Tier 4", "Multi-state Support", "Audit Prep"]
+  },
+  {
+    tier: 6,
+    creditRange: { min: 50000, max: 60000 },
+    price: 1750,
+    name: "Tier 6",
+    features: ["Everything in Tier 5", "Dedicated Support", "Rush Processing"]
+  },
+  {
+    tier: 7,
+    creditRange: { min: 60000, max: Infinity },
+    price: 2500,
+    name: "Tier 7",
+    features: ["Everything in Tier 6", "White Glove Service", "Quarterly Updates"]
+  }
+];
+
+export const assignPricingTier = (federalCredit: number): PricingTier => {
+  const tier = PRICING_TIERS.find(
+    t => federalCredit >= t.creditRange.min && federalCredit < t.creditRange.max
+  );
+  
+  return tier || PRICING_TIERS[PRICING_TIERS.length - 1];
+};
+
+// Calculate ROI
+export const calculateROI = (federalCredit: number, price: number): number => {
+  return Math.round((federalCredit / price) * 100) / 100;
+};
+```
+
+**8. Create Results Display Step (components/calculator/steps/ResultsDisplayStep.tsx):**
+```typescript
+/**
+ * @description Step 4: Display calculation results with blur effect
+ * INTEGRATION: Triggers lead capture when CTA clicked
+ */
+
+interface ResultsDisplayStepProps {
+  results: any;
+  isBlurred: boolean;
+  onCTAClick: () => void;
+}
+
+export const ResultsDisplayStep: React.FC<ResultsDisplayStepProps> = ({
+  results,
+  isBlurred,
+  onCTAClick
+}) => {
+  if (!results) {
+    return <div>Calculating...</div>;
+  }
+
+  return (
+    <div className="relative">
+      {/* Results Content */}
+      <div className={`${isBlurred ? 'filter blur-sm' : ''} transition-all duration-300`}>
+        <h3 className="text-2xl font-bold mb-8 text-center">
+          Your Estimated R&D Tax Credit
+        </h3>
+
+        {/* Credit Display */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-8 rounded-xl mb-6">
+          <div className="text-center">
+            <p className="text-lg opacity-90 mb-2">Total Federal R&D Credit</p>
+            <CountUp
+              end={results.federalCredit}
+              duration={2}
+              prefix="$"
+              separator=","
+              className="text-5xl font-bold"
+            />
+          </div>
+        </div>
+
+        {/* Breakdown */}
+        <div className="bg-gray-50 p-6 rounded-lg mb-6">
+          <h4 className="font-semibold mb-4">Credit Breakdown</h4>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Qualified Wage Expenses</span>
+              <span className="font-medium">${results.wages.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Qualified Contractor Costs</span>
+              <span className="font-medium">${results.contractorQRE.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Qualified Supplies</span>
+              <span className="font-medium">${results.suppliesQRE.toLocaleString()}</span>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <div className="flex justify-between font-semibold">
+                <span>Total QREs</span>
+                <span>${results.totalQRE.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pricing Tier */}
+        <div className="bg-blue-50 p-6 rounded-lg mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h4 className="font-semibold text-lg">{results.tierInfo.name}</h4>
+              <p className="text-gray-600">Documentation Package</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-blue-600">
+                ${results.tierInfo.price}
+              </p>
+              <p className="text-sm text-green-600 font-medium">
+                {results.roi}x ROI
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Blur Overlay CTA */}
+      {isBlurred && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md">
+            <h3 className="text-2xl font-bold mb-4">
+              See Your Full Results
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Enter your email to unlock your complete R&D credit estimate, 
+              pricing details, and next steps.
+            </p>
+            <button
+              onClick={onCTAClick}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all"
+            >
+              Get My Full Estimate
+            </button>
+            <p className="text-sm text-gray-500 mt-4">
+              No credit card required • Takes 30 seconds
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// CountUp animation component
+const CountUp: React.FC<any> = ({ end, duration, prefix, separator, className }) => {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let startTime: number;
+    const animateCount = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      
+      setCount(Math.floor(progress * end));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateCount);
+      }
+    };
+    
+    requestAnimationFrame(animateCount);
+  }, [end, duration]);
+  
+  return (
+    <span className={className}>
+      {prefix}{count.toLocaleString('en-US')}
+    </span>
+  );
+};
+```
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * Calculator Component Architecture
+ * 
+ * STATE MANAGEMENT:
+ * - Uses useReducer for complex multi-step state
+ * - Real-time calculation on expense changes
+ * - Results cached to prevent recalculation
+ * 
+ * USER FLOW:
+ * 1. Business Type → Determines relevant activities
+ * 2. Activities → Validates R&D qualification
+ * 3. Expenses → Calculates QREs and credit
+ * 4. Results → Shows credit with pricing tier
+ * 
+ * CALCULATIONS:
+ * - Federal: 14% of QREs (simplified ASC)
+ * - Contractors: Limited to 65% per IRC
+ * - State: 5% placeholder (TODO: state-specific)
+ * 
+ * INTEGRATIONS:
+ * - Lead capture modal (Task 1.4.1)
+ * - Pricing tier assignment (7 tiers)
+ * - Analytics tracking (TODO)
+ * 
+ * MOBILE: Fully responsive with touch-friendly inputs
+ * A11Y: Keyboard navigation, ARIA labels, focus management
+ */
+```"
