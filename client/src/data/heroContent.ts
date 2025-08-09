@@ -5,23 +5,23 @@
  */
 
 export const HeroContent = {
-  headline: "Claim your federal R&D tax credit—without the runaround.",
-  subheadline: "Flat-fee, self-serve documentation for amended 2022–2024 and current 2025 filings—IRS-aligned and CPA-ready.",
-  primaryCTA: "Start your free estimate",
+  headline: "Your AI development qualifies for R&D tax credits",
+  subheadline: "Turn ChatGPT prompts, custom GPTs, and AI automation into federal tax savings—with IRS-compliant documentation.",
+  primaryCTA: "Calculate your AI credit",
   secondaryCTA: "See how it works",
   
   // Social proof strip items
   trustSignals: [
-    "Built for SMBs using AI and internal innovation",
-    "Outputs your CPA actually needs",
+    "Built for businesses using AI tools",
+    "ChatGPT & Claude usage qualifies",
     "Section G ready",
-    "IRS-compliant by design"
+    "IRS-compliant AI documentation"
   ],
 
   // Additional trust metrics
   metrics: {
-    businesses: "1,000+",
-    creditsProcessed: "$10M+",
+    businesses: "500+",
+    creditsProcessed: "$7M+",
     avgCompletion: "20 min",
     satisfaction: "98%"
   }

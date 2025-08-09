@@ -1,6 +1,6 @@
 /**
  * @file QualifyingActivitiesStep.tsx
- * @description Step 2: Qualifying activities selection
+ * @description Step 2: Qualifying AI R&D activities selection
  */
 
 import { motion } from 'framer-motion';
@@ -12,56 +12,56 @@ interface QualifyingActivitiesStepProps {
 }
 
 const allActivities = {
-  software: [
-    { id: 'new-features', label: 'Developing new features or capabilities' },
-    { id: 'architecture', label: 'Designing system architecture' },
-    { id: 'algorithms', label: 'Creating algorithms or data models' },
-    { id: 'integration', label: 'Integrating third-party APIs or services' },
-    { id: 'performance', label: 'Optimizing performance or scalability' },
-    { id: 'security', label: 'Implementing security features' },
-    { id: 'testing', label: 'Developing automated testing frameworks' },
-    { id: 'cloud', label: 'Cloud infrastructure development' }
+  agency: [
+    { id: 'custom-gpts', label: 'Build custom GPTs or AI assistants for specific use cases' },
+    { id: 'content-systems', label: 'Create AI content generation systems and workflows' },
+    { id: 'client-chatbots', label: 'Develop chatbots for client websites or services' },
+    { id: 'ai-campaigns', label: 'Design AI-powered marketing campaigns' },
+    { id: 'prompt-engineering', label: 'Design and test prompts for consistent results' },
+    { id: 'automation-workflows', label: 'Build AI automation workflows for repetitive tasks' },
+    { id: 'ai-analytics', label: 'Implement AI-driven analytics and reporting' }
   ],
-  manufacturing: [
-    { id: 'product-design', label: 'New product design and development' },
-    { id: 'process-improvement', label: 'Manufacturing process improvements' },
-    { id: 'automation', label: 'Implementing automation systems' },
-    { id: 'quality', label: 'Quality control innovations' },
-    { id: 'materials', label: 'Testing new materials or compounds' },
-    { id: 'prototyping', label: 'Creating and testing prototypes' },
-    { id: 'tooling', label: 'Developing custom tooling or equipment' }
+  ecommerce: [
+    { id: 'customer-service-ai', label: 'Build AI customer service tools and chatbots' },
+    { id: 'personalization', label: 'Create AI personalization and recommendation systems' },
+    { id: 'inventory-ai', label: 'Develop AI inventory management systems' },
+    { id: 'pricing-models', label: 'Build dynamic AI pricing models' },
+    { id: 'review-analysis', label: 'Implement AI review analysis and sentiment tracking' },
+    { id: 'product-descriptions', label: 'Create AI systems for product descriptions' },
+    { id: 'email-automation', label: 'Design AI email response systems' }
   ],
-  engineering: [
-    { id: 'design-innovation', label: 'Engineering design innovations' },
-    { id: 'cad-cam', label: 'CAD/CAM development' },
-    { id: 'simulation', label: 'Creating simulations or models' },
-    { id: 'technical-solutions', label: 'Developing technical solutions' },
-    { id: 'system-integration', label: 'Complex system integration' },
-    { id: 'optimization', label: 'Process or system optimization' }
+  consultant: [
+    { id: 'custom-analysis', label: 'Build custom AI analysis tools for clients' },
+    { id: 'report-automation', label: 'Create AI-powered report generation systems' },
+    { id: 'gpt-assistants', label: 'Develop specialized GPT assistants for consulting' },
+    { id: 'data-processing', label: 'Build AI data processing and insight tools' },
+    { id: 'client-portals', label: 'Create AI-enhanced client portals' },
+    { id: 'knowledge-bases', label: 'Develop AI knowledge base systems' }
   ],
-  biotech: [
-    { id: 'research', label: 'Scientific research and experiments' },
-    { id: 'clinical-trials', label: 'Clinical trials and studies' },
-    { id: 'drug-development', label: 'Drug or treatment development' },
-    { id: 'medical-devices', label: 'Medical device innovation' },
-    { id: 'lab-testing', label: 'Laboratory testing and analysis' },
-    { id: 'formulation', label: 'Product formulation' }
+  service: [
+    { id: 'scheduling-ai', label: 'Build AI scheduling and booking systems' },
+    { id: 'quote-generation', label: 'Create AI quoting and estimation tools' },
+    { id: 'service-chatbots', label: 'Develop service-specific chatbots' },
+    { id: 'workflow-automation', label: 'Implement AI workflow automation' },
+    { id: 'customer-comm', label: 'Build AI customer communication systems' },
+    { id: 'predictive-maintenance', label: 'Create predictive AI maintenance tools' }
   ],
-  ai: [
-    { id: 'ml-models', label: 'Machine learning model development' },
-    { id: 'training', label: 'Model training and optimization' },
-    { id: 'nlp', label: 'Natural language processing' },
-    { id: 'computer-vision', label: 'Computer vision applications' },
-    { id: 'data-pipeline', label: 'Data pipeline development' },
-    { id: 'algorithm-research', label: 'Algorithm research and testing' }
+  saas: [
+    { id: 'ai-features', label: 'Develop new AI-powered features' },
+    { id: 'llm-integration', label: 'Integrate LLMs (GPT, Claude, etc.) into products' },
+    { id: 'custom-models', label: 'Train custom AI models for specific use cases' },
+    { id: 'api-development', label: 'Build AI API endpoints and services' },
+    { id: 'ml-pipelines', label: 'Create machine learning data pipelines' },
+    { id: 'ai-infrastructure', label: 'Build AI infrastructure and scaling systems' },
+    { id: 'rag-systems', label: 'Implement RAG (Retrieval Augmented Generation) systems' }
   ],
   other: [
-    { id: 'innovation', label: 'Product or service innovation' },
-    { id: 'technical-uncertainty', label: 'Solving technical uncertainties' },
-    { id: 'experimentation', label: 'Systematic experimentation' },
-    { id: 'process-development', label: 'New process development' },
-    { id: 'technology-adaptation', label: 'Adapting new technologies' },
-    { id: 'custom-solutions', label: 'Creating custom technical solutions' }
+    { id: 'ai-automation', label: 'Develop AI-powered automation systems' },
+    { id: 'custom-ai-tools', label: 'Build custom AI tools for business processes' },
+    { id: 'prompt-libraries', label: 'Create and test prompt libraries' },
+    { id: 'ai-integration', label: 'Integrate AI into existing systems' },
+    { id: 'process-optimization', label: 'Use AI to optimize business processes' },
+    { id: 'ai-experimentation', label: 'Experiment with new AI technologies' }
   ]
 };
 
@@ -84,10 +84,10 @@ export const QualifyingActivitiesStep: React.FC<QualifyingActivitiesStepProps> =
     <div>
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Which activities does your team perform?
+          Which AI activities does your business do?
         </h3>
         <p className="text-gray-600">
-          Select all that apply - these help determine your qualifying research expenses
+          Select all that apply - these AI development activities qualify for R&D credits
         </p>
       </div>
 

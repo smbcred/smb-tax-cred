@@ -1,16 +1,16 @@
 /**
  * @file BusinessTypeStep.tsx
- * @description Step 1: Business type selection
+ * @description Step 1: Business type selection for AI R&D
  */
 
 import { motion } from 'framer-motion';
 import { 
-  FaLaptopCode, 
-  FaIndustry, 
-  FaFlask, 
-  FaMicrochip,
+  FaPalette,
+  FaShoppingCart,
+  FaBriefcase,
+  FaTools,
   FaRobot,
-  FaHeartbeat
+  FaBuilding
 } from 'react-icons/fa';
 
 interface BusinessTypeStepProps {
@@ -20,46 +20,46 @@ interface BusinessTypeStepProps {
 
 const businessTypes = [
   {
-    id: 'software',
-    title: 'Software & Technology',
-    description: 'Web/mobile apps, SaaS, AI/ML, data analytics',
-    icon: <FaLaptopCode className="text-3xl" />,
-    examples: ['Custom software development', 'Cloud applications', 'API integrations']
+    id: 'agency',
+    title: 'Marketing/Creative Agency',
+    description: 'Using AI for content, campaigns, automation',
+    icon: <FaPalette className="text-3xl" />,
+    examples: ['AI content generation', 'Automated campaigns', 'Custom chatbots for clients']
   },
   {
-    id: 'manufacturing',
-    title: 'Manufacturing',
-    description: 'Product design, process improvements, automation',
-    icon: <FaIndustry className="text-3xl" />,
-    examples: ['New product development', 'Process optimization', 'Quality improvements']
+    id: 'ecommerce',
+    title: 'E-commerce Brand',
+    description: 'AI for customer service, personalization',
+    icon: <FaShoppingCart className="text-3xl" />,
+    examples: ['AI customer support', 'Product recommendations', 'Dynamic pricing models']
   },
   {
-    id: 'engineering',
-    title: 'Engineering & Architecture',
-    description: 'Design innovation, technical solutions, CAD/CAM',
-    icon: <FaMicrochip className="text-3xl" />,
-    examples: ['Engineering design', 'Technical consulting', 'System integration']
+    id: 'consultant',
+    title: 'Consultant/Coach',
+    description: 'AI tools for client deliverables, analysis',
+    icon: <FaBriefcase className="text-3xl" />,
+    examples: ['AI-powered reports', 'Automated analysis', 'Custom GPT assistants']
   },
   {
-    id: 'biotech',
-    title: 'Life Sciences & Biotech',
-    description: 'Research, clinical trials, medical devices',
-    icon: <FaFlask className="text-3xl" />,
-    examples: ['Drug development', 'Medical research', 'Clinical studies']
+    id: 'service',
+    title: 'Service Business',
+    description: 'AI for operations, scheduling, quotes',
+    icon: <FaTools className="text-3xl" />,
+    examples: ['AI scheduling systems', 'Automated quotes', 'Service chatbots']
   },
   {
-    id: 'ai',
-    title: 'AI & Machine Learning',
-    description: 'Algorithm development, model training, automation',
+    id: 'saas',
+    title: 'SaaS/Software Company',
+    description: 'Building AI features and integrations',
     icon: <FaRobot className="text-3xl" />,
-    examples: ['ML model development', 'Computer vision', 'Natural language processing']
+    examples: ['AI feature development', 'LLM integrations', 'Custom AI models']
   },
   {
     id: 'other',
     title: 'Other Industries',
-    description: 'Any business developing new or improved products/processes',
-    icon: <FaHeartbeat className="text-3xl" />,
-    examples: ['Agriculture tech', 'Financial tech', 'Energy solutions']
+    description: 'Any business using AI for innovation',
+    icon: <FaBuilding className="text-3xl" />,
+    examples: ['AI automation', 'Process optimization', 'Custom AI tools']
   }
 ];
 
@@ -128,8 +128,8 @@ export const BusinessTypeStep: React.FC<BusinessTypeStepProps> = ({
 
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
-          <strong>💡 Tip:</strong> Most businesses that develop new products, improve processes, 
-          or use technology to solve problems qualify for the R&D tax credit.
+          <strong>💡 Tip:</strong> If you're using AI tools like ChatGPT, Claude, or custom GPTs to innovate 
+          and improve your business processes, you likely qualify for the R&D tax credit.
         </p>
       </div>
     </div>

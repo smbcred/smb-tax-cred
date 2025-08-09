@@ -52,7 +52,7 @@ export const ResultsDisplayStep: React.FC<ResultsDisplayStepProps> = ({
               Your Results Are Ready!
             </h3>
             <p className="text-gray-600 mb-6 max-w-md">
-              Enter your email to unlock your complete R&D credit estimate, 
+              Enter your email to unlock your complete AI R&D credit estimate, 
               pricing details, and next steps.
             </p>
             <button
@@ -73,10 +73,10 @@ export const ResultsDisplayStep: React.FC<ResultsDisplayStepProps> = ({
       <div className={isBlurred ? 'filter blur-md' : ''}>
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            Your R&D Tax Credit Estimate
+            Your AI R&D Tax Credit Estimate
           </h3>
           <p className="text-gray-600">
-            Based on your inputs, here's your potential tax savings
+            Based on your AI development activities, here's your potential tax savings
           </p>
         </div>
 

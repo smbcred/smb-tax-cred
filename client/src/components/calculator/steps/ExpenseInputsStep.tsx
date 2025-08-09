@@ -55,10 +55,10 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     <div>
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Enter your annual expenses
+          Enter your AI-related expenses
         </h3>
         <p className="text-gray-600">
-          These help us calculate your qualifying research expenses (QREs)
+          Include wages for employees working on AI projects and AI tool/service costs
         </p>
       </div>
 
@@ -81,7 +81,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Technical/R&D Employees
+                Employees Working on AI Projects
               </label>
               <input
                 type="number"
@@ -91,13 +91,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 placeholder="e.g., 10"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Engineers, developers, researchers, etc.
+                Staff developing AI tools, prompts, or automations
               </p>
             </div>
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Average Technical Employee Salary
+              Average Salary of AI Project Employees
             </label>
             <div className="relative">
               <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -112,13 +112,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
           </div>
         </div>
 
-        {/* Other Expenses */}
+        {/* AI-Related Expenses */}
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-gray-900 mb-4">Other R&D Expenses</h4>
+          <h4 className="font-semibold text-gray-900 mb-4">AI Tool & Service Expenses</h4>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Annual Contractor/Consultant Costs
+                AI Consultants/Contractors (annual)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -129,11 +129,14 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 50,000"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  External AI developers, prompt engineers, consultants
+                </p>
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Software & Tools (annual licenses)
+                AI Software & APIs (ChatGPT, Claude, etc.)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -144,11 +147,14 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 25,000"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  OpenAI, Anthropic, Cohere, Midjourney, other AI tools
+                </p>
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cloud Computing & Hosting
+                Cloud & Infrastructure for AI
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -159,6 +165,9 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 15,000"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  AWS, Azure, GCP for AI workloads, vector databases
+                </p>
               </div>
             </div>
           </div>
