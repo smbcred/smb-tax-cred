@@ -84,14 +84,23 @@ export const calculations = pgTable("calculations", {
   totalEmployees: integer("total_employees"),
   technicalEmployees: integer("technical_employees"),
   averageTechnicalSalary: decimal("average_technical_salary", { precision: 12, scale: 2 }),
+  rdAllocationPercentage: integer("rd_allocation_percentage").default(100),
   contractorCosts: decimal("contractor_costs", { precision: 12, scale: 2 }),
   softwareCosts: decimal("software_costs", { precision: 12, scale: 2 }),
   cloudCosts: decimal("cloud_costs", { precision: 12, scale: 2 }),
   otherCosts: decimal("other_costs", { precision: 12, scale: 2 }),
+  // Prior year data
+  isFirstTimeFiler: boolean("is_first_time_filer").default(true),
+  priorYearQREs: jsonb("prior_year_qres").default('[]'),
+  // ASC calculation details
+  ascMethod: varchar("asc_method", { length: 20 }), // 'first-time' or 'repeat'
+  creditRate: decimal("credit_rate", { precision: 4, scale: 2 }), // 0.06 or 0.14
+  baseAmount: decimal("base_amount", { precision: 12, scale: 2 }),
+  excessQRE: decimal("excess_qre", { precision: 12, scale: 2 }),
   // Calculated results
   totalQRE: decimal("total_qre", { precision: 12, scale: 2 }),
   federalCredit: decimal("federal_credit", { precision: 12, scale: 2 }),
-  stateCredit: decimal("state_credit", { precision: 12, scale: 2 }),
+  stateCredit: decimal("state_credit", { precision: 12, scale: 2 }).default('0'),
   totalBenefit: decimal("total_benefit", { precision: 12, scale: 2 }),
   pricingTier: integer("pricing_tier"),
   tierName: varchar("tier_name", { length: 50 }),
@@ -99,8 +108,10 @@ export const calculations = pgTable("calculations", {
   // Additional data
   taxYear: integer("tax_year").default(sql`EXTRACT(YEAR FROM CURRENT_DATE)`),
   qualifyingActivities: jsonb("qualifying_activities"),
-  calculationMethod: varchar("calculation_method", { length: 20 }).default("simplified"),
+  calculationMethod: varchar("calculation_method", { length: 20 }).default("asc"),
   calculationData: jsonb("calculation_data"),
+  warnings: jsonb("warnings").default('[]'),
+  assumptions: jsonb("assumptions").default('[]'),
   // Lead tracking
   isLead: boolean("is_lead").default(true),
   leadConvertedAt: timestamp("lead_converted_at"),

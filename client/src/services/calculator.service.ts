@@ -126,12 +126,12 @@ export const qualifyingActivities: QualifyingActivity[] = [
   }
 ];
 
-// Pricing tiers based on calculated credit amounts
+// Standardized 7-tier pricing structure based on calculated credit amounts
 export const pricingTiers: PricingTier[] = [
   {
     tier: 1,
     name: "Starter",
-    price: 495,
+    price: 500,
     creditRange: "Up to $10,000",
     features: [
       "Credit calculation",
@@ -143,9 +143,8 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 2,
     name: "Growth",
-    price: 1495,
-    creditRange: "$10,001 - $25,000",
-    popular: true,
+    price: 750,
+    creditRange: "$10,001 - $20,000",
     features: [
       "Everything in Starter",
       "Detailed narratives",
@@ -155,26 +154,63 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 3,
-    name: "Scale",
-    price: 2495,
-    creditRange: "$25,001 - $50,000",
+    name: "Professional",
+    price: 1000,
+    creditRange: "$20,001 - $30,000",
+    popular: true,
     features: [
       "Everything in Growth",
+      "Advanced documentation",
+      "Audit preparation",
+      "Quarterly reviews"
+    ]
+  },
+  {
+    tier: 4,
+    name: "Scale",
+    price: 1250,
+    creditRange: "$30,001 - $40,000",
+    features: [
+      "Everything in Professional",
       "Advanced analytics",
       "Audit support",
       "Dedicated specialist"
     ]
   },
   {
-    tier: 4,
-    name: "Enterprise",
-    price: 3995,
-    creditRange: "$50,000+",
+    tier: 5,
+    name: "Advanced",
+    price: 1500,
+    creditRange: "$40,001 - $50,000",
     features: [
       "Everything in Scale",
       "Custom consulting",
       "Multi-entity support",
-      "Ongoing compliance"
+      "Monthly reviews"
+    ]
+  },
+  {
+    tier: 6,
+    name: "Premium",
+    price: 1750,
+    creditRange: "$50,001 - $60,000",
+    features: [
+      "Everything in Advanced",
+      "White-glove service",
+      "Ongoing compliance",
+      "Executive reporting"
+    ]
+  },
+  {
+    tier: 7,
+    name: "Enterprise",
+    price: 2000,
+    creditRange: "$60,000+",
+    features: [
+      "Everything in Premium",
+      "Unlimited consulting",
+      "Full audit defense",
+      "Custom integration"
     ]
   }
 ];
@@ -209,12 +245,16 @@ export const calculateRDTaxCredit = (expenses: CalculatorExpenses): CalculationR
 
 /**
  * Determine pricing tier based on calculated federal credit amount
+ * Uses standardized 7-tier structure matching calculator engine
  */
 export const getPricingTier = (creditAmount: number): PricingTier => {
-  if (creditAmount <= 10000) return pricingTiers[0];
-  if (creditAmount <= 25000) return pricingTiers[1];
-  if (creditAmount <= 50000) return pricingTiers[2];
-  return pricingTiers[3];
+  if (creditAmount <= 10000) return pricingTiers[0];  // Tier 1: Starter
+  if (creditAmount <= 20000) return pricingTiers[1];  // Tier 2: Growth
+  if (creditAmount <= 30000) return pricingTiers[2];  // Tier 3: Professional
+  if (creditAmount <= 40000) return pricingTiers[3];  // Tier 4: Scale
+  if (creditAmount <= 50000) return pricingTiers[4];  // Tier 5: Advanced
+  if (creditAmount <= 60000) return pricingTiers[5];  // Tier 6: Premium
+  return pricingTiers[6];  // Tier 7: Enterprise
 };
 
 /**

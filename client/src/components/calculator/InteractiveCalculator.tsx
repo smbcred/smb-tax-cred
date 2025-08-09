@@ -33,6 +33,8 @@ interface CalculatorState {
     contractorCosts: number;
     softwareCosts: number;
     cloudCosts: number;
+    isFirstTimeFiler?: boolean;
+    priorYearQREs?: number[];
   };
   results: {
     totalQRE: number;
@@ -64,7 +66,9 @@ const initialState: CalculatorState = {
     rdAllocationPercentage: 100,
     contractorCosts: 0,
     softwareCosts: 0,
-    cloudCosts: 0
+    cloudCosts: 0,
+    isFirstTimeFiler: true,
+    priorYearQREs: []
   },
   results: null,
   isValid: false
@@ -133,8 +137,8 @@ export const InteractiveCalculator: React.FC = () => {
           suppliesCosts: 0,
           softwareCosts: state.expenses.softwareCosts,
           cloudCosts: state.expenses.cloudCosts,
-          priorYearQREs: [], // No prior QREs by default
-          isFirstTimeFiler: true // Default to first-time filer (6% rate)
+          priorYearQREs: state.expenses.priorYearQREs || [],
+          isFirstTimeFiler: state.expenses.isFirstTimeFiler ?? true
         });
         
         const results = {

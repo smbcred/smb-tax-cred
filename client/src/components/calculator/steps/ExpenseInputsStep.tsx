@@ -16,6 +16,8 @@ interface ExpenseInputsStepProps {
     contractorCosts: number;
     softwareCosts: number;
     cloudCosts: number;
+    isFirstTimeFiler?: boolean;
+    priorYearQREs?: number[];
   };
   onUpdate: (updates: any) => void;
   businessType: string | null;
@@ -27,20 +29,73 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   businessType
 }) => {
   const [localExpenses, setLocalExpenses] = useState(expenses);
+  const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
+  const [warnings, setWarnings] = useState<string[]>([]);
 
-  // Debounced update to parent
+  // Debounced update to parent and validation
   useEffect(() => {
     const timer = setTimeout(() => {
       onUpdate(localExpenses);
+      validateExpenses();
     }, 500);
     return () => clearTimeout(timer);
   }, [localExpenses]);
 
-  const handleChange = (field: string, value: string) => {
+  const validateExpenses = () => {
+    const newWarnings: string[] = [];
+    
+    if (localExpenses.rdAllocationPercentage && localExpenses.rdAllocationPercentage > 80) {
+      newWarnings.push('Allocating over 80% to R&D may require additional documentation');
+    }
+    
+    if (localExpenses.averageTechnicalSalary > 0 && localExpenses.averageTechnicalSalary < 30000) {
+      newWarnings.push('Average salary seems low for technical employees');
+    }
+    
+    if (localExpenses.averageTechnicalSalary > 300000) {
+      newWarnings.push('Average salary is unusually high - ensure this reflects actual wages');
+    }
+    
+    if (localExpenses.contractorCosts > (localExpenses.technicalEmployees * localExpenses.averageTechnicalSalary)) {
+      newWarnings.push('Contractor costs exceed employee wages - ensure proper documentation');
+    }
+    
+    setWarnings(newWarnings);
+  };
+
+  const handleChange = (field: string, value: string | boolean | number) => {
+    if (typeof value === 'boolean') {
+      setLocalExpenses(prev => ({
+        ...prev,
+        [field]: value
+      }));
+      if (field === 'isFirstTimeFiler') {
+        setShowPriorYears(!value);
+        if (value) {
+          setLocalExpenses(prev => ({ ...prev, priorYearQREs: [] }));
+        }
+      }
+    } else if (typeof value === 'number') {
+      setLocalExpenses(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    } else {
+      const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
+      setLocalExpenses(prev => ({
+        ...prev,
+        [field]: numValue
+      }));
+    }
+  };
+
+  const handlePriorYearChange = (yearIndex: number, value: string) => {
     const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
+    const priorYears = localExpenses.priorYearQREs || [0, 0, 0];
+    priorYears[yearIndex] = numValue;
     setLocalExpenses(prev => ({
       ...prev,
-      [field]: numValue
+      priorYearQREs: priorYears
     }));
   };
 
@@ -50,7 +105,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   const contractorQRE = localExpenses.contractorCosts * 0.65; // Only contractors limited to 65%
   const suppliesQRE = localExpenses.softwareCosts + localExpenses.cloudCosts;
   const totalQRE = wageQRE + contractorQRE + suppliesQRE;
-  const estimatedCredit = Math.round(totalQRE * 0.14);
+  const creditRate = localExpenses.isFirstTimeFiler ? 0.06 : 0.14;
+  const estimatedCredit = Math.round(totalQRE * creditRate);
 
   return (
     <div>
@@ -61,6 +117,11 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
         <p className="text-gray-600">
           Include wages for employees working on innovation projects and technology costs
         </p>
+        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800 font-medium">
+            💵 Federal Credit Only - No state credit calculations included
+          </p>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -115,27 +176,89 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 % Time on R&D Activities
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={localExpenses.rdAllocationPercentage ?? 100}
-                  onChange={(e) => handleChange('rdAllocationPercentage', e.target.value)}
-                  min="0"
-                  max="100"
-                  className="w-full pr-8 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="100"
-                />
-                <span className="absolute right-3 top-2 text-gray-500">%</span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    value={localExpenses.rdAllocationPercentage ?? 100}
+                    onChange={(e) => handleChange('rdAllocationPercentage', parseInt(e.target.value))}
+                    min="0"
+                    max="100"
+                    step="5"
+                    className="flex-1"
+                  />
+                  <div className="relative w-20">
+                    <input
+                      type="number"
+                      value={localExpenses.rdAllocationPercentage ?? 100}
+                      onChange={(e) => handleChange('rdAllocationPercentage', e.target.value)}
+                      min="0"
+                      max="100"
+                      className="w-full pr-6 px-2 py-1 border border-gray-300 rounded text-center"
+                    />
+                    <span className="absolute right-2 top-1 text-gray-500">%</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Percentage of time spent on experimentation & testing
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Percentage of time spent on experimentation & testing
-              </p>
             </div>
             </div>
           </div>
         </div>
 
-        {/* AI-Related Expenses */}
+        {/* Prior Year QREs */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-gray-900 mb-4">Prior Year R&D Information</h4>
+          <div className="space-y-4">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={localExpenses.isFirstTimeFiler ?? true}
+                onChange={(e) => handleChange('isFirstTimeFiler', e.target.checked)}
+                className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                First-time R&D tax credit filer (6% credit rate)
+              </span>
+            </label>
+            
+            {!localExpenses.isFirstTimeFiler && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-3"
+              >
+                <p className="text-sm text-gray-600">
+                  Enter your prior 3 years of Qualified Research Expenses (14% credit rate on excess)
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {[0, 1, 2].map((yearIndex) => (
+                    <div key={yearIndex}>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        {new Date().getFullYear() - yearIndex - 1} QREs
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-2 top-2 text-gray-500 text-sm">$</span>
+                        <input
+                          type="text"
+                          value={(localExpenses.priorYearQREs?.[yearIndex] || 0).toLocaleString()}
+                          onChange={(e) => handlePriorYearChange(yearIndex, e.target.value)}
+                          className="w-full pl-6 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Innovation-Related Expenses */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h4 className="font-semibold text-gray-900 mb-4">Innovation Tool & Service Expenses</h4>
           <div className="space-y-4">
@@ -195,6 +318,24 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Validation Warnings */}
+        {warnings.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+          >
+            <h5 className="font-medium text-yellow-800 mb-2">⚠️ Please Note:</h5>
+            <ul className="space-y-1">
+              {warnings.map((warning, index) => (
+                <li key={index} className="text-sm text-yellow-700">
+                  • {warning}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
 
         {/* Live Estimate */}
         {localExpenses.technicalEmployees > 0 && localExpenses.averageTechnicalSalary > 0 && (
