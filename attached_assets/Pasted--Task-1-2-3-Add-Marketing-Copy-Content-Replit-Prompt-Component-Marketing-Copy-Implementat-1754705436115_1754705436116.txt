@@ -1,0 +1,444 @@
+# Task 1.2.3: Add Marketing Copy & Content - Replit Prompt
+
+## Component: Marketing Copy Implementation
+**Reference**: Copywriting & Positioning Guide.md, Branding + positioning system for SMBTaxCredits.md, SMBTaxCredits Competitive Positioning.md, rd-tax-credit-saas-index.md
+
+### Overview
+Populate the SMBTaxCredits.com landing page with all conversion-optimized copy, including headlines, value propositions, social proof elements, FAQ content, and CTAs. This implementation uses the approved brand voice and messaging from the knowledge base.
+
+### Technical Requirements
+- **Dependencies**: React components already created in Task 1.2.1
+- **Content Management**: Static content for MVP, prepare structure for future CMS
+- **SEO**: Proper meta tags, structured data, semantic HTML
+- **A/B Testing**: Structure copy to easily swap variants
+
+### Implementation Prompt
+
+"Add all marketing copy and content to the SMBTaxCredits.com landing page using the approved messaging from the brand guidelines. Implement conversion-optimized copy that speaks directly to SMB owners about R&D tax credits.
+
+**1. Update Meta Tags and SEO (components/seo/MetaTags.tsx):**
+```typescript
+/**
+ * @file MetaTags.tsx
+ * @description SEO meta tags for SMBTaxCredits.com
+ * @knowledgeBase Copywriting & Positioning Guide.md - SEO section
+ */
+
+import { Helmet } from 'react-helmet-async';
+
+export const MetaTags: React.FC = () => {
+  return (
+    <Helmet>
+      <title>Federal R&D Tax Credit for SMBs | Flat-Fee, Self-Serve, IRS-Compliant</title>
+      <meta 
+        name="description" 
+        content="Claim the federal R&D credit without consultants. Flat-fee, self-serve platform that generates Form 6765 data, Section G summaries, and amended-return exhibits." 
+      />
+      <meta name="keywords" content="R&D tax credit for small business, Form 6765 Section G, QRE examples, AI activities that qualify, payroll tax offset R&D credit" />
+      
+      {/* Open Graph tags */}
+      <meta property="og:title" content="Claim your federal R&D tax credit—without the runaround" />
+      <meta property="og:description" content="Flat-fee, self-serve documentation for amended 2022–2024 and current 2025 filings" />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://smbtaxcredits.com" />
+      
+      {/* Structured data for Local Business */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "SMBTaxCredits.com",
+          "description": "R&D Tax Credit Documentation Platform",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web"
+        })}
+      </script>
+    </Helmet>
+  );
+};
+```
+
+**2. Hero Section Copy (components/sections/HeroContent.tsx):**
+```typescript
+/**
+ * @description Hero section with primary value proposition
+ * COPY: Approved headlines from Copywriting & Positioning Guide
+ */
+
+export const HeroContent = {
+  headline: "Claim your federal R&D tax credit—without the runaround.",
+  subheadline: "Flat-fee, self-serve documentation for amended 2022–2024 and current 2025 filings—IRS-aligned and CPA-ready.",
+  primaryCTA: "Start your free estimate",
+  secondaryCTA: "See how it works",
+  
+  // Social proof strip items
+  trustSignals: [
+    "Built for SMBs using AI and internal innovation",
+    "Outputs your CPA actually needs",
+    "Section G ready",
+    "IRS-compliant by design"
+  ]
+};
+```
+
+**3. Benefits/Features Copy (data/benefitsContent.ts):**
+```typescript
+/**
+ * @description Benefits grid content
+ * @knowledgeBase Copywriting & Positioning Guide.md - Messaging Pillars
+ */
+
+export const benefitsContent = [
+  {
+    icon: "FaShieldAlt",
+    title: "IRS-Compliant by Design",
+    description: "Section G project summaries following the 80%/Top-50 rule. Amended-claim exhibits with components, activity narratives, and QRE categories. Built-in §280C election handling.",
+    highlight: "Section G ready"
+  },
+  {
+    icon: "FaDollarSign",
+    title: "Flat-Fee Transparency",
+    description: "No percentage cuts or surprise fees. Pay a fixed amount based on your credit size. On a $50K credit, contingency firms charge $10,000—we charge $1,000.",
+    highlight: "10x savings vs consultants"
+  },
+  {
+    icon: "FaClock",
+    title: "Hours, Not Months",
+    description: "Complete intake in 15-20 minutes. Get your documentation package in 1-3 business days. No lengthy scoping calls or drawn-out engagements.",
+    highlight: "Fast turnaround"
+  },
+  {
+    icon: "FaFileAlt",
+    title: "CPA-Ready Outputs",
+    description: "Clean handoff with Form 6765 data, Form 3800 summary, Form 8974 (if QSB eligible), exhibits PDF, and complete workpapers. Your CPA will love the organized package.",
+    highlight: "Ready to file"
+  },
+  {
+    icon: "FaCheckCircle",
+    title: "Simple, Guided Process",
+    description: "Plain-English wizard translates the four-part test into yes/no prompts with examples. Auto-builds project narratives from your inputs. Smart validations prevent common errors.",
+    highlight: "No jargon"
+  },
+  {
+    icon: "FaLock",
+    title: "Secure by Default",
+    description: "Bank-level encryption, minimal data collection, and automatic deletion after 90 days. Clean audit trail for your records. Your data is always protected.",
+    highlight: "Enterprise security"
+  }
+];
+```
+
+**4. How It Works Copy (data/processContent.ts):**
+```typescript
+/**
+ * @description 3-step process explanation
+ */
+
+export const processSteps = [
+  {
+    number: "1",
+    title: "Estimate",
+    description: "Answer a few questions to size your credit",
+    details: "Quick questionnaire about your business type, R&D activities, and expenses. Get an instant estimate of your federal credit amount and see your ROI.",
+    timeEstimate: "2 minutes",
+    icon: "FaCalculator"
+  },
+  {
+    number: "2",
+    title: "Document",
+    description: "We turn your projects and costs into IRS-ready narratives and forms",
+    details: "Our AI generates Section G summaries, technical narratives, and QRE categorization. Everything maps to the four-part test and IRS requirements.",
+    timeEstimate: "15-20 minutes",
+    icon: "FaFileSignature"
+  },
+  {
+    number: "3",
+    title: "File",
+    description: "Download your package and file with your CPA",
+    details: "Get Form 6765 data, amended-return exhibits, and workpapers. Need payroll offset? We prep the Form 8974 data. Clean handoff to your tax preparer.",
+    timeEstimate: "Ready in 1-3 days",
+    icon: "FaDownload"
+  }
+];
+```
+
+**5. Pricing Section Copy (data/pricingContent.ts):**
+```typescript
+/**
+ * @description Pricing tiers with ROI messaging
+ * @knowledgeBase pricing_strategy_rd_platform.md
+ */
+
+export const pricingContent = {
+  headline: "Transparent, Flat-Fee Pricing",
+  subheadline: "Keep more of your credit. No percentage cuts.",
+  
+  tiers: [
+    {
+      tier: 1,
+      creditRange: "Credits < $10K",
+      price: 500,
+      example: "$8K credit = 16x ROI",
+      features: [
+        "Federal R&D Credit Forms",
+        "Technical Narrative (4-8 pages)",
+        "Section 174A Deduction",
+        "Compliance Memo",
+        "90-day Document Access"
+      ]
+    },
+    {
+      tier: 2,
+      creditRange: "Credits $10K-$20K",
+      price: 750,
+      example: "$15K credit = 20x ROI",
+      features: ["Everything in Tier 1", "Enhanced narrative detail", "Priority support"]
+    },
+    {
+      tier: 3,
+      creditRange: "Credits $20K-$30K",
+      price: 1000,
+      example: "$25K credit = 25x ROI",
+      features: ["Everything in Tier 2", "Multi-project support", "Expedited processing"]
+    },
+    {
+      tier: 4,
+      creditRange: "Credits $30K-$40K",
+      price: 1250,
+      example: "$35K credit = 28x ROI",
+      features: ["Everything in Tier 3", "Complex project structures", "Executive summary"]
+    }
+  ],
+  
+  additionalYear: {
+    price: 297,
+    description: "Add another year",
+    note: "Same comprehensive documentation for each additional tax year"
+  },
+  
+  comparison: {
+    competitor: "20% contingency fee on $50K credit",
+    competitorPrice: "$10,000",
+    ourPrice: "$1,000",
+    savings: "You save $9,000"
+  }
+};
+```
+
+**6. FAQ Content (data/faqContent.ts):**
+```typescript
+/**
+ * @description Frequently asked questions
+ * @knowledgeBase SMBTaxCredits Competitive Positioning.md
+ */
+
+export const faqContent = [
+  {
+    question: "Do I even qualify for the R&D credit?",
+    answer: "If you develop software, use AI, create new products, or improve processes with technology, you likely qualify. The key is whether you faced technical uncertainty and went through a process of experimentation. Our calculator helps you determine eligibility in under 2 minutes.",
+    category: "eligibility"
+  },
+  {
+    question: "What if I'm not profitable yet?",
+    answer: "Great news! Qualified Small Businesses (QSBs) can claim up to $500K against payroll taxes instead of income taxes. If you have less than $5M in gross receipts and no receipts from more than 5 years ago, you may qualify for this cash-flow friendly option.",
+    category: "eligibility"
+  },
+  {
+    question: "Can I claim credits for past years?",
+    answer: "Yes! You can amend returns for 2022, 2023, and 2024. Each additional year is just $297. The IRS follows a 3-year/2-year rule for refunds, so don't wait too long.",
+    category: "process"
+  },
+  {
+    question: "Do you file my taxes?",
+    answer: "No, we prepare all the documentation and forms your CPA needs to file. Think of us as R&D credit specialists who handle the complex documentation while your CPA handles the actual filing. It's a clean handoff.",
+    category: "process"
+  },
+  {
+    question: "How is this different from hiring a consultant?",
+    answer: "Traditional consultants charge 20-40% of your credit and take months. We charge a flat fee (typically 2-5% of your credit) and deliver in days. You get the same IRS-compliant documentation without the sales pressure or huge fees.",
+    category: "comparison"
+  },
+  {
+    question: "What documentation will I receive?",
+    answer: "You'll get everything needed for filing: Form 6765 data, technical narratives explaining how your work meets the four-part test, Section G summaries, QRE calculations, a compliance memo, recordkeeping checklist, and step-by-step filing instructions for your CPA.",
+    category: "deliverables"
+  },
+  {
+    question: "How long does the whole process take?",
+    answer: "Most users complete the intake in 15-20 minutes. We then generate your documentation package within 1-3 business days. Compare that to traditional consultants who take 2-3 months!",
+    category: "timeline"
+  },
+  {
+    question: "Is my data secure?",
+    answer: "Absolutely. We use bank-level encryption, collect only the minimum data needed, and automatically delete everything after 90 days. We're SOC 2 Type II compliant and never share your data.",
+    category: "security"
+  },
+  {
+    question: "What if my credit estimate changes?",
+    answer: "If your final credit is lower than estimated, we automatically refund the difference in pricing tiers. If it's higher, we may charge up to $250 more (pre-authorized). We believe in fair, transparent pricing.",
+    category: "pricing"
+  },
+  {
+    question: "Do you handle state R&D credits?",
+    answer: "Our base package focuses on federal credits, which are available to all qualifying businesses. State credits vary significantly by state. We can provide state-specific guidance as an add-on service.",
+    category: "scope"
+  }
+];
+```
+
+**7. Trust & Compliance Copy (data/complianceContent.ts):**
+```typescript
+/**
+ * @description Compliance and trust-building content
+ */
+
+export const complianceContent = {
+  headline: "Built for IRS Compliance",
+  
+  features: [
+    {
+      title: "Four-Part Test Alignment",
+      description: "Every project narrative addresses: Business Purpose, Technological in Nature, Uncertainty, and Process of Experimentation"
+    },
+    {
+      title: "Section G Ready",
+      description: "Project summaries follow the 80%/Top-50 rule for businesses with 30+ projects"
+    },
+    {
+      title: "Amended Return Exhibits",
+      description: "Complete documentation package includes business components, activity descriptions, and QRE categorization"
+    },
+    {
+      title: "Audit Trail",
+      description: "Comprehensive workpapers and change logs provide full transparency for any review"
+    }
+  ],
+  
+  disclaimer: "We prepare documentation and data for your federal R&D credit claim. We don't provide tax advice or audit defense; your CPA will file your return. Estimates are based on your inputs and current IRS rules and may change with further documentation."
+};
+```
+
+**8. CTA Copy Variations (data/ctaContent.ts):**
+```typescript
+/**
+ * @description Call-to-action variations for A/B testing
+ * TODO: Implement A/B testing framework
+ */
+
+export const ctaVariations = {
+  primary: [
+    "Start your free estimate",
+    "Calculate my credit",
+    "See what I can claim",
+    "Get my R&D credit estimate"
+  ],
+  
+  secondary: [
+    "See how it works",
+    "Learn more",
+    "Watch 2-min demo",
+    "View sample package"
+  ],
+  
+  conversion: [
+    "Build my package",
+    "Get my documents",
+    "Claim my credit",
+    "Start documentation"
+  ],
+  
+  trust: [
+    "No credit card required",
+    "Get your estimate in 2 minutes",
+    "Join 1,000+ SMBs claiming credits",
+    "IRS-compliant documentation"
+  ]
+};
+```
+
+**9. Value Proposition Snippets (data/valueProps.ts):**
+```typescript
+/**
+ * @description Short value props for various sections
+ */
+
+export const valueProps = {
+  hero: "Turn your innovation into cash flow",
+  calculator: "See your federal R&D credit in under 2 minutes",
+  pricing: "Save 90% vs traditional consultants",
+  cta: "Get back 6-16% of your R&D expenses",
+  trust: "IRS-aligned documentation you can file with confidence",
+  
+  // Competitor positioning
+  vsConsultants: "Flat fee vs 20-40% of your credit",
+  vsCPAs: "R&D specialists your CPA will thank you for using",
+  vsDIY: "Compliant documentation, not just estimates",
+  
+  // Urgency
+  deadline: "Don't lose your 2022 credits - file by April 2025",
+  opportunity: "Most SMBs leave $50K+ unclaimed each year"
+};
+```
+
+**10. Industry-Specific Messaging (data/industryContent.ts):**
+```typescript
+/**
+ * @description Tailored messaging for different industries
+ * @knowledgeBase user_archetype_profiles.md
+ */
+
+export const industryMessaging = {
+  software: {
+    headline: "Your code improvements = tax credits",
+    activities: ["API development", "Algorithm optimization", "Performance improvements", "New feature development"],
+    example: "A SaaS startup claimed $75K for building their recommendation engine"
+  },
+  
+  ecommerce: {
+    headline: "E-commerce innovation qualifies too",
+    activities: ["AI personalization", "Custom checkout flows", "Inventory algorithms", "Fraud detection"],
+    example: "An online retailer got $45K back for their custom analytics platform"
+  },
+  
+  manufacturing: {
+    headline: "Process improvements count as R&D",
+    activities: ["Automation development", "Quality testing", "Custom tooling", "IoT integration"],
+    example: "A small manufacturer claimed $60K for their automated QC system"
+  },
+  
+  agencies: {
+    headline: "Internal tools and frameworks qualify",
+    activities: ["Proprietary frameworks", "Automation tools", "Client platforms", "AI workflows"],
+    example: "A digital agency got $35K for building their project management system"
+  }
+};
+```
+
+CRITICAL: Add comprehensive documentation:
+```javascript
+/**
+ * Marketing Copy Implementation
+ * 
+ * COPY SOURCES:
+ * - Headlines: Copywriting & Positioning Guide.md
+ * - Value Props: SMBTaxCredits Competitive Positioning.md
+ * - FAQ: Compiled from multiple knowledge base docs
+ * - Pricing: pricing_strategy_rd_platform.md
+ * 
+ * BRAND VOICE:
+ * - Clear, expert, calm
+ * - Reassuring and directive
+ * - 8th-10th grade reading level
+ * - Active voice, short sentences
+ * 
+ * COMPLIANCE:
+ * - No guaranteed outcomes
+ * - Clear scope boundaries
+ * - IRS-aligned terminology
+ * 
+ * A/B TESTING: CTA variations ready for testing
+ * TODO: Implement copy testing framework
+ * TODO: Add testimonials when available
+ * TODO: Create industry-specific landing pages
+ */
+```"
