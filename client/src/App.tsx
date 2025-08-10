@@ -61,6 +61,7 @@ function Router() {
           <Route path="/industries/ecommerce" component={Ecommerce} />
           <Route path="/industries/services" component={ProfessionalServices} />
           <Route path="/industries/healthcare" component={Healthcare} />
+          <Route path="/intake-form" component={IntakeFormPage} />
         </>
       ) : (
         <>
