@@ -13,7 +13,8 @@ import type {
   CalculatorExpenses, 
   CalculationResult, 
   LeadCaptureData, 
-  CompanyInfoData 
+  CompanyInfoData,
+  DashboardResponse
 } from "@shared/schema";
 
 // Auth service
@@ -146,9 +147,9 @@ export const paymentService = {
   }
 };
 
-// Dashboard service
+// Dashboard service with enhanced real-time data
 export const dashboardService = {
-  async getDashboardData() {
+  async getDashboardData(): Promise<DashboardResponse> {
     const response = await apiRequest("GET", "/api/dashboard");
     return response.json();
   }

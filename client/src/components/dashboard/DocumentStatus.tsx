@@ -12,33 +12,35 @@ interface Document {
 }
 
 interface DocumentStatusProps {
-  documents?: Document[];
-  hasDocuments: boolean;
+  documents?: any[];
+  documentsGenerated?: number;
+  hasDocuments?: boolean;
 }
 
-export default function DocumentStatus({ documents = [], hasDocuments }: DocumentStatusProps) {
+export default function DocumentStatus({ documents = [], documentsGenerated = 0, hasDocuments }: DocumentStatusProps) {
+  const actualHasDocuments = hasDocuments ?? documentsGenerated > 0;
   // Mock documents for demonstration
   const mockDocuments: Document[] = [
     {
       id: '1',
       name: 'R&D Tax Credit Application Form',
       type: 'form',
-      status: hasDocuments ? 'completed' : 'pending',
-      lastUpdated: hasDocuments ? '2024-01-15' : undefined
+      status: actualHasDocuments ? 'completed' : 'pending',
+      lastUpdated: actualHasDocuments ? '2024-01-15' : undefined
     },
     {
       id: '2',
       name: 'Technical Compliance Memo',
       type: 'memo',
-      status: hasDocuments ? 'available' : 'pending',
-      lastUpdated: hasDocuments ? '2024-01-15' : undefined
+      status: actualHasDocuments ? 'available' : 'pending',
+      lastUpdated: actualHasDocuments ? '2024-01-15' : undefined
     },
     {
       id: '3',
       name: 'Detailed Activity Report',
       type: 'report',
-      status: hasDocuments ? 'available' : 'in_progress',
-      lastUpdated: hasDocuments ? '2024-01-15' : undefined
+      status: actualHasDocuments ? 'available' : 'in_progress',
+      lastUpdated: actualHasDocuments ? '2024-01-15' : undefined
     },
     {
       id: '4',

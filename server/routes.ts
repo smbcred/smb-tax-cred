@@ -621,34 +621,146 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard data route
+  // Dashboard data route with comprehensive information
   app.get("/api/dashboard", authenticateToken, async (req: any, res) => {
     try {
-      const [calculations, companies, intakeForms, payments] = await Promise.all([
+      // Fetch all user data in parallel for optimal performance
+      const [calculations, companies, intakeForms, payments, documents] = await Promise.all([
         storage.getCalculationsByUserId(req.user.id),
         storage.getCompaniesByUserId(req.user.id),
         storage.getIntakeFormsByUserId(req.user.id),
         storage.getPaymentsByUserId(req.user.id),
+        storage.getDocumentsByUserId(req.user.id),
       ]);
 
+      // Calculate summary statistics
       const latestCalculation = calculations[0];
       const hasCompletedPayment = payments.some(p => p.status === "completed");
       const hasIntakeFormInProgress = intakeForms.some(f => f.status === "in_progress");
+      const documentsGenerated = documents.filter(d => d.status === "completed").length;
 
-      res.json({
-        user: req.user,
-        calculations,
-        companies,
-        intakeForms,
-        payments,
+      // Calculate progress statistics
+      const totalSections = 4; // Company Info, R&D Activities, Expense Breakdown, Supporting Info
+      let completedSections = 0;
+      let totalFields = 0;
+      let completedFields = 0;
+
+      // Analyze intake form completion status
+      intakeForms.forEach(form => {
+        const formData = form.formData as any || {};
+        
+        // Company Info section (10 fields)
+        const companyFields = ['legalName', 'ein', 'entityType', 'industry', 'address', 'phone', 'primaryContact', 'website', 'yearFounded', 'description'];
+        const companyCompleted = companyFields.filter(field => formData.companyInfo?.[field]).length;
+        totalFields += companyFields.length;
+        completedFields += companyCompleted;
+        if (companyCompleted === companyFields.length) completedSections++;
+
+        // R&D Activities section (12 fields)
+        const rdFields = ['primaryActivities', 'businessPurpose', 'uncertainties', 'experiments', 'timeframe', 'personnel', 'outcomes', 'documentation', 'previousClaims', 'relatedProjects', 'futureActivities', 'qualificationBasis'];
+        const rdCompleted = rdFields.filter(field => formData.rdActivities?.[field]).length;
+        totalFields += rdFields.length;
+        completedFields += rdCompleted;
+        if (rdCompleted === rdFields.length) completedSections++;
+
+        // Expense Breakdown section (10 fields)
+        const expenseFields = ['wages', 'contractors', 'supplies', 'cloud', 'equipment', 'software', 'travel', 'training', 'consultants', 'other'];
+        const expenseCompleted = expenseFields.filter(field => formData.expenses?.[field]).length;
+        totalFields += expenseFields.length;
+        completedFields += expenseCompleted;
+        if (expenseCompleted === expenseFields.length) completedSections++;
+
+        // Supporting Information section (6 fields)
+        const supportingFields = ['projectDocuments', 'financialRecords', 'personnelRecords', 'contracts', 'receipts', 'technicalSpecs'];
+        const supportingCompleted = supportingFields.filter(field => formData.supporting?.[field]).length;
+        totalFields += supportingFields.length;
+        completedFields += supportingCompleted;
+        if (supportingCompleted === supportingFields.length) completedSections++;
+      });
+
+      const completionPercentage = totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
+      const estimatedTimeRemaining = Math.max(0, (totalFields - completedFields) * 1.5); // 1.5 minutes per field
+
+      // Format response with proper types
+      const dashboardData = {
+        user: {
+          id: req.user.id,
+          email: req.user.email,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          phone: req.user.phone,
+          status: req.user.status,
+          createdAt: req.user.createdAt.toISOString(),
+          lastLoginAt: req.user.lastLoginAt?.toISOString() || null,
+          loginCount: req.user.loginCount,
+        },
+        companies: companies.map(c => ({
+          id: c.id,
+          legalName: c.legalName,
+          ein: c.ein,
+          entityType: c.entityType,
+          industry: c.industry,
+          address: c.address,
+          createdAt: c.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: c.updatedAt?.toISOString() || new Date().toISOString(),
+        })),
+        calculations: calculations.map(c => ({
+          id: c.id,
+          userId: c.userId,
+          federalCredit: c.federalCredit,
+          totalQRE: c.totalQRE,
+          pricingTier: c.pricingTier,
+          pricingAmount: c.pricingAmount,
+          createdAt: c.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        payments: payments.map(p => ({
+          id: p.id,
+          userId: p.userId,
+          calculationId: p.calculationId,
+          amount: p.amount,
+          status: p.status,
+          stripePaymentIntentId: p.stripePaymentIntentId,
+          createdAt: p.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        intakeForms: intakeForms.map(f => ({
+          id: f.id,
+          userId: f.userId,
+          companyId: f.companyId,
+          taxYear: f.taxYear,
+          status: f.status,
+          currentSection: f.currentSection,
+          completionPercentage: Math.round((completedFields / Math.max(totalFields, 1)) * 100),
+          createdAt: f.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: f.updatedAt?.toISOString() || new Date().toISOString(),
+        })),
+        documents: documents.map(d => ({
+          id: d.id,
+          intakeFormId: d.intakeFormId,
+          documentType: d.documentType,
+          status: d.status,
+          fileName: d.fileName,
+          downloadCount: d.downloadCount,
+          createdAt: d.createdAt?.toISOString() || new Date().toISOString(),
+        })),
         summary: {
-          estimatedCredit: latestCalculation?.federalCredit || 0,
+          estimatedCredit: parseFloat(latestCalculation?.federalCredit || "0"),
           hasCompletedPayment,
           hasIntakeFormInProgress,
-          nextSteps: getNextSteps(hasCompletedPayment, hasIntakeFormInProgress, intakeForms),
+          documentsGenerated,
+          nextSteps: getEnhancedNextSteps(hasCompletedPayment, hasIntakeFormInProgress, intakeForms, completionPercentage),
+          progressStats: {
+            totalSections,
+            completedSections,
+            completionPercentage,
+            estimatedTimeRemaining,
+          },
         },
-      });
+        lastUpdated: new Date().toISOString(),
+      };
+
+      res.json(dashboardData);
     } catch (error: any) {
+      console.error("Dashboard API error:", error);
       res.status(500).json({ message: "Failed to fetch dashboard data" });
     }
   });
@@ -657,8 +769,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-// Helper function to determine next steps
-function getNextSteps(hasCompletedPayment: boolean, hasIntakeFormInProgress: boolean, intakeForms: any[]) {
+// Enhanced helper function to determine next steps with time estimates
+function getEnhancedNextSteps(hasCompletedPayment: boolean, hasIntakeFormInProgress: boolean, intakeForms: any[], completionPercentage: number) {
   const steps = [];
   
   if (!hasCompletedPayment) {
@@ -668,32 +780,60 @@ function getNextSteps(hasCompletedPayment: boolean, hasIntakeFormInProgress: boo
       description: "Pay for your R&D tax credit documentation service",
       status: "pending",
       action: "payment",
+      estimatedMinutes: 5,
     });
   } else if (!hasIntakeFormInProgress && intakeForms.length === 0) {
     steps.push({
       id: "intake",
-      title: "Complete intake form",
-      description: "Provide detailed information about your R&D activities",
+      title: "Start intake form",
+      description: "Begin providing detailed information about your R&D activities",
       status: "current",
       action: "intake",
+      estimatedMinutes: 45,
     });
   } else if (hasIntakeFormInProgress) {
+    const currentForm = intakeForms.find(f => f.status === "in_progress");
+    const remainingTime = Math.max(5, Math.round((100 - completionPercentage) * 0.5)); // 0.5 min per % remaining
+    
     steps.push({
       id: "intake",
-      title: "Complete intake form",
-      description: "Continue filling out your R&D activity details",
-      status: "current", 
+      title: "Continue intake form",
+      description: `Complete your R&D activity details (${completionPercentage}% done)`,
+      status: "current",
       action: "intake",
+      estimatedMinutes: remainingTime,
     });
-  } else {
+  } else if (intakeForms.some(f => f.status === "submitted")) {
+    steps.push({
+      id: "processing",
+      title: "Documentation in progress",
+      description: "Our team is preparing your R&D tax credit documentation",
+      status: "current",
+      action: "wait",
+      estimatedMinutes: 0,
+    });
+  } else if (intakeForms.some(f => f.status === "completed")) {
     steps.push({
       id: "documents",
-      title: "Review generated documents",
-      description: "Your IRS-compliant documentation is being prepared",
-      status: "pending",
-      action: "documents",
+      title: "Download documents",
+      description: "Your R&D tax credit documentation is ready for download",
+      status: "completed",
+      action: "download",
+      estimatedMinutes: 0,
     });
   }
   
   return steps;
+}
+
+// Legacy helper function for backward compatibility
+function getNextSteps(hasCompletedPayment: boolean, hasIntakeFormInProgress: boolean, intakeForms: any[]) {
+  const enhancedSteps = getEnhancedNextSteps(hasCompletedPayment, hasIntakeFormInProgress, intakeForms, 0);
+  return enhancedSteps.map(step => ({
+    id: step.id,
+    title: step.title,
+    description: step.description,
+    status: step.status,
+    action: step.action,
+  }));
 }

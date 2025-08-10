@@ -441,3 +441,89 @@ export type CalculationResult = {
   pricingTier: number;
   pricingAmount: number;
 };
+
+// Dashboard API response schema
+export const dashboardResponseSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+    firstName: z.string().nullable(),
+    lastName: z.string().nullable(),
+    phone: z.string().nullable(),
+    status: z.string(),
+    createdAt: z.string(),
+    lastLoginAt: z.string().nullable(),
+    loginCount: z.number(),
+  }),
+  companies: z.array(z.object({
+    id: z.string(),
+    legalName: z.string(),
+    ein: z.string().nullable(),
+    entityType: z.string().nullable(),
+    industry: z.string().nullable(),
+    address: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })),
+  calculations: z.array(z.object({
+    id: z.string(),
+    userId: z.string(),
+    federalCredit: z.string(),
+    totalQRE: z.string(),
+    pricingTier: z.number(),
+    pricingAmount: z.string(),
+    createdAt: z.string(),
+  })),
+  payments: z.array(z.object({
+    id: z.string(),
+    userId: z.string(),
+    calculationId: z.string().nullable(),
+    amount: z.string(),
+    status: z.string(),
+    stripePaymentIntentId: z.string().nullable(),
+    createdAt: z.string(),
+  })),
+  intakeForms: z.array(z.object({
+    id: z.string(),
+    userId: z.string(),
+    companyId: z.string(),
+    taxYear: z.number(),
+    status: z.string(),
+    currentSection: z.string(),
+    completionPercentage: z.number(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })),
+  documents: z.array(z.object({
+    id: z.string(),
+    intakeFormId: z.string(),
+    documentType: z.string(),
+    status: z.string(),
+    fileName: z.string().nullable(),
+    downloadCount: z.number(),
+    createdAt: z.string(),
+  })),
+  summary: z.object({
+    estimatedCredit: z.number(),
+    hasCompletedPayment: z.boolean(),
+    hasIntakeFormInProgress: z.boolean(),
+    documentsGenerated: z.number(),
+    nextSteps: z.array(z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      status: z.enum(["pending", "current", "completed"]),
+      action: z.string(),
+      estimatedMinutes: z.number().optional(),
+    })),
+    progressStats: z.object({
+      totalSections: z.number(),
+      completedSections: z.number(),
+      completionPercentage: z.number(),
+      estimatedTimeRemaining: z.number(), // in minutes
+    }),
+  }),
+  lastUpdated: z.string(),
+});
+
+export type DashboardResponse = z.infer<typeof dashboardResponseSchema>;

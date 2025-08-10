@@ -66,8 +66,11 @@ export interface IStorage {
   updateIntakeForm(id: string, updates: Partial<IntakeForm>): Promise<IntakeForm>;
 
   // Document operations
+  getDocument(id: string): Promise<Document | undefined>;
   getDocumentsByIntakeFormId(intakeFormId: string): Promise<Document[]>;
+  getDocumentsByUserId(userId: string): Promise<Document[]>;
   createDocument(document: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document>;
+  updateDocument(id: string, updates: Partial<Document>): Promise<Document>;
 
   // Lead operations
   getLead(id: string): Promise<Lead | undefined>;
@@ -218,12 +221,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Document operations
+  async getDocument(id: string): Promise<Document | undefined> {
+    const [document] = await db.select().from(documents).where(eq(documents.id, id));
+    return document;
+  }
+
   async getDocumentsByIntakeFormId(intakeFormId: string): Promise<Document[]> {
     return db.select().from(documents).where(eq(documents.intakeFormId, intakeFormId));
   }
 
+  async getDocumentsByUserId(userId: string): Promise<Document[]> {
+    // Join documents with intake forms to get user documents
+    const result = await db
+      .select()
+      .from(documents)
+      .innerJoin(intakeForms, eq(documents.intakeFormId, intakeForms.id))
+      .where(eq(intakeForms.userId, userId));
+    
+    return result.map(row => row.documents);
+  }
+
   async createDocument(insertDocument: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document> {
     const [document] = await db.insert(documents).values(insertDocument).returning();
+    return document;
+  }
+
+  async updateDocument(id: string, updates: Partial<Document>): Promise<Document> {
+    const [document] = await db
+      .update(documents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(documents.id, id))
+      .returning();
     return document;
   }
 

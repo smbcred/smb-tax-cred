@@ -17,14 +17,16 @@ import ProgressOverview from "@/components/dashboard/ProgressOverview";
 import ActionItemsChecklist from "@/components/dashboard/ActionItemsChecklist";
 import DocumentStatus from "@/components/dashboard/DocumentStatus";
 import ProgressTracker from "@/components/dashboard/ProgressTracker";
-import { DashboardData } from "@/types";
+import type { DashboardResponse } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
   
-  const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
+  const { data: dashboardData, isLoading, error } = useQuery<DashboardResponse>({
     queryKey: ["/api/dashboard"],
     enabled: !!user,
+    refetchInterval: 30000, // Real-time updates every 30 seconds
+    staleTime: 0, // Always consider data stale for real-time behavior
   });
 
   if (isLoading) {
@@ -67,7 +69,7 @@ export default function Dashboard() {
             <ProgressOverview 
               hasCompletedPayment={summary.hasCompletedPayment}
               hasIntakeFormInProgress={summary.hasIntakeFormInProgress}
-              hasDocuments={false}
+              hasDocuments={summary.documentsGenerated > 0}
             />
 
             {/* Action Items */}
@@ -77,7 +79,10 @@ export default function Dashboard() {
           {/* Sidebar */}
           <div className="space-y-8">
             {/* Document Status */}
-            <DocumentStatus hasDocuments={false} />
+            <DocumentStatus 
+              documents={dashboardData.documents}
+              documentsGenerated={summary.documentsGenerated}
+            />
           </div>
         </div>
 
@@ -126,10 +131,10 @@ export default function Dashboard() {
                 icon: 'fas fa-file-upload'
               }
             ]}
-            overallProgress={38.9} // (8 + 6) / (8 + 12 + 10 + 6) * 100
-            currentSection="rd-activities"
+            overallProgress={summary.progressStats.completionPercentage}
+            currentSection={dashboardData.intakeForms[0]?.currentSection || "company-info"}
             isSaving={false}
-            lastSavedAt={new Date()}
+            lastSavedAt={dashboardData.intakeForms[0] ? new Date(dashboardData.intakeForms[0].updatedAt) : new Date()}
             onSectionClick={(sectionId) => {
               console.log('Navigate to section:', sectionId);
               // TODO: Navigate to intake form section
