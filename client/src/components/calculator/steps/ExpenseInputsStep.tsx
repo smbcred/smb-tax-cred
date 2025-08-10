@@ -28,6 +28,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   onUpdate,
   businessType
 }) => {
+  const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
   const [warnings, setWarnings] = useState<string[]>([]);
 
@@ -36,10 +37,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     setShowPriorYears(!expenses.isFirstTimeFiler);
   }, [expenses.isFirstTimeFiler]);
 
-  // Validate expenses when they change
+  // Debounced update to parent
   useEffect(() => {
-    validateExpenses();
-  }, [expenses.rdAllocationPercentage, expenses.averageTechnicalSalary, expenses.contractorCosts, expenses.technicalEmployees]);
+    const timer = setTimeout(() => {
+      validateExpenses();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [expenses]);
 
   const validateExpenses = () => {
     const newWarnings: string[] = [];
@@ -63,6 +67,14 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     setWarnings(newWarnings);
   };
 
+  // Get display value for input fields
+  const getDisplayValue = (field: string, value: number): string => {
+    if (localValues[field] !== undefined) {
+      return localValues[field];
+    }
+    return value > 0 ? value.toLocaleString() : '';
+  };
+
   const handleChange = (field: string, value: string | boolean | number) => {
     if (typeof value === 'boolean') {
       onUpdate({ [field]: value });
@@ -75,9 +87,20 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     } else if (typeof value === 'number') {
       onUpdate({ [field]: value });
     } else {
-      // Handle string input - convert for calculation
+      // Handle string input - store for display, convert for calculation
+      setLocalValues(prev => ({ ...prev, [field]: value }));
       const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
-      onUpdate({ [field]: numValue });
+      
+      // Debounced update to parent
+      setTimeout(() => {
+        onUpdate({ [field]: numValue });
+        // Clear local value after successful update
+        setLocalValues(prev => {
+          const newValues = { ...prev };
+          delete newValues[field];
+          return newValues;
+        });
+      }, 500);
     }
   };
 
@@ -136,8 +159,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 Total Employees
               </label>
               <input
-                type="number"
-                value={expenses.totalEmployees || ''}
+                type="text"
+                value={getDisplayValue('totalEmployees', expenses.totalEmployees)}
                 onChange={(e) => handleChange('totalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 25"
@@ -148,8 +171,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 Employees Working on Innovation Projects
               </label>
               <input
-                type="number"
-                value={expenses.technicalEmployees || ''}
+                type="text"
+                value={getDisplayValue('technicalEmployees', expenses.technicalEmployees)}
                 onChange={(e) => handleChange('technicalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 10"
@@ -168,7 +191,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={expenses.averageTechnicalSalary ? expenses.averageTechnicalSalary.toLocaleString() : ''}
+                  value={getDisplayValue('averageTechnicalSalary', expenses.averageTechnicalSalary)}
                   onChange={(e) => handleChange('averageTechnicalSalary', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 95,000"
@@ -272,7 +295,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={expenses.contractorCosts ? expenses.contractorCosts.toLocaleString() : ''}
+                  value={getDisplayValue('contractorCosts', expenses.contractorCosts)}
                   onChange={(e) => handleChange('contractorCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 50,000"
@@ -295,7 +318,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={expenses.softwareCosts ? expenses.softwareCosts.toLocaleString() : ''}
+                  value={getDisplayValue('softwareCosts', expenses.softwareCosts)}
                   onChange={(e) => handleChange('softwareCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 25,000"
@@ -313,7 +336,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={expenses.cloudCosts ? expenses.cloudCosts.toLocaleString() : ''}
+                  value={getDisplayValue('cloudCosts', expenses.cloudCosts)}
                   onChange={(e) => handleChange('cloudCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 15,000"
