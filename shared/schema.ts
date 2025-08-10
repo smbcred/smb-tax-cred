@@ -448,9 +448,19 @@ export const calculatorExpensesSchema = z.object({
 export const companyInfoSchema = z.object({
   legalName: z.string().min(1, "Legal business name is required"),
   ein: z.string().regex(/^\d{2}-\d{7}$/, "EIN must be in format 12-3456789"),
-  entityType: z.enum(["llc", "corp", "s-corp", "partnership", "other"]),
+  entityType: z.enum(["llc", "corp", "s-corp", "partnership", "sole-proprietorship", "other"]),
   industry: z.string().min(1, "Industry is required"),
-  address: z.string().min(1, "Business address is required"),
+  address: z.object({
+    street: z.string().min(1, "Street address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(2, "State is required"),
+    zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, "ZIP code must be in format 12345 or 12345-6789"),
+  }),
+  yearFounded: z.number().min(1800, "Year founded must be valid").max(new Date().getFullYear(), "Year founded cannot be in the future"),
+  naicsCode: z.string().optional(),
+  naicsDescription: z.string().optional(),
+  phone: z.string().min(10, "Phone number is required"),
+  website: z.string().url("Website must be a valid URL").optional().or(z.literal("")),
 });
 
 export type LeadCaptureData = z.infer<typeof leadCaptureSchema>;

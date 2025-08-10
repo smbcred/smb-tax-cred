@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import CompanyInfoSection from './sections/CompanyInfoSection';
 
 interface FormSectionProps {
   sectionId: string;
@@ -25,14 +26,17 @@ export default function FormSection({
     onDataChange(newData);
   };
 
-  // Validate section based on sectionId
+  // Note: Validation is now handled by individual section components
+  // CompanyInfoSection handles its own validation
   useEffect(() => {
+    if (sectionId === 'company-info') {
+      // Validation handled by CompanyInfoSection component
+      return;
+    }
+    
     let isValid = false;
     
     switch (sectionId) {
-      case 'company-info':
-        isValid = !!(data.legalName && data.ein && data.businessType && data.address);
-        break;
       case 'rd-activities':
         isValid = !!(data.primaryActivities && data.technicalChallenges && data.systematicProcess);
         break;
@@ -50,126 +54,11 @@ export default function FormSection({
   }, [data, sectionId, onValidationChange]);
 
   const renderCompanyInfoSection = () => (
-    <div className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="legalName">Legal Business Name *</Label>
-          <Input
-            id="legalName"
-            value={data.legalName || ''}
-            onChange={(e) => handleInputChange('legalName', e.target.value)}
-            placeholder="Enter your legal business name"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="ein">Federal EIN *</Label>
-          <Input
-            id="ein"
-            value={data.ein || ''}
-            onChange={(e) => handleInputChange('ein', e.target.value)}
-            placeholder="12-3456789"
-            pattern="[0-9]{2}-[0-9]{7}"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="businessType">Business Type *</Label>
-          <Select
-            value={data.businessType || ''}
-            onValueChange={(value) => handleInputChange('businessType', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select business type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="corporation">Corporation</SelectItem>
-              <SelectItem value="llc">LLC</SelectItem>
-              <SelectItem value="partnership">Partnership</SelectItem>
-              <SelectItem value="sole-proprietorship">Sole Proprietorship</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="industry">Industry</Label>
-          <Select
-            value={data.industry || ''}
-            onValueChange={(value) => handleInputChange('industry', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select industry" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="technology">Technology</SelectItem>
-              <SelectItem value="manufacturing">Manufacturing</SelectItem>
-              <SelectItem value="healthcare">Healthcare</SelectItem>
-              <SelectItem value="financial">Financial Services</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="address">Business Address *</Label>
-        <Textarea
-          id="address"
-          value={data.address || ''}
-          onChange={(e) => handleInputChange('address', e.target.value)}
-          placeholder="Enter your complete business address"
-          rows={3}
-          required
-        />
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="totalEmployees">Total Employees</Label>
-          <Input
-            id="totalEmployees"
-            type="number"
-            value={data.totalEmployees || ''}
-            onChange={(e) => handleInputChange('totalEmployees', parseInt(e.target.value) || 0)}
-            placeholder="0"
-            min="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="technicalEmployees">Technical Employees</Label>
-          <Input
-            id="technicalEmployees"
-            type="number"
-            value={data.technicalEmployees || ''}
-            onChange={(e) => handleInputChange('technicalEmployees', parseInt(e.target.value) || 0)}
-            placeholder="0"
-            min="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="taxYear">Tax Year</Label>
-          <Select
-            value={data.taxYear?.toString() || '2024'}
-            onValueChange={(value) => handleInputChange('taxYear', parseInt(value))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select tax year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
+    <CompanyInfoSection 
+      data={data} 
+      onDataChange={onDataChange} 
+      onValidationChange={onValidationChange}
+    />
   );
 
   const renderRDActivitiesSection = () => (
