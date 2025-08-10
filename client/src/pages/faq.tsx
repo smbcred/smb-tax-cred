@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 import { Footer } from "@/components/layout/Footer";
+import ResponsiveNav from "@/components/navigation/ResponsiveNav";
 
 interface FAQItem {
   question: string;
@@ -188,8 +189,11 @@ const FAQPage = () => {
 
   return (
     <div className="min-h-screen bg-cloud">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-20">
+      {/* Global Navigation */}
+      <ResponsiveNav />
+      
+      {/* Hero Section with padding for fixed nav */}
+      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-20 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
