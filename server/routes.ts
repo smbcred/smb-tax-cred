@@ -2379,6 +2379,344 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // S3 storage endpoints
+  app.post("/api/s3/upload", authenticateToken, async (req: any, res) => {
+    try {
+      const { s3UploadRequestSchema } = await import("@shared/schema");
+      const multer = await import("multer");
+      
+      // Configure multer for file upload handling
+      const upload = multer.default({
+        storage: multer.default.memoryStorage(),
+        limits: {
+          fileSize: 50 * 1024 * 1024, // 50MB limit
+        },
+        fileFilter: (req, file, cb) => {
+          // Allow common document types
+          const allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain',
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+          ];
+          
+          if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+          } else {
+            cb(new Error('Invalid file type. Only PDF, Word, text, and image files are allowed.'));
+          }
+        },
+      }).single('file');
+
+      // Handle file upload with multer
+      upload(req, res, async (uploadError: any) => {
+        if (uploadError) {
+          return res.status(400).json({
+            success: false,
+            error: uploadError.message || 'File upload failed',
+          });
+        }
+
+        if (!req.file) {
+          return res.status(400).json({
+            success: false,
+            error: 'No file provided',
+          });
+        }
+
+        try {
+          const uploadRequest = s3UploadRequestSchema.parse({
+            fileName: req.file.originalname,
+            fileType: req.file.mimetype,
+            fileSize: req.file.size,
+            documentType: req.body.documentType,
+            calculationId: req.body.calculationId,
+            jobId: req.body.jobId,
+          });
+
+          const { getS3StorageService } = await import("./services/s3Storage");
+          const s3Service = getS3StorageService();
+
+          console.log('S3 upload request:', {
+            userId: req.user.id,
+            fileName: uploadRequest.fileName,
+            fileSize: uploadRequest.fileSize,
+            documentType: uploadRequest.documentType,
+          });
+
+          const uploadResult = await s3Service.uploadFile({
+            ...uploadRequest,
+            userId: req.user.id,
+          }, req.file.buffer);
+
+          res.json({
+            success: true,
+            upload: uploadResult,
+            message: 'File uploaded successfully',
+          });
+
+        } catch (error: any) {
+          console.error("S3 upload processing error:", error);
+          
+          if (error.name === 'ZodError') {
+            return res.status(400).json({
+              success: false,
+              error: 'Invalid upload data',
+              details: error.errors,
+            });
+          }
+
+          res.status(500).json({ 
+            success: false,
+            error: error.message || "Failed to upload file"
+          });
+        }
+      });
+
+    } catch (error: any) {
+      console.error("S3 upload endpoint error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Upload endpoint error"
+      });
+    }
+  });
+
+  app.get("/api/s3/files", authenticateToken, async (req: any, res) => {
+    try {
+      const { documentType } = req.query;
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      const files = await s3Service.listUserFiles(req.user.id, documentType);
+
+      res.json({
+        success: true,
+        files,
+        count: files.length,
+      });
+
+    } catch (error: any) {
+      console.error("S3 list files error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to list files"
+      });
+    }
+  });
+
+  app.get("/api/s3/file/:key(*)", authenticateToken, async (req: any, res) => {
+    try {
+      const { key } = req.params;
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      const metadata = await s3Service.getFileMetadata(key);
+
+      // Verify user access to file
+      if (metadata.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied to this file',
+        });
+      }
+
+      res.json({
+        success: true,
+        file: metadata,
+      });
+
+    } catch (error: any) {
+      console.error("S3 get file metadata error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get file metadata"
+      });
+    }
+  });
+
+  app.get("/api/s3/download/:key(*)", authenticateToken, async (req: any, res) => {
+    try {
+      const { key } = req.params;
+      const { expiresIn = 3600 } = req.query; // Default 1 hour
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      // Get file metadata to verify user access
+      const metadata = await s3Service.getFileMetadata(key);
+
+      if (metadata.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied to this file',
+        });
+      }
+
+      const downloadUrl = await s3Service.generateSignedUrl(key, parseInt(expiresIn as string));
+
+      res.json({
+        success: true,
+        downloadUrl,
+        expiresAt: new Date(Date.now() + parseInt(expiresIn as string) * 1000).toISOString(),
+        metadata,
+      });
+
+    } catch (error: any) {
+      console.error("S3 download URL generation error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate download URL"
+      });
+    }
+  });
+
+  app.delete("/api/s3/file/:key(*)", authenticateToken, async (req: any, res) => {
+    try {
+      const { key } = req.params;
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      // Get file metadata to verify user access
+      const metadata = await s3Service.getFileMetadata(key);
+
+      if (metadata.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied to this file',
+        });
+      }
+
+      await s3Service.deleteFile(key);
+
+      res.json({
+        success: true,
+        message: 'File deleted successfully',
+      });
+
+    } catch (error: any) {
+      console.error("S3 delete file error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to delete file"
+      });
+    }
+  });
+
+  app.post("/api/s3/batch-upload", authenticateToken, async (req: any, res) => {
+    try {
+      const { s3BatchUploadRequestSchema } = await import("@shared/schema");
+      const validatedRequest = s3BatchUploadRequestSchema.parse(req.body);
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      console.log('S3 batch upload request:', {
+        userId: req.user.id,
+        calculationId: validatedRequest.calculationId,
+        documentCount: validatedRequest.documents.length,
+      });
+
+      // Convert base64 encoded files to buffers
+      const documents = validatedRequest.documents.map(doc => ({
+        fileName: doc.fileName,
+        fileType: doc.fileType,
+        fileBuffer: Buffer.from(doc.fileData, 'base64'),
+        documentType: doc.documentType,
+      }));
+
+      const uploadResults = await s3Service.uploadDocumentPackage(
+        req.user.id,
+        validatedRequest.calculationId,
+        documents
+      );
+
+      res.json({
+        success: true,
+        uploads: uploadResults,
+        total: uploadResults.length,
+        completed: uploadResults.filter(r => r.uploadUrl !== '').length,
+        failed: uploadResults.filter(r => r.uploadUrl === '').length,
+      });
+
+    } catch (error: any) {
+      console.error("S3 batch upload error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid batch upload data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to upload document package"
+      });
+    }
+  });
+
+  app.get("/api/s3/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      const stats = await s3Service.getStorageStats(req.user.id);
+
+      res.json({
+        success: true,
+        stats,
+      });
+
+    } catch (error: any) {
+      console.error("S3 storage stats error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get storage statistics"
+      });
+    }
+  });
+
+  app.post("/api/s3/cleanup", authenticateToken, async (req: any, res) => {
+    try {
+      // Only allow admin users to perform cleanup
+      if (req.user.email !== 'admin@smbtaxcredits.com') {
+        return res.status(403).json({
+          success: false,
+          error: 'Admin access required',
+        });
+      }
+
+      const { daysOld = 30 } = req.body;
+      const beforeDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
+      const { getS3StorageService } = await import("./services/s3Storage");
+      const s3Service = getS3StorageService();
+
+      const deletedCount = await s3Service.cleanupExpiredFiles(beforeDate);
+
+      res.json({
+        success: true,
+        deletedCount,
+        beforeDate: beforeDate.toISOString(),
+      });
+
+    } catch (error: any) {
+      console.error("S3 cleanup error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to cleanup expired files"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

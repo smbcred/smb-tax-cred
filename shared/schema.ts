@@ -978,6 +978,67 @@ export type PDFGenerationRequest = z.infer<typeof pdfGenerationRequestSchema>;
 export type PDFGenerationResponse = z.infer<typeof pdfGenerationResponseSchema>;
 export type PDFQualityVerification = z.infer<typeof pdfQualityVerificationSchema>;
 
+// S3 storage schemas
+export const s3UploadRequestSchema = z.object({
+  fileName: z.string().min(1, "File name is required"),
+  fileType: z.string().min(1, "File type is required"),
+  fileSize: z.number().min(1, "File size must be greater than 0").max(50 * 1024 * 1024, "File size must be less than 50MB"),
+  documentType: z.enum(['narrative', 'compliance_memo', 'pdf_form', 'supporting_document', 'calculation']),
+  calculationId: z.string().optional(),
+  jobId: z.string().optional(),
+});
+
+export const s3UploadResponseSchema = z.object({
+  uploadUrl: z.string(),
+  key: z.string(),
+  downloadUrl: z.string(),
+  expiresAt: z.string(),
+  metadata: z.object({
+    fileName: z.string(),
+    fileType: z.string(),
+    fileSize: z.number(),
+    documentType: z.string(),
+  }),
+});
+
+export const s3FileMetadataSchema = z.object({
+  key: z.string(),
+  fileName: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  documentType: z.string(),
+  userId: z.string(),
+  calculationId: z.string().optional(),
+  jobId: z.string().optional(),
+  uploadedAt: z.string(),
+  lastModified: z.string(),
+  downloadUrl: z.string().optional(),
+  expiresAt: z.string().optional(),
+});
+
+export const s3StorageStatsSchema = z.object({
+  totalFiles: z.number(),
+  totalSize: z.number(),
+  filesByType: z.record(z.string(), z.number()),
+  sizeByType: z.record(z.string(), z.number()),
+});
+
+export const s3BatchUploadRequestSchema = z.object({
+  calculationId: z.string(),
+  documents: z.array(z.object({
+    fileName: z.string(),
+    fileType: z.string(),
+    documentType: s3UploadRequestSchema.shape.documentType,
+    fileData: z.string(), // base64 encoded file data
+  })),
+});
+
+export type S3UploadRequest = z.infer<typeof s3UploadRequestSchema>;
+export type S3UploadResponse = z.infer<typeof s3UploadResponseSchema>;
+export type S3FileMetadata = z.infer<typeof s3FileMetadataSchema>;
+export type S3StorageStats = z.infer<typeof s3StorageStatsSchema>;
+export type S3BatchUploadRequest = z.infer<typeof s3BatchUploadRequestSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;
