@@ -16,8 +16,8 @@ _Source: rd-saas-complete-guide.v2.md_
 | 1.3.2 | Implement Calculator Logic | [x] |
 | 1.3.3 | Create Results Display | [x] |
 | 1.4.1 | Build Lead Capture Modal | [x] |
-| 1.4.2 | Implement Lead Storage | [ ] |
-| 1.4.3 | Post-Capture Experience | [ ] |
+| 1.4.2 | Implement Lead Storage | [x] |
+| 1.4.3 | Post-Capture Experience | [x] |
 | 1.5.1 | Stripe Checkout Setup | [ ] |
 | 1.5.2 | Create Checkout API | [ ] |
 | 1.5.3 | Payment Success Flow | [ ] |

@@ -19,6 +19,13 @@ import {
   Shield,
   Award
 } from 'lucide-react';
+
+// Extend window type for gtag
+declare global {
+  interface Window {
+    gtag?: (command: string, action: string, parameters?: any) => void;
+  }
+}
 import { BusinessTypeStep } from './steps/BusinessTypeStep';
 import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
 import { ExpenseInputsStepNew as ExpenseInputsStep } from './steps/ExpenseInputsStepNew';
@@ -128,6 +135,14 @@ export const InteractiveCalculator: React.FC = () => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
   const [stepErrors, setStepErrors] = useState<Record<number, string[]>>({});
+
+  // Auto-hide success animation after 5 seconds
+  useEffect(() => {
+    if (showRevealAnimation) {
+      const timer = setTimeout(() => setShowRevealAnimation(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showRevealAnimation]);
 
   // Real-time calculation effect
   const performCalculation = useCallback(() => {
@@ -481,8 +496,7 @@ export const InteractiveCalculator: React.FC = () => {
                     </div>
                   </motion.div>
                   
-                  {/* Hide reveal animation after a few seconds */}
-                  {showRevealAnimation && setTimeout(() => setShowRevealAnimation(false), 5000)}
+
                 </motion.div>
               )}
             </motion.div>

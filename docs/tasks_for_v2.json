@@ -52,12 +52,12 @@
   {
     "id": "1.4.2",
     "title": "Implement Lead Storage",
-    "completed": false
+    "completed": true
   },
   {
     "id": "1.4.3",
     "title": "Post-Capture Experience",
-    "completed": false
+    "completed": true
   },
   {
     "id": "1.5.1",
