@@ -2933,6 +2933,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email notification endpoints
+  app.post("/api/email/send", authenticateToken, async (req: any, res) => {
+    try {
+      const { emailNotificationRequestSchema } = await import("@shared/schema");
+      const validatedRequest = emailNotificationRequestSchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+
+      const { getEmailNotificationService } = await import("./services/emailNotificationService");
+      const emailService = getEmailNotificationService();
+
+      console.log('Email notification request:', {
+        userId: req.user.id,
+        recipientEmail: validatedRequest.recipientEmail,
+        templateType: validatedRequest.templateType,
+        priority: validatedRequest.priority,
+      });
+
+      const result = await emailService.sendNotification(validatedRequest);
+
+      res.json({
+        success: true,
+        notification: result,
+        message: 'Email notification sent successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Email notification error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email notification request',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to send email notification"
+      });
+    }
+  });
+
+  app.get("/api/email/status/:notificationId", authenticateToken, async (req: any, res) => {
+    try {
+      const { notificationId } = req.params;
+
+      const { getEmailNotificationService } = await import("./services/emailNotificationService");
+      const emailService = getEmailNotificationService();
+
+      const status = await emailService.getDeliveryStatus(notificationId);
+
+      if (!status) {
+        return res.status(404).json({
+          success: false,
+          error: 'Email notification not found',
+        });
+      }
+
+      res.json({
+        success: true,
+        status,
+      });
+
+    } catch (error: any) {
+      console.error("Email status error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get email status"
+      });
+    }
+  });
+
+  app.get("/api/email/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const { days = 30 } = req.query;
+
+      const { getEmailNotificationService } = await import("./services/emailNotificationService");
+      const emailService = getEmailNotificationService();
+
+      const stats = await emailService.getEmailStats(req.user.id, parseInt(days as string));
+
+      res.json({
+        success: true,
+        stats,
+        period: `Last ${days} days`,
+      });
+
+    } catch (error: any) {
+      console.error("Email stats error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get email statistics"
+      });
+    }
+  });
+
+  app.post("/api/email/webhook", async (req: any, res) => {
+    try {
+      // SendGrid webhook endpoint (public, no authentication required)
+      const { getEmailNotificationService } = await import("./services/emailNotificationService");
+      const emailService = getEmailNotificationService();
+
+      console.log('Processing SendGrid webhook:', req.body);
+
+      await emailService.handleWebhook(req.body);
+
+      res.status(200).json({ 
+        success: true,
+        message: 'Webhook processed successfully' 
+      });
+
+    } catch (error: any) {
+      console.error("Email webhook error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to process webhook"
+      });
+    }
+  });
+
+  app.post("/api/email/unsubscribe", async (req: any, res) => {
+    try {
+      const { email, reason } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email address is required',
+        });
+      }
+
+      const { getEmailNotificationService } = await import("./services/emailNotificationService");
+      const emailService = getEmailNotificationService();
+
+      await emailService.unsubscribe(email, reason);
+
+      res.json({
+        success: true,
+        message: 'Successfully unsubscribed from email notifications',
+      });
+
+    } catch (error: any) {
+      console.error("Email unsubscribe error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to unsubscribe"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

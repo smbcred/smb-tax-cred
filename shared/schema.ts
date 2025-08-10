@@ -1098,6 +1098,59 @@ export type DownloadResponse = z.infer<typeof downloadResponseSchema>;
 export type DownloadTracking = z.infer<typeof downloadTrackingSchema>;
 export type DownloadStats = z.infer<typeof downloadStatsSchema>;
 
+// Email notification schemas
+export const emailNotificationRequestSchema = z.object({
+  recipientEmail: z.string().email("Valid email address is required"),
+  recipientName: z.string().min(1, "Recipient name is required"),
+  templateType: z.enum(['document_ready', 'calculation_complete', 'compliance_memo_ready', 'download_ready', 'welcome', 'payment_confirmation']),
+  templateData: z.record(z.any()).default({}),
+  priority: z.enum(['low', 'normal', 'high']).default('normal'),
+  scheduledAt: z.string().optional(),
+  trackingEnabled: z.boolean().default(true),
+  unsubscribeEnabled: z.boolean().default(true),
+});
+
+export const emailDeliveryStatusSchema = z.object({
+  notificationId: z.string(),
+  messageId: z.string().optional(),
+  status: z.enum(['queued', 'sent', 'delivered', 'opened', 'clicked', 'bounced', 'failed', 'unsubscribed']),
+  recipientEmail: z.string().email(),
+  sentAt: z.string().optional(),
+  deliveredAt: z.string().optional(),
+  openedAt: z.string().optional(),
+  clickedAt: z.string().optional(),
+  bouncedAt: z.string().optional(),
+  failedAt: z.string().optional(),
+  errorMessage: z.string().optional(),
+  bounceType: z.enum(['soft', 'hard', 'block', 'spam']).optional(),
+  userAgent: z.string().optional(),
+  ipAddress: z.string().optional(),
+});
+
+export const emailStatsSchema = z.object({
+  totalSent: z.number(),
+  totalDelivered: z.number(),
+  totalOpened: z.number(),
+  totalClicked: z.number(),
+  totalBounced: z.number(),
+  totalFailed: z.number(),
+  deliveryRate: z.number(),
+  openRate: z.number(),
+  clickRate: z.number(),
+  bounceRate: z.number(),
+  recentActivity: z.array(z.object({
+    date: z.string(),
+    sent: z.number(),
+    delivered: z.number(),
+    opened: z.number(),
+    clicked: z.number(),
+  })),
+});
+
+export type EmailNotificationRequest = z.infer<typeof emailNotificationRequestSchema>;
+export type EmailDeliveryStatus = z.infer<typeof emailDeliveryStatusSchema>;
+export type EmailStats = z.infer<typeof emailStatsSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;
