@@ -58,8 +58,14 @@ const Login = () => {
         description: "You have successfully logged in.",
       });
       
-      // Redirect to dashboard
-      setLocation("/dashboard");
+      // Check for stored redirect destination
+      const redirectPath = localStorage.getItem("redirect_after_login");
+      if (redirectPath) {
+        localStorage.removeItem("redirect_after_login");
+        setLocation(redirectPath);
+      } else {
+        setLocation("/dashboard");
+      }
     },
     onError: (error: any) => {
       toast({

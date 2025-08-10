@@ -54,6 +54,45 @@ export class AuthManager {
   }
 
   /**
+   * Get token expiration time in seconds
+   */
+  static getTokenExpiration(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Check if token is expiring soon (within specified minutes)
+   */
+  static isTokenExpiringSoon(minutesBefore: number = 5): boolean {
+    const expiration = this.getTokenExpiration();
+    if (!expiration) return false;
+    
+    const now = Date.now() / 1000;
+    const timeUntilExpiry = expiration - now;
+    
+    return timeUntilExpiry <= (minutesBefore * 60);
+  }
+
+  /**
+   * Get remaining token lifetime in seconds
+   */
+  static getTokenTimeRemaining(): number {
+    const expiration = this.getTokenExpiration();
+    if (!expiration) return 0;
+    
+    const now = Date.now() / 1000;
+    return Math.max(0, expiration - now);
+  }
+
+  /**
    * Get authorization header for API requests
    */
   static getAuthHeader(): Record<string, string> {

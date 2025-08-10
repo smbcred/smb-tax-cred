@@ -24,6 +24,7 @@ import ProfessionalServices from "@/pages/industries/services";
 import Healthcare from "@/pages/industries/healthcare";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -62,9 +63,21 @@ function Router() {
         </>
       ) : (
         <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/checkout" component={Checkout} />
+          <Route path="/">
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/dashboard">
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/checkout">
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          </Route>
           <Route path="/how-it-works" component={HowItWorks} />
           <Route path="/pricing" component={PricingPage} />
           <Route path="/faq" component={FAQPage} />
