@@ -27,27 +27,27 @@
      COLOR SYSTEM
      ================= */
   
-  /* Core Palette */
-  --color-ink: #0B0C0E;          /* Primary text, dark UI */
-  --color-graphite: #1C1E22;     /* Headers, dark surfaces */
-  --color-slate: #3B3F45;        /* Secondary text */
-  --color-ash: #8A9099;          /* Tertiary text, muted elements */
-  --color-cloud: #F5F7FA;        /* Subtle backgrounds */
-  --color-paper: #FFFFFF;        /* Main background */
+  /* Core Palette - HSL Format */
+  --color-ink: hsl(210, 15%, 5%);          /* Primary text, dark UI */
+  --color-graphite: hsl(220, 10%, 12%);    /* Headers, dark surfaces */
+  --color-slate: hsl(216, 8%, 25%);        /* Secondary text */
+  --color-ash: hsl(220, 7%, 58%);          /* Tertiary text, muted elements */
+  --color-cloud: hsl(210, 25%, 97%);       /* Subtle backgrounds */
+  --color-paper: hsl(0, 0%, 100%);         /* Main background */
   
-  /* Brand Colors */
-  --color-blue: #2E5AAC;         /* Primary brand, CTAs */
-  --color-blue-dark: #234488;    /* Hover state for blue */
-  --color-blue-light: #E8F0FE;   /* Light blue backgrounds */
-  --color-emerald: #1E8E5A;      /* Success, secondary accent */
-  --color-emerald-dark: #176B45; /* Hover state for emerald */
-  --color-emerald-light: #E6F7F0; /* Light emerald backgrounds */
+  /* Brand Colors - HSL Format */
+  --color-blue: hsl(217, 58%, 43%);        /* Primary brand, CTAs */
+  --color-blue-dark: hsl(217, 59%, 34%);   /* Hover state for blue */
+  --color-blue-light: hsl(216, 89%, 95%);  /* Light blue backgrounds */
+  --color-emerald: hsl(154, 65%, 34%);     /* Success, secondary accent */
+  --color-emerald-dark: hsl(154, 63%, 25%); /* Hover state for emerald */
+  --color-emerald-light: hsl(150, 44%, 93%); /* Light emerald backgrounds */
   
-  /* Semantic Colors */
-  --color-info: #0B6EEF;         /* Information */
-  --color-warn: #B78103;         /* Warnings */
-  --color-error: #B42318;        /* Errors */
-  --color-border: #E4E7EC;       /* Dividers, borders */
+  /* Semantic Colors - HSL Format */
+  --color-info: hsl(211, 92%, 49%);        /* Information */
+  --color-warn: hsl(43, 93%, 37%);         /* Warnings */
+  --color-error: hsl(4, 72%, 41%);         /* Errors */
+  --color-border: hsl(213, 27%, 91%);      /* Dividers, borders */
   
   /* =================
      TYPOGRAPHY

@@ -14,34 +14,34 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-// Design tokens matching our CSS custom properties
+// Design tokens matching our CSS custom properties (HSL format)
 export const theme = {
   colors: {
-    // Core Palette
-    ink: '#0B0C0E',
-    graphite: '#1C1E22',
-    slate: '#3B3F45',
-    ash: '#8A9099',
-    cloud: '#F5F7FA',
-    paper: '#FFFFFF',
+    // Core Palette - HSL Format
+    ink: 'hsl(210, 15%, 5%)',
+    graphite: 'hsl(220, 10%, 12%)',
+    slate: 'hsl(216, 8%, 25%)',
+    ash: 'hsl(220, 7%, 58%)',
+    cloud: 'hsl(210, 25%, 97%)',
+    paper: 'hsl(0, 0%, 100%)',
 
-    // Brand Colors
+    // Brand Colors - HSL Format
     blue: {
-      DEFAULT: '#2E5AAC',
-      dark: '#234488',
-      light: '#E8F0FE',
+      DEFAULT: 'hsl(217, 58%, 43%)',
+      dark: 'hsl(217, 59%, 34%)',
+      light: 'hsl(216, 89%, 95%)',
     },
     emerald: {
-      DEFAULT: '#1E8E5A',
-      dark: '#176B45',
-      light: '#E6F7F0',
+      DEFAULT: 'hsl(154, 65%, 34%)',
+      dark: 'hsl(154, 63%, 25%)',
+      light: 'hsl(150, 44%, 93%)',
     },
 
-    // Semantic Colors
-    info: '#0B6EEF',
-    warn: '#B78103',
-    error: '#B42318',
-    border: '#E4E7EC',
+    // Semantic Colors - HSL Format
+    info: 'hsl(211, 92%, 49%)',
+    warn: 'hsl(43, 93%, 37%)',
+    error: 'hsl(4, 72%, 41%)',
+    border: 'hsl(213, 27%, 91%)',
   },
 
   typography: {
