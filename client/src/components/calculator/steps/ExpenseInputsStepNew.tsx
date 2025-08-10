@@ -27,27 +27,26 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
   onUpdate,
   businessType
 }) => {
-  // Simple controlled inputs - no fancy state management
+  // Keep all form values as strings while typing - NEVER coerce to numbers
   const [inputs, setInputs] = useState(() => ({
     totalEmployees: expenses.totalEmployees > 0 ? expenses.totalEmployees.toString() : '',
     technicalEmployees: expenses.technicalEmployees > 0 ? expenses.technicalEmployees.toString() : '',
     averageTechnicalSalary: expenses.averageTechnicalSalary > 0 ? expenses.averageTechnicalSalary.toString() : '',
     contractorCosts: expenses.contractorCosts > 0 ? expenses.contractorCosts.toString() : '',
     softwareCosts: expenses.softwareCosts > 0 ? expenses.softwareCosts.toString() : '',
-    cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toString() : ''
+    cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toString() : '',
+    rdAllocationPercentage: (expenses.rdAllocationPercentage ?? 100).toString()
   }));
 
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
 
-  // NO useEffect for initialization - use lazy initial state instead
-
-  // Handle text input changes
+  // Handle text input changes - allow empty strings and partial typing
   const handleInputChange = (field: string, value: string) => {
-    // Update local state immediately
+    // Update local state immediately - allow ANY string value including ''
     setInputs(prev => ({ ...prev, [field]: value }));
     
-    // Update parent with number value
-    const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
+    // Update parent with number value - only convert when not empty
+    const numValue = value === '' ? 0 : parseInt(value.replace(/[^0-9]/g, '')) || 0;
     onUpdate({ [field]: numValue });
   };
 
@@ -99,10 +98,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
                 Total Employees
               </label>
               <input
-                type="text"
+                type="number"
+                inputMode="decimal"
                 value={inputs.totalEmployees}
                 onChange={(e) => handleInputChange('totalEmployees', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                 placeholder="e.g., 25"
               />
             </div>
@@ -111,10 +111,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
                 Employees Working on Innovation Projects
               </label>
               <input
-                type="text"
+                type="number"
+                inputMode="decimal"
                 value={inputs.technicalEmployees}
                 onChange={(e) => handleInputChange('technicalEmployees', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                 placeholder="e.g., 10"
               />
             </div>
@@ -127,10 +128,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
             <div className="relative">
               <span className="absolute left-3 top-2 text-gray-500">$</span>
               <input
-                type="text"
+                type="number"
+                inputMode="decimal"
                 value={inputs.averageTechnicalSalary}
                 onChange={(e) => handleInputChange('averageTechnicalSalary', e.target.value)}
-                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                 placeholder="e.g., 95,000"
               />
             </div>
@@ -143,15 +145,19 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
             <div className="flex items-center gap-3">
               <input
                 type="range"
-                value={expenses.rdAllocationPercentage ?? 100}
-                onChange={(e) => handleDirectChange('rdAllocationPercentage', parseInt(e.target.value))}
+                value={inputs.rdAllocationPercentage}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setInputs(prev => ({ ...prev, rdAllocationPercentage: value }));
+                  handleDirectChange('rdAllocationPercentage', parseInt(value));
+                }}
                 min="0"
                 max="100"
                 step="5"
                 className="flex-1"
               />
               <div className="w-16 text-center font-medium">
-                {expenses.rdAllocationPercentage ?? 100}%
+                {inputs.rdAllocationPercentage}%
               </div>
             </div>
           </div>
@@ -184,10 +190,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="decimal"
                   value={inputs.contractorCosts}
                   onChange={(e) => handleInputChange('contractorCosts', e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                   placeholder="e.g., 50,000"
                 />
               </div>
@@ -199,10 +206,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="decimal"
                   value={inputs.softwareCosts}
                   onChange={(e) => handleInputChange('softwareCosts', e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                   placeholder="e.g., 25,000"
                 />
               </div>
@@ -214,10 +222,11 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="decimal"
                   value={inputs.cloudCosts}
                   onChange={(e) => handleInputChange('cloudCosts', e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-black bg-white"
                   placeholder="e.g., 15,000"
                 />
               </div>

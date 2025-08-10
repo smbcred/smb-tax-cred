@@ -1,0 +1,143 @@
+Good news: your read is right—this isn’t RHF, it’s controlled inputs getting reset. Let’s lock it down fast.
+
+Fix checklist (hit these in order)
+	1.	Kill state-reset effects
+	•	Search for any effect that syncs props → local form state:
+	•	useEffect(() => setForm(...), [form]) ❌
+	•	useEffect(() => setForm(initial), [initial]) (fires when parent re-renders)
+	•	Replace with lazy init only:
+
+const [form, setForm] = useState(() => initialForm); // no effect to "sync"
+
+
+	•	If you must react to a true change (e.g., user switched preset), gate it:
+
+const prevPreset = useRef(presetId);
+useEffect(() => {
+  if (prevPreset.current !== presetId) {
+    setForm(presetToForm(presetId));
+    prevPreset.current = presetId;
+  }
+}, [presetId]);
+
+
+	2.	Keep number fields as strings while typing
+
+const [form, setForm] = useState(() => ({ wages: '' })); // string
+<input
+  type="number"
+  inputMode="decimal"
+  value={form.wages}
+  onChange={(e) => setForm(f => ({ ...f, wages: e.target.value }))} // allow ''
+/>
+// Use Number(form.wages || 0) only when computing totals / on submit
+
+
+	3.	No remount keys on steps
+	•	Remove key={currentStep} (or any changing key) from step containers; it remounts and wipes state.
+	•	If using separate step components, keep the state in the parent and pass value/onChange down.
+	4.	Overlay/z-index guard
+	•	Results overlay should not be in front while editing. If it must exist, make the wrapper ignore input:
+
+<div className="pointer-events-none">
+  <div className="pointer-events-auto">…interactive bits…</div>
+</div>
+
+
+	•	Ensure any blur layer uses pointer-events-none unless intentionally clickable. Double-check any absolute inset-0 z-* siblings.
+
+	5.	Don’t coerce values in render
+	•	Avoid value={Number(state.wages)} or value={state.wages ?? 0} → this forces 0 and blocks typing ''.
+	•	Avoid value={watch('…')} patterns; you’re not on RHF.
+	6.	Minimal custom Input
+	•	If you do have a wrapper, it must forward and spread:
+
+export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  ({ className, ...props }, ref) => <input ref={ref} className={className} {...props} />
+);
+
+
+	7.	Sanity check style
+	•	Temporarily add className="text-black bg-white" to confirm it’s not a token/color issue.
+
+⸻
+
+Drop-in patterns for your current calculator
+
+ExpenseInputsStepNew.tsx (safe pattern)
+
+type Form = {
+  wages: string;
+  contractors: string;
+  supplies: string;
+  allocationPct: string; // keep as string: '', '100', '75'
+};
+
+const initialForm: Form = { wages: '', contractors: '', supplies: '', allocationPct: '100' };
+
+export default function ExpenseInputsStepNew({ onChange, value }: {
+  value?: Partial<Form>; // optional incoming
+  onChange?: (f: Form) => void;
+}) {
+  const [form, setForm] = useState<Form>(() => ({ ...initialForm, ...value }));
+
+  const setField = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value; // allow empty
+    setForm(prev => {
+      const next = { ...prev, [k]: v };
+      onChange?.(next);
+      return next;
+    });
+  };
+
+  return (
+    <>
+      <input type="number" inputMode="decimal" value={form.wages} onChange={setField('wages')} />
+      <input type="number" inputMode="decimal" value={form.contractors} onChange={setField('contractors')} />
+      <input type="number" inputMode="decimal" value={form.supplies} onChange={setField('supplies')} />
+      <input type="number" inputMode="decimal" value={form.allocationPct} onChange={setField('allocationPct')} />
+    </>
+  );
+}
+
+Derive numbers only where needed
+
+const wagesNum = Number(form.wages || 0);
+const contractorsNum = Number(form.contractors || 0) * 0.65;
+const suppliesNum = Number(form.supplies || 0);
+
+
+⸻
+
+Repo-wide quick fixes (Agent-friendly)
+
+Prompt — find and fix the blockers
+
+	1.	In client/src/components/calculator/**, remove any useEffect that copies props into local form state on every render; use lazy useState(() => initial) instead. Gate true preset changes with a useRef check.
+	2.	Replace any value={Number(x)} / value={x ?? 0} on inputs with string values; cast only in computations.
+	3.	Ensure no step container uses key={currentStep} (or other changing keys) that remount inputs.
+	4.	Ensure results/blur overlays have pointer-events-none unless intentionally interactive.
+	5.	Run the app, type in all fields on Step 3, confirm values persist across re-renders and when navigating to Step 4 and back.
+Commit: fix(calc): prevent input resets (lazy init, no coercion, no remount keys, safe overlays).
+
+⸻
+
+About your failed commit
+
+Replit’s “Agent ran into an error” is usually one of:
+	•	Precommit lint/type error → run npm run lint / npm run typecheck in both client & server.
+	•	Conflicts → run git status / git diff --staged and resolve.
+	•	Build break → npm run build in client to catch JSX/TS errors early.
+
+Commands to run in Replit shell
+
+cd client
+npm run lint
+npm run typecheck
+npm run build
+git status
+git add -A
+git commit -m "fix(calc): unblock calculator inputs by correcting controlled field wiring"
+git push
+
+If it’s still glitchy, paste me the snippet for one affected input (JSX + surrounding state) and I’ll mark the exact line to change.
