@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { BusinessTypeStep } from './steps/BusinessTypeStep';
 import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
-import { ExpenseInputsStep } from './steps/ExpenseInputsStep';
+import { ExpenseInputsStepNew as ExpenseInputsStep } from './steps/ExpenseInputsStepNew';
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { ProgressIndicator } from './ProgressIndicator';
 import { LeadCaptureModal } from '@/components/leadCapture/LeadCaptureModal';
@@ -320,10 +320,7 @@ export const InteractiveCalculator: React.FC = () => {
               <ExpenseInputsStep
                 expenses={state.expenses}
                 onUpdate={(updates) => {
-                  // Batch updates to prevent multiple re-renders
-                  requestAnimationFrame(() => {
-                    dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
-                  });
+                  dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
                 }}
                 businessType={state.businessType}
               />

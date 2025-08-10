@@ -28,28 +28,18 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
   businessType
 }) => {
   // Simple controlled inputs - no fancy state management
-  const [inputs, setInputs] = useState({
-    totalEmployees: '',
-    technicalEmployees: '',
-    averageTechnicalSalary: '',
-    contractorCosts: '',
-    softwareCosts: '',
-    cloudCosts: ''
-  });
+  const [inputs, setInputs] = useState(() => ({
+    totalEmployees: expenses.totalEmployees > 0 ? expenses.totalEmployees.toString() : '',
+    technicalEmployees: expenses.technicalEmployees > 0 ? expenses.technicalEmployees.toString() : '',
+    averageTechnicalSalary: expenses.averageTechnicalSalary > 0 ? expenses.averageTechnicalSalary.toString() : '',
+    contractorCosts: expenses.contractorCosts > 0 ? expenses.contractorCosts.toString() : '',
+    softwareCosts: expenses.softwareCosts > 0 ? expenses.softwareCosts.toString() : '',
+    cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toString() : ''
+  }));
 
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
 
-  // Initialize inputs once on mount
-  useEffect(() => {
-    setInputs({
-      totalEmployees: expenses.totalEmployees > 0 ? expenses.totalEmployees.toString() : '',
-      technicalEmployees: expenses.technicalEmployees > 0 ? expenses.technicalEmployees.toString() : '',
-      averageTechnicalSalary: expenses.averageTechnicalSalary > 0 ? expenses.averageTechnicalSalary.toString() : '',
-      contractorCosts: expenses.contractorCosts > 0 ? expenses.contractorCosts.toString() : '',
-      softwareCosts: expenses.softwareCosts > 0 ? expenses.softwareCosts.toString() : '',
-      cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toString() : ''
-    });
-  }, []);
+  // NO useEffect for initialization - use lazy initial state instead
 
   // Handle text input changes
   const handleInputChange = (field: string, value: string) => {

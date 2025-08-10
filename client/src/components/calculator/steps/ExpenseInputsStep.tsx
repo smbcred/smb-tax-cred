@@ -30,29 +30,37 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
 }) => {
   // Use controlled inputs with form values that persist during typing
   const [formValues, setFormValues] = useState({
-    totalEmployees: expenses.totalEmployees || '',
-    technicalEmployees: expenses.technicalEmployees || '',
-    averageTechnicalSalary: expenses.averageTechnicalSalary || '',
-    contractorCosts: expenses.contractorCosts || '',
-    softwareCosts: expenses.softwareCosts || '',
-    cloudCosts: expenses.cloudCosts || ''
+    totalEmployees: '',
+    technicalEmployees: '',
+    averageTechnicalSalary: '',
+    contractorCosts: '',
+    softwareCosts: '',
+    cloudCosts: ''
   });
   
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
   const [warnings, setWarnings] = useState<string[]>([]);
   const updateTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize form values from props only on mount
+  // Initialize form values from props - PROPERLY track expense changes
   useEffect(() => {
-    setFormValues({
+    // Only update form values if we haven't initialized yet OR if props have ACTUALLY changed
+    const newFormValues = {
       totalEmployees: expenses.totalEmployees > 0 ? expenses.totalEmployees.toString() : '',
       technicalEmployees: expenses.technicalEmployees > 0 ? expenses.technicalEmployees.toString() : '',
       averageTechnicalSalary: expenses.averageTechnicalSalary > 0 ? expenses.averageTechnicalSalary.toLocaleString() : '',
       contractorCosts: expenses.contractorCosts > 0 ? expenses.contractorCosts.toLocaleString() : '',
       softwareCosts: expenses.softwareCosts > 0 ? expenses.softwareCosts.toLocaleString() : '',
       cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toLocaleString() : ''
-    });
-  }, []); // Only run on mount
+    };
+    
+    // Only update if not initialized yet
+    if (!isInitialized) {
+      setFormValues(newFormValues);
+      setIsInitialized(true);
+    }
+  }, [expenses, isInitialized]); // Track both expenses AND initialization state
 
   // Update showPriorYears when first-time filer status changes
   useEffect(() => {
