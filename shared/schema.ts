@@ -1039,6 +1039,65 @@ export type S3FileMetadata = z.infer<typeof s3FileMetadataSchema>;
 export type S3StorageStats = z.infer<typeof s3StorageStatsSchema>;
 export type S3BatchUploadRequest = z.infer<typeof s3BatchUploadRequestSchema>;
 
+// Download system schemas
+export const downloadRequestSchema = z.object({
+  fileKeys: z.array(z.string().min(1, "File key is required")),
+  downloadType: z.enum(['single', 'zip']),
+  expiresIn: z.number().min(60).max(24 * 60 * 60).default(3600), // 1 minute to 24 hours
+  trackingEnabled: z.boolean().default(true),
+  compressionLevel: z.number().min(0).max(9).default(6),
+});
+
+export const downloadResponseSchema = z.object({
+  downloadToken: z.string(),
+  downloadUrl: z.string(),
+  expiresAt: z.string(),
+  fileCount: z.number(),
+  estimatedSize: z.number(),
+  downloadType: z.enum(['single', 'zip']),
+  trackingId: z.string(),
+});
+
+export const downloadTrackingSchema = z.object({
+  trackingId: z.string(),
+  downloadToken: z.string(),
+  userId: z.string(),
+  fileKeys: z.array(z.string()),
+  downloadType: z.enum(['single', 'zip']),
+  fileCount: z.number(),
+  totalSize: z.number(),
+  downloadedSize: z.number().default(0),
+  downloadedAt: z.string().optional(),
+  startedAt: z.string(),
+  completedAt: z.string().optional(),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+  status: z.enum(['pending', 'started', 'completed', 'failed', 'expired']).default('pending'),
+  errorMessage: z.string().optional(),
+});
+
+export const downloadStatsSchema = z.object({
+  totalDownloads: z.number(),
+  totalSize: z.number(),
+  downloadsByType: z.record(z.string(), z.number()),
+  downloadsByDay: z.array(z.object({
+    date: z.string(),
+    count: z.number(),
+    size: z.number(),
+  })),
+  topFiles: z.array(z.object({
+    fileKey: z.string(),
+    fileName: z.string(),
+    downloadCount: z.number(),
+    lastDownloaded: z.string(),
+  })),
+});
+
+export type DownloadRequest = z.infer<typeof downloadRequestSchema>;
+export type DownloadResponse = z.infer<typeof downloadResponseSchema>;
+export type DownloadTracking = z.infer<typeof downloadTrackingSchema>;
+export type DownloadStats = z.infer<typeof downloadStatsSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;

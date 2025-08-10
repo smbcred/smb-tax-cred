@@ -2717,6 +2717,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download system endpoints
+  app.post("/api/downloads/create", authenticateToken, async (req: any, res) => {
+    try {
+      const { downloadRequestSchema } = await import("@shared/schema");
+      const validatedRequest = downloadRequestSchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      console.log('Download creation request:', {
+        userId: req.user.id,
+        fileCount: validatedRequest.fileKeys.length,
+        downloadType: validatedRequest.downloadType,
+      });
+
+      const downloadResponse = await downloadManager.createDownload(validatedRequest);
+
+      res.json({
+        success: true,
+        download: downloadResponse,
+        message: 'Download prepared successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Download creation error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid download request',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to create download"
+      });
+    }
+  });
+
+  app.get("/api/downloads/secure/:token", async (req: any, res) => {
+    try {
+      const { token } = req.params;
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      // Get client information
+      const clientInfo = {
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('User-Agent'),
+      };
+
+      console.log('Processing secure download:', {
+        token: token.substring(0, 10) + '...',
+        clientInfo,
+      });
+
+      const downloadData = await downloadManager.processDownload(token, clientInfo);
+
+      // Set appropriate headers for download
+      res.setHeader('Content-Type', downloadData.contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${downloadData.filename}"`);
+      res.setHeader('Content-Length', downloadData.size);
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+
+      // Send the file
+      if (Buffer.isBuffer(downloadData.stream)) {
+        res.send(downloadData.stream);
+      } else {
+        downloadData.stream.pipe(res);
+      }
+
+    } catch (error: any) {
+      console.error("Secure download error:", error);
+      res.status(404).json({ 
+        success: false,
+        error: error.message || "Download not found or expired"
+      });
+    }
+  });
+
+  app.get("/api/downloads/status/:trackingId", authenticateToken, async (req: any, res) => {
+    try {
+      const { trackingId } = req.params;
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      const tracking = await downloadManager.getDownloadStatus(trackingId);
+
+      if (!tracking) {
+        return res.status(404).json({
+          success: false,
+          error: 'Download tracking not found',
+        });
+      }
+
+      // Verify user owns the download
+      if (tracking.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied to this download',
+        });
+      }
+
+      res.json({
+        success: true,
+        tracking,
+      });
+
+    } catch (error: any) {
+      console.error("Download status error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get download status"
+      });
+    }
+  });
+
+  app.get("/api/downloads/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const { days = 30 } = req.query;
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      const stats = await downloadManager.getUserDownloadStats(req.user.id, parseInt(days as string));
+
+      res.json({
+        success: true,
+        stats,
+        period: `Last ${days} days`,
+      });
+
+    } catch (error: any) {
+      console.error("Download stats error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get download statistics"
+      });
+    }
+  });
+
+  app.delete("/api/downloads/:token", authenticateToken, async (req: any, res) => {
+    try {
+      const { token } = req.params;
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      // Get download info to verify ownership
+      const tracking = await downloadManager.getDownloadStatus(token);
+      if (tracking && tracking.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied to this download',
+        });
+      }
+
+      await downloadManager.deleteDownloadToken(token);
+
+      res.json({
+        success: true,
+        message: 'Download token deleted successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Download deletion error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to delete download"
+      });
+    }
+  });
+
+  app.post("/api/downloads/optimize", authenticateToken, async (req: any, res) => {
+    try {
+      const { fileKeys, maxBandwidth, compressionLevel, streamingEnabled } = req.body;
+
+      if (!Array.isArray(fileKeys) || fileKeys.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'File keys array is required',
+        });
+      }
+
+      const { getDownloadManager } = await import("./services/downloadManager");
+      const downloadManager = getDownloadManager();
+
+      const optimization = await downloadManager.optimizeDownload(fileKeys, {
+        maxBandwidth,
+        compressionLevel,
+        streamingEnabled,
+      });
+
+      res.json({
+        success: true,
+        optimization,
+      });
+
+    } catch (error: any) {
+      console.error("Download optimization error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to optimize download"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {
