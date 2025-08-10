@@ -1555,6 +1555,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Claude API endpoints
+  app.post("/api/claude/generate", authenticateToken, async (req: any, res) => {
+    try {
+      const { claudeRequestSchema } = await import("@shared/schema");
+      const validatedRequest = claudeRequestSchema.parse(req.body);
+
+      // Import Claude service
+      const { getClaudeService } = await import("./services/claude");
+      const claudeService = getClaudeService();
+
+      console.log('Claude text generation request:', {
+        userId: req.user.id,
+        promptLength: validatedRequest.prompt.length,
+        systemPromptLength: validatedRequest.systemPrompt?.length || 0,
+        maxTokens: validatedRequest.maxTokens,
+        temperature: validatedRequest.temperature,
+      });
+
+      const response = await claudeService.generateText(validatedRequest);
+
+      res.json({
+        success: true,
+        response,
+        tokenUsage: claudeService.getTokenUsage(),
+      });
+
+    } catch (error: any) {
+      console.error("Claude generation error:", error);
+      
+      // Handle Claude-specific errors
+      if (error.type) {
+        return res.status(error.type === 'authentication' ? 401 : 
+                         error.type === 'rate_limit' ? 429 :
+                         error.type === 'invalid_request' ? 400 : 500).json({ 
+          success: false,
+          error: error.message,
+          type: error.type,
+          retryAfter: error.retryAfter,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate text with Claude"
+      });
+    }
+  });
+
+  app.post("/api/claude/validate", authenticateToken, async (req: any, res) => {
+    try {
+      // Import Claude service
+      const { getClaudeService } = await import("./services/claude");
+      const claudeService = getClaudeService();
+
+      console.log('Claude connection validation request:', {
+        userId: req.user.id,
+      });
+
+      const isValid = await claudeService.validateConnection();
+
+      res.json({
+        success: true,
+        isValid,
+        tokenUsage: claudeService.getTokenUsage(),
+      });
+
+    } catch (error: any) {
+      console.error("Claude validation error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to validate Claude connection",
+        isValid: false,
+      });
+    }
+  });
+
+  app.get("/api/claude/usage", authenticateToken, async (req: any, res) => {
+    try {
+      // Import Claude service
+      const { getClaudeService } = await import("./services/claude");
+      const claudeService = getClaudeService();
+
+      const usage = claudeService.getTokenUsage();
+      const estimatedCost = claudeService.calculateCost(usage);
+
+      res.json({
+        success: true,
+        usage,
+        estimatedCost,
+      });
+
+    } catch (error: any) {
+      console.error("Claude usage error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get Claude usage"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

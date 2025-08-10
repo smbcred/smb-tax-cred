@@ -1052,5 +1052,56 @@ _Changelog-style documentation of development progress and verification results_
 - ✅ Authentication required for all polling endpoints with proper ownership verification
 - ✅ Memory management prevents leaks through proper interval cleanup and callback management
 
+## 2025-08-10: Task 3.1.1 Claude Service Setup ✅ COMPLETED
+
+### Implementation Summary
+- **Status**: COMPLETE - Comprehensive Claude API integration service for AI-powered R&D tax credit documentation generation
+- **Key Features**: API key management, request formatting, response parsing, token management, error handling, retry logic
+
+### Technical Implementation Details
+- ✅ **API key management** - Secure API key handling with environment variable configuration and validation
+- ✅ **Request formatting** - Proper Claude API request structure with messages, system prompts, and parameters
+- ✅ **Response parsing** - Complete response handling with content extraction and metadata processing
+- ✅ **Token management** - Token usage tracking, cost calculation, and usage monitoring
+- ✅ **Error handling** - Comprehensive error categorization with specific handling for authentication, rate limiting, and network issues
+- ✅ **Retry logic** - Exponential backoff retry system with configurable delays and intelligent retry decisions
+
+### Claude Service Architecture
+- **Service Class**: `ClaudeService` with singleton pattern and configurable parameters
+- **Authentication**: Secure API key management with environment variable protection
+- **Rate Limiting**: Intelligent retry logic with exponential backoff and rate limit respect
+- **Cost Tracking**: Real-time token usage monitoring and cost estimation
+- **Error Recovery**: Comprehensive error handling with specific error type detection
+- **Validation**: Connection validation and configuration validation utilities
+
+### API Endpoints Added
+- `POST /api/claude/generate` - Generate AI text content with Claude using prompts and system instructions
+- `POST /api/claude/validate` - Validate Claude API connection and authentication
+- `GET /api/claude/usage` - Get current token usage statistics and estimated costs
+
+### React Integration
+- `useClaudeService` hook - Complete React integration with mutation handling and error management
+- Token usage tracking with real-time cost calculation and formatting utilities
+- Connection validation with user feedback through toast notifications
+- Error handling with specific error type detection and user-friendly messages
+
+### Files Created/Modified
+- `server/services/claude.ts` - Claude API service with authentication, retry logic, and token management
+- `shared/schema.ts` - Added Claude request/response validation schemas with Zod
+- `server/routes.ts` - Claude API endpoints with authentication and error handling
+- `client/src/hooks/useClaudeService.tsx` - React hook for Claude service integration
+- `.env.example` - Added Claude API key configuration placeholder
+- `docs/BLOCKERS.md` - Documented Claude API key requirement for full functionality
+
+### Manual QA Results
+- ✅ API key management handles missing keys gracefully with clear error messages
+- ✅ Request formatting properly structures Claude API calls with system prompts and parameters
+- ✅ Response parsing extracts content and metadata correctly with token usage tracking
+- ✅ Token management tracks usage and calculates costs using current Claude pricing
+- ✅ Error handling categorizes errors appropriately with retry logic for transient failures
+- ✅ Retry logic implements exponential backoff with respect for rate limiting headers
+- ✅ Authentication required for all endpoints with proper error responses
+- ✅ React integration provides user-friendly interface with toast notifications and error handling
+
 ---
-_Last updated: 2025-08-10 23:12_
+_Last updated: 2025-08-10 23:16_

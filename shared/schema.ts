@@ -500,6 +500,37 @@ export const makeWebhookPayloadSchema = z.object({
 });
 
 // Workflow trigger payload schema
+// Claude API schemas
+export const claudeRequestSchema = z.object({
+  prompt: z.string().min(1, "Prompt is required"),
+  systemPrompt: z.string().optional(),
+  maxTokens: z.number().min(1).max(8192).optional(),
+  temperature: z.number().min(0).max(1).optional(),
+  metadata: z.record(z.any()).optional(),
+});
+
+export const claudeResponseSchema = z.object({
+  content: z.string(),
+  tokensUsed: z.object({
+    input: z.number(),
+    output: z.number(),
+    total: z.number(),
+  }),
+  model: z.string(),
+  finishReason: z.string(),
+  usage: z.object({
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+  }).optional(),
+});
+
+export const claudeErrorSchema = z.object({
+  type: z.enum(['authentication', 'rate_limit', 'invalid_request', 'api_error', 'network_error']),
+  message: z.string(),
+  code: z.string().optional(),
+  retryAfter: z.number().optional(),
+});
+
 export const workflowTriggerPayloadSchema = z.object({
   intakeFormId: z.string(),
   airtableRecordId: z.string().optional(),
@@ -554,6 +585,9 @@ export type InsertWebhookEvent = z.infer<typeof insertWebhookEventSchema>;
 export type InsertWorkflowTrigger = z.infer<typeof insertWorkflowTriggerSchema>;
 export type MakeWebhookPayload = z.infer<typeof makeWebhookPayloadSchema>;
 export type WorkflowTriggerPayload = z.infer<typeof workflowTriggerPayloadSchema>;
+export type ClaudeRequest = z.infer<typeof claudeRequestSchema>;
+export type ClaudeResponse = z.infer<typeof claudeResponseSchema>;
+export type ClaudeError = z.infer<typeof claudeErrorSchema>;
 
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
