@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import type { FormProgress, FormSection } from '@shared/schema';
 
 interface UseFormProgressOptions {
@@ -59,32 +60,32 @@ export function useFormProgress({
   });
 
   const [formData, setFormData] = useState<Record<string, any>>({});
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Debounced auto-save data
-  const debouncedFormData = useDebounce(formData, autoSaveDelay);
+  // Enhanced auto-save integration
+  const currentSectionData = formData[progress.currentSection] || {};
+  const autoSave = useAutoSave({
+    intakeFormId,
+    data: currentSectionData,
+    section: progress.currentSection || 'company-info',
+    debounceMs: autoSaveDelay,
+    intervalMs: 30000, // 30 seconds
+    enabled: !!intakeFormId && !!progress.currentSection,
+  });
 
-  // Auto-save effect
+  // Update progress state from auto-save (memoized to prevent loops)
   useEffect(() => {
-    if (hasUnsavedChanges && debouncedFormData && onAutoSave && progress.currentSection) {
-      const saveData = async () => {
-        setProgress(prev => ({ ...prev, isAutoSaving: true }));
-        try {
-          await onAutoSave(debouncedFormData[progress.currentSection], progress.currentSection);
-          setProgress(prev => ({ 
-            ...prev, 
-            isAutoSaving: false,
-            lastSavedAt: new Date().toISOString()
-          }));
-          setHasUnsavedChanges(false);
-        } catch (error) {
-          console.error('Auto-save failed:', error);
-          setProgress(prev => ({ ...prev, isAutoSaving: false }));
-        }
+    setProgress(prev => {
+      if (prev.isAutoSaving === autoSave.isAutoSaving && 
+          prev.lastSavedAt === autoSave.lastSavedAt) {
+        return prev; // No change, prevent unnecessary re-render
+      }
+      return {
+        ...prev,
+        isAutoSaving: autoSave.isAutoSaving,
+        lastSavedAt: autoSave.lastSavedAt,
       };
-      saveData();
-    }
-  }, [debouncedFormData, hasUnsavedChanges, onAutoSave, progress.currentSection]);
+    });
+  }, [autoSave.isAutoSaving, autoSave.lastSavedAt]);
 
   // Navigate to section
   const navigateToSection = useCallback((sectionId: string) => {
@@ -100,7 +101,6 @@ export function useFormProgress({
       ...prev,
       [sectionId]: { ...prev[sectionId], ...data }
     }));
-    setHasUnsavedChanges(true);
   }, []);
 
   // Update section completion
@@ -163,7 +163,7 @@ export function useFormProgress({
   return {
     progress,
     formData,
-    hasUnsavedChanges,
+    hasUnsavedChanges: autoSave.hasUnsavedChanges,
     navigateToSection,
     updateSectionData,
     updateSectionProgress,
@@ -174,5 +174,10 @@ export function useFormProgress({
     validateSection,
     setProgress,
     setFormData,
+    // Auto-save state
+    autoSave: {
+      ...autoSave,
+      manualSave: autoSave.manualSave,
+    },
   };
 }

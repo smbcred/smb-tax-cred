@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Circle, Clock, Save } from 'lucide-react';
 import FormSection from '@/components/forms/FormSection';
+import { SaveIndicator } from '@/components/ui/save-indicator';
 
 interface IntakeFormProps {
   intakeFormId?: string;
@@ -41,7 +42,7 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
     },
   });
 
-  // Form progress management
+  // Form progress management with enhanced auto-save
   const {
     progress,
     formData,
@@ -54,13 +55,9 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
     getCurrentSection,
     getCurrentSectionData,
     validateSection,
+    autoSave,
   } = useFormProgress({
     intakeFormId,
-    onAutoSave: async (data, section) => {
-      if (intakeFormId) {
-        await autoSaveMutation.mutateAsync({ data, section });
-      }
-    },
     autoSaveDelay: 2000,
   });
 
@@ -164,26 +161,25 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
           </div>
           <Progress value={progress.overallProgress} className="h-2" />
           
-          {/* Auto-save status */}
-          <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
-            <div className="flex items-center">
-              {progress.isAutoSaving ? (
-                <>
-                  <Save className="w-3 h-3 mr-1 animate-pulse" />
-                  <span>Auto-saving...</span>
-                </>
-              ) : progress.lastSavedAt ? (
-                <>
-                  <CheckCircle className="w-3 h-3 mr-1 text-emerald-600" />
-                  <span>Last saved: {new Date(progress.lastSavedAt).toLocaleTimeString()}</span>
-                </>
-              ) : hasUnsavedChanges ? (
-                <>
-                  <Clock className="w-3 h-3 mr-1 text-amber-600" />
-                  <span>Unsaved changes</span>
-                </>
-              ) : null}
-            </div>
+          {/* Enhanced auto-save status */}
+          <div className="flex items-center justify-between mt-2">
+            <SaveIndicator
+              status={autoSave.saveStatus}
+              lastSavedAt={autoSave.lastSavedAt}
+              hasUnsavedChanges={autoSave.hasUnsavedChanges}
+              isOnline={autoSave.isOnline}
+            />
+            {autoSave.error && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={autoSave.manualSave}
+                disabled={autoSave.isAutoSaving}
+                className="text-xs h-6"
+              >
+                Retry Save
+              </Button>
+            )}
           </div>
         </div>
       </div>
