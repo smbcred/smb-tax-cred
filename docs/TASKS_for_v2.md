@@ -19,7 +19,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 1.4.2 | Implement Lead Storage | [x] | [📋](./acceptance/1.4.2.md) |
 | 1.4.3 | Post-Capture Experience | [x] | [📋](./acceptance/1.4.3.md) |
 | 1.5.1 | Stripe Checkout Setup | [x] | [📋](./acceptance/1.5.1.md) |
-| 1.5.2 | Create Checkout API | [ ] | [📋](./acceptance/1.5.2.md) |
+| 1.5.2 | Create Checkout API | [x] | [📋](./acceptance/1.5.2.md) |
 | 1.5.3 | Payment Success Flow | [ ] | [📋](./acceptance/1.5.3.md) |
 | 1.6.1 | Implement JWT Authentication | [ ] | [📋](./acceptance/1.6.1.md) |
 | 1.6.2 | Create Login/Register Pages | [ ] | [📋](./acceptance/1.6.2.md) |
