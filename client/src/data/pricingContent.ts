@@ -6,7 +6,7 @@
 
 export const pricingContent = {
   headline: "Simple, Transparent Pricing",
-  subheadline: "One flat fee based on your potential credit size. No percentages, no surprises.",
+  subheadline: "Just one flat fee—we never take a percentage of your credit like traditional consultants.",
   
   tiers: [
     {

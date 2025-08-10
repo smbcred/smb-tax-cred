@@ -1,214 +1,66 @@
 # SMBTaxCredits.com - Replit Development Guide
 
 ## Overview
-
-SMBTaxCredits.com is a self-serve SaaS platform that helps small businesses document their AI experimentation work to claim federal R&D tax credits. We convert practical test-and-learn activities with ChatGPT, Claude, custom GPTs, and automations into IRS-compliant documentation worth 10-16% of project costs.
-
-**Core Mission**: "Turn everyday AI experiments into tax savings" - We serve businesses USING AI tools, not building them. The platform helps SMBs calculate their potential R&D tax credits, captures leads through an interactive calculator, processes payments via Stripe, collects detailed business information through smart forms, and generates IRS-compliant documentation using AI.
-
-**CRITICAL COMPLIANCE**: 
-- We are a documentation service, NOT tax advisors
-- Never guarantee credits or audit outcomes
-- Always use "may qualify" language with disclaimers
-- Section 174 Warning: For 2022-2025, R&D expenses must be capitalized and amortized over 5 years (domestic) which significantly impacts cash flow
+SMBTaxCredits.com is a self-serve SaaS platform designed to help small businesses document their AI experimentation work to claim federal R&D tax credits. It converts practical test-and-learn activities with AI tools like ChatGPT and Claude into IRS-compliant documentation, potentially worth 10-16% of project costs. The platform's core mission is to "Turn everyday AI experiments into tax savings" for businesses *using* AI tools, not building them. It features an interactive calculator for lead capture, processes payments, collects business information via smart forms, and generates IRS-compliant documentation using AI. The service focuses on documentation and explicitly disclaims tax advisory roles, always using "may qualify" language.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
-
-## Recent Changes
-
-### Complete Design System Migration (January 10, 2025)
-- **PHASE 1-5 COMPLETED**: Successfully migrated entire application to new robust design system
-- **DESIGN TOKENS**: Implemented comprehensive CSS variables for colors, typography, spacing, shadows, and animations
-- **COMPONENT ENHANCEMENTS**: Upgraded all buttons, forms, cards with consistent hover/focus states and size variants
-- **ANIMATION SYSTEM**: Added 9 animation utilities (fadeIn, slideIn, scaleIn, pulse, spin, bounce) with delay options
-- **DARK MODE**: Enhanced dark mode support with component-specific overrides and improved contrast
-- **UTILITY CLASSES**: Added flex/grid utilities, transition helpers, accessibility features, loading states
-- **PERFORMANCE**: Consolidated styles, removed duplicates, optimized with design token architecture
-- **ACCESSIBILITY**: Added focus indicators, screen reader utilities, proper contrast ratios
-
-### Site Rebranding (January 10, 2025)
-- **RENAMED SITE**: Changed from "R&D Tax Credit Pro" to "SMBTaxCredits.com" throughout the application
-- **UPDATED BRANDING**: Changed all references in navigation, footer, dashboard, and metadata
-- **EMAIL UPDATE**: Changed support email from support@rdtaxcreditpro.com to support@smbtaxcredits.com
-- **URL UPDATE**: Updated Open Graph URLs to https://smbtaxcredits.com
-- **CONSISTENCY**: Ensured consistent branding across all pages and components
-
-### Comprehensive Design System Overhaul (January 9, 2025)
-- **DESIGN TOKENS**: Created centralized design system with brand colors from visual identity guide
-- **BRAND COLORS**: Implemented blue (#2E5AAC) and emerald (#1E8E5A) as primary/secondary colors
-- **TYPOGRAPHY SYSTEM**: Set up Inter font with hierarchical sizes for consistency
-- **TAILWIND CONFIG**: Updated with brand palette, custom shadows, and animation utilities
-- **ACCESSIBILITY**: Ensured AA compliance with proper contrast ratios and touch targets
-- **SPACING GRID**: Implemented 4pt grid system for consistent layout spacing
-- **PROFESSIONAL TRUST**: Design emphasizes credibility for SMBs documenting AI experimentation
-
-### Lead Capture Modal System (January 9, 2025)
-- **VALUE EXCHANGE**: Modal emphasizes getting "$15,000 credit breakdown" for contact info
-- **TRUST SIGNALS**: Added "No credit card required", security badges, 500+ businesses social proof
-- **SUCCESS STORY**: Included marketing agency example saving $15K from GPT development
-- **FORM VALIDATION**: Real-time validation with helpful error messages
-- **MOBILE RESPONSIVE**: Touch-friendly inputs with proper spacing
-- **API INTEGRATION**: Connected to existing backend lead capture endpoint
-- **CONVERSION FOCUSED**: Appears at peak interest moment after calculation
-
-### AI-Forward Calculator Implementation (January 9, 2025)
-- **PIVOTED TO AI-FORWARD**: Changed business types to focus on AI/automation use cases
-- **NEW BUSINESS TYPES**: Marketing/Creative Agency, E-commerce, Consulting, SaaS, Healthcare
-- **AI ACTIVITIES**: Custom GPTs, Prompt Engineering, Chatbots, AI Automations, Data Analysis
-- **ENHANCED VALIDATION**: Comprehensive input validation with AI-specific warnings
-- **ROI METRICS**: Added payback days calculation to ROI metrics
-- **CONFIDENCE SCORING**: Added confidence level assessment based on data quality
-
-### Complete Calculator Engine Overhaul (January 9, 2025)
-- **FIXED CRITICAL BUG**: Employee wages now calculate at full value with R&D allocation percentage
-- **FIXED ASC CALCULATION**: Proper implementation with 6% for first-time filers, 14% for repeat filers
-- **FIXED PRICING TIERS**: Unified 7-tier system ($500-$2000) aligned across all components
-- **FIXED SOFTWARE COSTS**: Removed incorrect 80% reduction - now calculates at full value
-- Contractor costs correctly limited to 65% per IRS Section 41 (wages are NOT limited)
-- Added R&D allocation percentage input (defaults to 100%) for accurate wage calculations
-- Implemented prior year QRE handling for proper ASC base amount calculation
-- Federal-only focus confirmed (state credits always 0)
-- Enhanced validation with business-friendly warnings and error messages
-- Added detailed calculation breakdowns showing wage, contractor, and supply calculations
-- Improved UI labels from "AI" to "Innovation" for broader appeal
-
-### Instructions.md Integration (January 10, 2025)
-- Added comprehensive project instructions and compliance guidelines
-- Critical updates on Section 174 capitalization requirement for 2022-2025
-- Established calculation accuracy rules using ASC method (6% first-time, 14% with prior QREs)
-- Contractor costs LIMITED to 65% per IRC Section 41
-- Legal compliance: documentation service only, never guarantee credits
-- Brand voice: "The Smart Friend Who Knows Taxes"
-- Focus on businesses USING AI tools, not building them
-
-### Enhanced Calculator UI with 4-Step Flow (January 9, 2025)
-- Implemented comprehensive 4-step calculator flow with visual progress indicator
-- Created ProgressIndicator component with clickable steps and completion tracking
-- Added step validation with clear, constructive error messages
-- Implemented keyboard navigation (Enter to advance, Escape to go back)
-- Enhanced step management with visited step tracking and smart navigation
-- Added error display with red alert boxes and specific guidance
-- Integrated help text footer with IRS Section 41 reference
-- Successfully tested email capture modal with blur/unblur effects
-- Maintained smooth animations and transitions between steps
-- Ensured mobile-responsive design with touch-friendly controls
-
-### Innovation Tax Credit Calculator Implementation (January 9, 2025)
-- Pivoted from AI-specific to broader innovation tax credit focus
-- Built InnovationCalculatorEngine with 10-14% federal credit rates
-- Created BusinessExamplesService with industry-specific profiles
-- Updated business types to professional services, e-commerce, healthcare, etc.
-- Redesigned activities around automation, custom solutions, process optimization
-- Implemented sophisticated expense calculation across 4 categories
-- Added validation with constructive business guidance
-- Created industry presets with real-world examples
-- Maintained pricing tier system from $500-$1500
-- Enhanced with professional insights and recommendations
-
-### Marketing Copy Integration (January 9, 2025)
-- Created comprehensive marketing data files with conversion-optimized copy
-- Integrated hero content with powerful value proposition and trust signals
-- Implemented benefits content highlighting 6 key features with IRS compliance focus
-- Added 3-step process explanation with time estimates and clear descriptions
-- Created transparent pricing content with ROI messaging and comparison callout
-- Added 10 FAQ items addressing common customer concerns
-- Implemented SEO meta tags with structured data for better search visibility
-- Created compliance content file for trust-building elements
-
-### Responsive Design Implementation (January 5, 2025)
-- Created comprehensive responsive navigation component with mobile hamburger menu
-- Built mobile-optimized hero section with intersection observer for performance
-- Implemented responsive grid layouts for benefits, pricing, and process steps
-- Enhanced all sections with mobile-first breakpoints (sm: 640px, md: 768px, lg: 1024px)
-- Added touch-friendly interfaces with minimum 44px touch targets
-- Integrated framer-motion animations with scroll-triggered effects
-- Optimized font sizes and spacing for mobile devices
-- Created reusable responsive components for consistent design patterns
-
-### Database Schema Enhancement (January 5, 2025)
-- Enhanced PostgreSQL database schema with comprehensive fields for R&D tax credit documentation
-- Added indexes on frequently queried fields for improved performance
-- Implemented proper foreign key relationships with CASCADE options
-- Added new fields for external integrations (Airtable, Make.com, AWS S3)
-- Created subscriptions table for Stripe payment tracking
-- Enhanced all tables with additional tracking and metadata fields
-- Added JSONB fields for flexible data storage (form sections, calculations)
-- Implemented comprehensive field types including inet for IP addresses, bigint for file sizes
-
-### Development Environment Configuration (January 3, 2025)
-- Added comprehensive linting with ESLint and code formatting with Prettier
-- Configured TypeScript with enhanced path mappings for better imports
-- Set up testing framework with Vitest and React Testing Library
-- Installed essential development dependencies including:
-  - Security packages: helmet, express-rate-limit, express-validator
-  - Logging: winston
-  - External services: @aws-sdk/client-s3, @sendgrid/mail, airtable
-  - File handling: multer, cors
-  - Scheduling: node-cron
-- Created configuration files for consistent code quality
-- Enhanced Tailwind configuration with comprehensive color palette
 
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React 18+ with TypeScript for type safety and modern development patterns
-- **Styling**: Tailwind CSS with custom design system variables and shadcn/ui component library
-- **State Management**: TanStack React Query for server state management and caching
-- **Routing**: Wouter for lightweight client-side routing
-- **Forms**: React Hook Form with Zod validation for robust form handling
-- **Build Tool**: Vite for fast development and optimized production builds
+- **Framework**: React 18+ with TypeScript.
+- **Styling**: Tailwind CSS with custom design system variables and shadcn/ui.
+- **State Management**: TanStack React Query for server state and caching.
+- **Routing**: Wouter for lightweight client-side routing.
+- **Forms**: React Hook Form with Zod validation.
+- **Build Tool**: Vite.
+- **UI/UX**: Emphasizes credibility for SMBs with a professional design system, including a comprehensive design system overhaul with design tokens for colors (blue, emerald), typography (Inter font), spacing, and animations. It includes enhanced dark mode support, accessibility features (AA compliance, focus indicators), and a 4-step calculator flow with visual progress indicators and clear validation.
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js REST API server
-- **Language**: TypeScript throughout the entire codebase for consistency
-- **Authentication**: JWT-based authentication with bcrypt password hashing
-- **API Design**: RESTful endpoints with proper error handling and logging middleware
-- **File Structure**: Modular route handlers with separate storage layer abstraction
+- **Runtime**: Node.js with Express.js REST API server.
+- **Language**: TypeScript.
+- **Authentication**: JWT-based authentication with bcrypt password hashing.
+- **API Design**: RESTful endpoints with error handling and logging middleware.
+- **File Structure**: Modular route handlers with storage layer abstraction.
 
 ### Data Storage Solutions
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Connection**: Neon serverless PostgreSQL with connection pooling
-- **Schema**: Comprehensive database schema including users, companies, calculations, payments, intake forms, leads, and documents
-- **Migrations**: Drizzle Kit for database schema migrations and management
+- **Database**: PostgreSQL with Drizzle ORM for type-safe operations.
+- **Connection**: Neon serverless PostgreSQL with connection pooling.
+- **Schema**: Comprehensive database schema for users, companies, calculations, payments, intake forms, leads, and documents, with Drizzle Kit for migrations.
 
 ### Authentication and Authorization
-- **Strategy**: JWT tokens stored in localStorage for client-side authentication
-- **Password Security**: bcrypt for secure password hashing with salt rounds
-- **Protected Routes**: Custom authentication middleware for API route protection
-- **User Sessions**: Token-based authentication with user context propagation
+- **Strategy**: JWT tokens stored in localStorage.
+- **Password Security**: bcrypt for password hashing.
+- **Protected Routes**: Custom authentication middleware.
+
+### System Design Choices
+- **Business Logic**: Calculator engine overhauled to focus on AI/automation use cases, with specific business types and AI activities. It includes accurate R&D allocation, proper ASC calculation (6% for first-time filers, 14% for repeat), and correct handling of wage and contractor costs (contractor costs limited to 65% per IRS Section 41).
+- **Compliance**: Adherence to IRS Section 174 warnings for 2022-2025 regarding capitalization and amortization. The platform is a documentation service only, not a tax advisor.
+- **Monorepo Structure**: Shared TypeScript types and schemas for full-stack type safety.
 
 ## External Dependencies
 
 ### Payment Processing
-- **Stripe**: Complete payment processing integration with Stripe Elements for secure card handling
-- **Dynamic Pricing**: Tiered pricing structure based on calculated R&D credit amounts
-- **Checkout Flow**: Custom checkout page with payment confirmation and error handling
+- **Stripe**: Complete payment processing with Stripe Elements for secure card handling and dynamic tiered pricing.
 
 ### Database Services
-- **Neon Database**: Serverless PostgreSQL with automatic scaling and connection pooling
-- **Drizzle ORM**: Type-safe database operations with schema validation
+- **Neon Database**: Serverless PostgreSQL.
+- **Drizzle ORM**: Type-safe database operations.
 
 ### AI and Document Generation
-- **Claude API**: AI-powered narrative generation for R&D tax credit documentation
-- **Documint**: PDF generation service for IRS-compliant forms and reports
+- **Claude API**: AI-powered narrative generation for R&D tax credit documentation.
+- **Documint**: PDF generation service for IRS-compliant forms and reports.
 
 ### Communication Services
-- **SendGrid**: Email delivery service for notifications and document delivery
-- **Airtable**: Workflow management and lead tracking integration
-- **Make.com**: Automation orchestration for business process workflows
+- **SendGrid**: Email delivery for notifications and document delivery.
+- **Airtable**: Workflow management and lead tracking.
+- **Make.com**: Automation orchestration for business process workflows.
 
 ### Cloud Storage
-- **AWS S3**: Document storage and secure file delivery for generated tax packages
-
-### Development Tools
-- **Replit Integration**: Custom Vite plugins for Replit development environment
-- **Runtime Error Handling**: Development-specific error overlay and debugging tools
+- **AWS S3**: Document storage and secure file delivery.
 
 ### UI Component System
-- **Radix UI**: Accessible, unstyled component primitives for complex UI elements
-- **Shadcn/ui**: Pre-built component library with consistent design patterns
-- **Font Awesome**: Icon system for consistent visual elements throughout the application
-
-The application is designed as a monorepo with shared TypeScript types and schemas, enabling type safety across the full stack while maintaining clear separation between client and server code.
+- **Radix UI**: Accessible, unstyled component primitives.
+- **Shadcn/ui**: Pre-built component library.
+- **Font Awesome**: Icon system.

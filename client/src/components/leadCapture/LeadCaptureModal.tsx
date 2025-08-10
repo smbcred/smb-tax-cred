@@ -216,19 +216,19 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                   </div>
                   
                   <h2 className="text-xl font-semibold mb-3">
-                    Your ${formatCurrency(federalCredit).replace('$', '')} Credit is Ready!
+                    Great news! Your AI work may qualify for credits
                   </h2>
                   
                   {/* Prominent Credit Amount Display */}
                   <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-3">
-                    <p className="text-sm text-blue-100 mb-1">Your Federal R&D Tax Credit</p>
+                    <p className="text-sm text-blue-100 mb-1">Potential Federal R&D Tax Credit</p>
                     <p className="text-4xl font-bold">
                       ${formatCurrency(federalCredit).replace('$', '')}
                     </p>
                   </div>
                   
                   <p className="text-sm text-blue-100">
-                    Get your complete documentation package for tax filing
+                    Let's get your documentation package started
                   </p>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-emerald-800">
-                    <strong>Success Story:</strong> A marketing agency like yours discovered $15,000 in credits from their custom GPT development work - get your full breakdown now!
+                    <strong>Quick Example:</strong> Sarah's marketing agency spent 200 hours perfecting ChatGPT prompts for client proposals. That work alone qualified for $12,000 in potential credits.
                   </p>
                 </div>
               </div>

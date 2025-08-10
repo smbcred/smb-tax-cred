@@ -9,7 +9,7 @@ export const benefitsContent = [
   {
     iconName: "FaCode",
     title: "No Coding Required",
-    description: "If you're experimenting with prompts, custom GPTs, or AI workflows, you qualify. No technical degree needed. We built this for business owners, not programmers.",
+    description: "Using ChatGPT to write better emails? Building custom GPTs? That counts! You don't need to be technical—if you're figuring out how AI helps your business, you may qualify.",
     highlight: "Built for AI users"
   },
   {
@@ -21,7 +21,7 @@ export const benefitsContent = [
   {
     iconName: "FaClock",
     title: "15-Minute Process",
-    description: "Answer simple questions about your AI projects. No tax forms to understand. Get your complete documentation package in 48 hours.",
+    description: "Answer simple questions—like 'How many hours did you spend testing prompts?' No confusing tax jargon. Your complete documentation arrives in 48 hours.",
     highlight: "Quick & easy"
   },
   {
@@ -32,8 +32,8 @@ export const benefitsContent = [
   },
   {
     iconName: "FaRobot",
-    title: "Built for AI Users",
-    description: "Designed specifically for businesses using ChatGPT, Claude, and AI tools. Real examples from marketing agencies, e-commerce, consultants, and more.",
+    title: "Made for Your AI Work",
+    description: "We get it—you're not building AI, you're using it to grow your business. From ChatGPT prompts to custom automations, we know what counts.",
     highlight: "AI-focused"
   },
   {
