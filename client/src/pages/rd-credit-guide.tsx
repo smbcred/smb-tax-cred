@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
 import { Calculator, FileText, CheckCircle2, AlertCircle, TrendingUp, Building2, Code2, FlaskConical, Users, Lightbulb, ArrowRight } from "lucide-react";
+import ResponsiveNav from "@/components/navigation/ResponsiveNav";
+import { Footer } from "@/components/layout/Footer";
 
 export default function RDCreditGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-cloud-50 to-white">
+      {/* Global Navigation */}
+      <ResponsiveNav />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-ink-900 to-ink-800 text-white py-16">
         <div className="container mx-auto px-4">
@@ -356,6 +360,9 @@ export default function RDCreditGuide() {
           </div>
         </div>
       </section>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }

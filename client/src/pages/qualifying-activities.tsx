@@ -21,6 +21,8 @@ import {
   Wrench,
   AlertCircle 
 } from "lucide-react";
+import ResponsiveNav from "@/components/navigation/ResponsiveNav";
+import { Footer } from "@/components/layout/Footer";
 
 const industryActivities = {
   software: {
@@ -128,6 +130,8 @@ const industryActivities = {
 export default function QualifyingActivities() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-cloud-50 to-white">
+      {/* Global Navigation */}
+      <ResponsiveNav />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-ink-900 to-ink-800 text-white py-16">
         <div className="container mx-auto px-4">
@@ -435,6 +439,9 @@ export default function QualifyingActivities() {
           </div>
         </div>
       </section>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }

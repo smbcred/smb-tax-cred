@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 import { Calendar, Clock, ArrowRight, Search, TrendingUp, DollarSign, FileText, Users, Lightbulb, Shield } from "lucide-react";
 import { useState } from "react";
+import ResponsiveNav from "@/components/navigation/ResponsiveNav";
+import { Footer } from "@/components/layout/Footer";
 
 const blogPosts = [
   {
@@ -124,6 +126,8 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cloud-50 to-white">
+      {/* Global Navigation */}
+      <ResponsiveNav />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-ink-900 to-ink-800 text-white py-16">
         <div className="container mx-auto px-4">
@@ -331,6 +335,9 @@ export default function Blog() {
           </div>
         </div>
       </section>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }
