@@ -726,6 +726,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document management endpoints
+  app.get("/api/intake-forms/:id/documents", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      const documents = await storage.getDocumentsByIntakeForm(formId);
+      
+      res.json({ 
+        success: true,
+        documents
+      });
+    } catch (error: any) {
+      console.error("Documents retrieval error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to retrieve documents"
+      });
+    }
+  });
+
+  app.post("/api/intake-forms/:id/documents", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      const { documentType, documentName, s3Url, expirationDate } = req.body;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      const document = await storage.createDocument({
+        intakeFormId: formId,
+        companyId: form.companyId,
+        userId: req.user.id,
+        documentType,
+        documentName,
+        s3Url,
+        status: s3Url ? 'available' : 'pending',
+        expirationDate: expirationDate ? new Date(expirationDate) : undefined
+      });
+      
+      res.json({ 
+        success: true,
+        message: "Document created successfully",
+        document
+      });
+    } catch (error: any) {
+      console.error("Document creation error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to create document"
+      });
+    }
+  });
+
+  app.patch("/api/documents/:id/url", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: documentId } = req.params;
+      const { s3Url, expirationDate } = req.body;
+      
+      // Get document to verify ownership
+      const document = await storage.getDocument(documentId);
+      if (!document || document.userId !== req.user.id) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      const updatedDocument = await storage.updateDocumentUrl(
+        documentId, 
+        s3Url, 
+        expirationDate ? new Date(expirationDate) : undefined
+      );
+      
+      // Sync document URLs to Airtable
+      try {
+        await storage.syncDocumentUrls(document.intakeFormId);
+      } catch (syncError: any) {
+        console.warn("Failed to sync document URLs to Airtable:", syncError.message);
+      }
+      
+      res.json({ 
+        success: true,
+        message: "Document URL updated successfully",
+        document: updatedDocument
+      });
+    } catch (error: any) {
+      console.error("Document URL update error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to update document URL"
+      });
+    }
+  });
+
+  app.patch("/api/documents/:id/status", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: documentId } = req.params;
+      const { status, error } = req.body;
+      
+      // Get document to verify ownership
+      const document = await storage.getDocument(documentId);
+      if (!document || document.userId !== req.user.id) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      const updatedDocument = await storage.updateDocumentStatus(documentId, status, error);
+      
+      // Update Airtable document status if form is synced
+      const form = await storage.getIntakeForm(document.intakeFormId);
+      if (form?.airtableRecordId) {
+        try {
+          const { getAirtableService } = await import("./services/airtable");
+          const airtableService = getAirtableService();
+          await airtableService.updateDocumentStatus(form.airtableRecordId, status, document.documentType);
+        } catch (syncError: any) {
+          console.warn("Failed to sync document status to Airtable:", syncError.message);
+        }
+      }
+      
+      res.json({ 
+        success: true,
+        message: "Document status updated successfully",
+        document: updatedDocument
+      });
+    } catch (error: any) {
+      console.error("Document status update error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to update document status"
+      });
+    }
+  });
+
+  app.get("/api/documents/expired", authenticateToken, async (req: any, res) => {
+    try {
+      // Only allow admin users to check expired documents (for now, any authenticated user)
+      const expiredDocuments = await storage.checkExpiredDocuments();
+      
+      res.json({ 
+        success: true,
+        expiredDocuments,
+        count: expiredDocuments.length
+      });
+    } catch (error: any) {
+      console.error("Expired documents check error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to check expired documents"
+      });
+    }
+  });
+
+  app.post("/api/documents/:id/access", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: documentId } = req.params;
+      
+      // Get document to verify ownership
+      const document = await storage.getDocument(documentId);
+      if (!document || document.userId !== req.user.id) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Check if document is expired
+      if (document.accessExpiresAt && new Date() > document.accessExpiresAt) {
+        return res.status(410).json({ message: "Document access has expired" });
+      }
+      
+      const updatedDocument = await storage.updateDocumentAccess(documentId);
+      
+      res.json({ 
+        success: true,
+        message: "Document access recorded",
+        document: updatedDocument
+      });
+    } catch (error: any) {
+      console.error("Document access error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to record document access"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

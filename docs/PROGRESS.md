@@ -853,5 +853,55 @@ _Changelog-style documentation of development progress and verification results_
 - ✅ Sync status UI components provide visual feedback with retry capabilities
 - ✅ Error handling ensures graceful failure recovery without breaking form submission
 
+## 2025-08-10: Task 2.3.3 Document URL Management ✅ COMPLETED
+
+### Implementation Summary
+- **Status**: COMPLETE - Comprehensive document URL management with tracking, expiration, status synchronization, polling mechanism, error recovery, and notification triggers
+- **Key Features**: Document CRUD operations, URL updates with S3 integration, expiration tracking, Airtable synchronization, status management, access tracking
+
+### Technical Implementation Details
+- ✅ **URL field updates** - Document URL management with S3 integration and automatic Airtable synchronization
+- ✅ **Expiration tracking** - Access expiration timestamps with automatic cleanup and validation
+- ✅ **Status synchronization** - Real-time status sync between database and Airtable for document generation workflow
+- ✅ **Polling mechanism** - Expired documents endpoint for cleanup tasks and automated maintenance
+- ✅ **Error recovery** - Comprehensive error handling with status updates and graceful failure recovery
+- ✅ **Notification triggers** - Airtable status updates trigger downstream automation workflows
+
+### Document Management Architecture
+- **Document CRUD**: Complete create, read, update operations with ownership verification and authentication
+- **URL Management**: S3 URL updates with expiration tracking and automatic status changes
+- **Status Tracking**: Document generation status with database and Airtable synchronization
+- **Access Control**: Download count tracking, access timestamps, and expiration validation
+- **Airtable Integration**: Document URL and status synchronization with customer records
+- **UI Components**: Comprehensive document status visualization with progress tracking and actions
+
+### API Endpoints Added
+- `GET /api/intake-forms/:id/documents` - Retrieve documents for intake form with authentication
+- `POST /api/intake-forms/:id/documents` - Create new document with metadata and status tracking
+- `PATCH /api/documents/:id/url` - Update document URL with S3 integration and Airtable sync
+- `PATCH /api/documents/:id/status` - Update document status with Airtable synchronization
+- `GET /api/documents/expired` - Retrieve expired documents for cleanup operations
+- `POST /api/documents/:id/access` - Track document access with download count and timestamps
+
+### Files Created/Modified
+- `server/routes.ts` - Added document management endpoints with authentication and validation
+- `server/services/airtable.ts` - Enhanced with document URL/status tracking and notification methods
+- `server/storage.ts` - Added comprehensive document management operations and Airtable sync
+- `shared/schema.ts` - Added generationError field for document error tracking
+- `client/src/components/ui/document-status.tsx` - Comprehensive document status UI components
+- `docs/acceptance/2.3.3.md` - Completed acceptance criteria documentation
+- `docs/TASKS_for_v2.md` - Marked task as complete
+
+### Manual QA Results
+- ✅ URL field updates correctly sync document URLs to Airtable customer records
+- ✅ Expiration tracking with proper timestamp validation and cleanup functionality
+- ✅ Status synchronization maintains consistency between database and Airtable
+- ✅ Polling mechanism enables automated document maintenance and cleanup
+- ✅ Error recovery ensures graceful handling of document generation failures
+- ✅ Notification triggers provide real-time status updates for downstream automation
+- ✅ Document creation, updates, and access tracking work seamlessly with authentication
+- ✅ UI components provide comprehensive document status visualization and management
+- ✅ Airtable integration maintains document URLs and statuses in customer records
+
 ---
-_Last updated: 2025-08-10 22:53_
+_Last updated: 2025-08-10 22:58_

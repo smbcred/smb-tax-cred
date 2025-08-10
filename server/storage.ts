@@ -289,40 +289,7 @@ export class DatabaseStorage implements IStorage {
     return intakeForm;
   }
 
-  // Document operations
-  async getDocument(id: string): Promise<Document | undefined> {
-    const [document] = await db.select().from(documents).where(eq(documents.id, id));
-    return document;
-  }
 
-  async getDocumentsByIntakeFormId(intakeFormId: string): Promise<Document[]> {
-    return db.select().from(documents).where(eq(documents.intakeFormId, intakeFormId));
-  }
-
-  async getDocumentsByUserId(userId: string): Promise<Document[]> {
-    // Join documents with intake forms to get user documents
-    const result = await db
-      .select()
-      .from(documents)
-      .innerJoin(intakeForms, eq(documents.intakeFormId, intakeForms.id))
-      .where(eq(intakeForms.userId, userId));
-    
-    return result.map(row => row.documents);
-  }
-
-  async createDocument(insertDocument: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document> {
-    const [document] = await db.insert(documents).values(insertDocument).returning();
-    return document;
-  }
-
-  async updateDocument(id: string, updates: Partial<Document>): Promise<Document> {
-    const [document] = await db
-      .update(documents)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(documents.id, id))
-      .returning();
-    return document;
-  }
 
   // Lead operations
   async getLead(id: string): Promise<Lead | undefined> {
@@ -397,6 +364,146 @@ export class DatabaseStorage implements IStorage {
     }
 
     await this.updateIntakeForm(intakeFormId, updates);
+  }
+
+  // Document URL and status management
+  async createDocument(documentData: {
+    intakeFormId: string;
+    companyId: string;
+    userId: string;
+    documentType: string;
+    documentName: string;
+    s3Url?: string;
+    status?: string;
+    expirationDate?: Date;
+  }): Promise<Document> {
+    const document = await db.insert(documents).values({
+      id: generateId(),
+      ...documentData,
+      status: documentData.status || 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning().then(rows => rows[0]);
+
+    return document;
+  }
+
+  async updateDocumentUrl(documentId: string, s3Url: string, expirationDate?: Date): Promise<Document> {
+    const updateData: any = {
+      s3Url,
+      status: 'available',
+      updatedAt: new Date(),
+    };
+
+    if (expirationDate) {
+      updateData.accessExpiresAt = expirationDate;
+      updateData.expirationDate = expirationDate; // Compatibility field
+    }
+
+    const document = await db.update(documents)
+      .set(updateData)
+      .where(eq(documents.id, documentId))
+      .returning()
+      .then(rows => rows[0]);
+
+    if (!document) {
+      throw new Error(`Document not found: ${documentId}`);
+    }
+
+    return document;
+  }
+
+  async updateDocumentStatus(documentId: string, status: string, error?: string): Promise<Document> {
+    const updateData: any = {
+      status,
+      updatedAt: new Date(),
+    };
+
+    if (error) {
+      updateData.generationError = error;
+    }
+
+    const document = await db.update(documents)
+      .set(updateData)
+      .where(eq(documents.id, documentId))
+      .returning()
+      .then(rows => rows[0]);
+
+    if (!document) {
+      throw new Error(`Document not found: ${documentId}`);
+    }
+
+    return document;
+  }
+
+  async getDocumentsByIntakeForm(intakeFormId: string): Promise<Document[]> {
+    return db.select()
+      .from(documents)
+      .where(eq(documents.intakeFormId, intakeFormId))
+      .orderBy(desc(documents.createdAt));
+  }
+
+  async getDocument(documentId: string): Promise<Document | null> {
+    const result = await db.select()
+      .from(documents)
+      .where(eq(documents.id, documentId))
+      .limit(1);
+    
+    return result[0] || null;
+  }
+
+  async checkExpiredDocuments(): Promise<Document[]> {
+    return db.select()
+      .from(documents)
+      .where(
+        and(
+          isNotNull(documents.accessExpiresAt),
+          lt(documents.accessExpiresAt, new Date()),
+          eq(documents.status, 'available')
+        )
+      );
+  }
+
+  async updateDocumentAccess(documentId: string): Promise<Document> {
+    const document = await db.update(documents)
+      .set({
+        downloadCount: sql`${documents.downloadCount} + 1`,
+        lastAccessedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(documents.id, documentId))
+      .returning()
+      .then(rows => rows[0]);
+
+    if (!document) {
+      throw new Error(`Document not found: ${documentId}`);
+    }
+
+    return document;
+  }
+
+  // Sync document URLs to Airtable
+  async syncDocumentUrls(intakeFormId: string): Promise<void> {
+    const form = await this.getIntakeForm(intakeFormId);
+    if (!form || !form.airtableRecordId) {
+      throw new Error(`Intake form not found or not synced to Airtable: ${intakeFormId}`);
+    }
+
+    const docs = await this.getDocumentsByIntakeForm(intakeFormId);
+    const documentUrls: Record<string, string> = {};
+
+    // Map document types to URLs
+    docs.forEach(doc => {
+      if (doc.s3Url && doc.status === 'available') {
+        documentUrls[doc.documentType] = doc.s3Url;
+      }
+    });
+
+    if (Object.keys(documentUrls).length > 0) {
+      const { getAirtableService } = await import("./services/airtable");
+      const airtableService = getAirtableService();
+      await airtableService.updateDocumentUrls(form.airtableRecordId, documentUrls);
+    }
   }
 }
 

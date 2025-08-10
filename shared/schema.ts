@@ -265,6 +265,7 @@ export const documents = pgTable("documents", {
   generatedBy: varchar("generated_by", { length: 50 }), // 'claude', 'documint', 'manual'
   generationTimeMs: integer("generation_time_ms"),
   generationCostCents: integer("generation_cost_cents"),
+  generationError: text("generation_error"),
   
   // Compatibility fields
   fileName: varchar("file_name"),

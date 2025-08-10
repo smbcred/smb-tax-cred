@@ -161,27 +161,7 @@ export class AirtableService {
     }
   }
 
-  // Add document URLs to a customer record
-  async updateDocumentUrls(recordId: string, documentUrls: string[]): Promise<void> {
-    this.ensureConfigured();
 
-    try {
-      await this.base(this.tableName).update([
-        {
-          id: recordId,
-          fields: {
-            'Document URLs': documentUrls.join(', '),
-            'Processing Status': 'documents_ready',
-          }
-        }
-      ], { typecast: true });
-
-      console.log(`Updated document URLs for Airtable record: ${recordId}`);
-    } catch (error: any) {
-      console.error('Failed to update document URLs:', error);
-      throw new Error(`Airtable document URL update failed: ${error.message}`);
-    }
-  }
 
   // Get a customer record by ID
   async getCustomerRecord(recordId: string): Promise<AirtableRecord | null> {
@@ -316,6 +296,95 @@ export class AirtableService {
     } catch (error: any) {
       console.error('Failed to sync with calculation results:', error);
       throw new Error(`Calculation results sync failed: ${error.message}`);
+    }
+  }
+
+  // Update document URLs in Airtable record
+  async updateDocumentUrls(recordId: string, documentUrls: Record<string, string>): Promise<void> {
+    this.ensureConfigured();
+
+    try {
+      const updateFields: Record<string, any> = {
+        'Updated At': new Date().toISOString(),
+      };
+
+      // Map document types to Airtable fields
+      if (documentUrls.compliance_memo) {
+        updateFields['Compliance Memo URL'] = documentUrls.compliance_memo;
+      }
+      if (documentUrls.supporting_docs) {
+        updateFields['Supporting Documents URL'] = documentUrls.supporting_docs;
+      }
+      if (documentUrls.calculation_summary) {
+        updateFields['Calculation Summary URL'] = documentUrls.calculation_summary;
+      }
+      if (documentUrls.tax_forms) {
+        updateFields['Tax Forms URL'] = documentUrls.tax_forms;
+      }
+
+      await this.base(this.tableName).update([
+        {
+          id: recordId,
+          fields: updateFields
+        }
+      ], { typecast: true });
+
+      console.log(`Updated document URLs for Airtable record: ${recordId}`);
+    } catch (error: any) {
+      console.error('Failed to update document URLs:', error);
+      throw new Error(`Document URL update failed: ${error.message}`);
+    }
+  }
+
+  // Update document generation status
+  async updateDocumentStatus(recordId: string, status: string, documentType?: string): Promise<void> {
+    this.ensureConfigured();
+
+    try {
+      const updateFields: Record<string, any> = {
+        'Document Generation Status': status,
+        'Updated At': new Date().toISOString(),
+      };
+
+      if (documentType) {
+        updateFields['Current Document Type'] = documentType;
+      }
+
+      await this.base(this.tableName).update([
+        {
+          id: recordId,
+          fields: updateFields
+        }
+      ], { typecast: true });
+
+      console.log(`Updated document status to "${status}" for record: ${recordId}`);
+    } catch (error: any) {
+      console.error('Failed to update document status:', error);
+      throw new Error(`Document status update failed: ${error.message}`);
+    }
+  }
+
+  // Track document expiration
+  async updateDocumentExpiration(recordId: string, documentType: string, expirationDate: Date): Promise<void> {
+    this.ensureConfigured();
+
+    try {
+      const updateFields: Record<string, any> = {
+        [`${documentType} Expiration`]: expirationDate.toISOString(),
+        'Updated At': new Date().toISOString(),
+      };
+
+      await this.base(this.tableName).update([
+        {
+          id: recordId,
+          fields: updateFields
+        }
+      ], { typecast: true });
+
+      console.log(`Updated document expiration for ${documentType} in record: ${recordId}`);
+    } catch (error: any) {
+      console.error('Failed to update document expiration:', error);
+      throw new Error(`Document expiration update failed: ${error.message}`);
     }
   }
 
