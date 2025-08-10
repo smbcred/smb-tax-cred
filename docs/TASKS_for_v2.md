@@ -22,7 +22,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 1.5.2 | Create Checkout API | [x] | [📋](./acceptance/1.5.2.md) |
 | 1.5.3 | Payment Success Flow | [x] | [📋](./acceptance/1.5.3.md) |
 | 1.6.1 | Implement JWT Authentication | [x] | [📋](./acceptance/1.6.1.md) |
-| 1.6.2 | Create Login/Register Pages | [ ] | [📋](./acceptance/1.6.2.md) |
+| 1.6.2 | Create Login/Register Pages | [x] | [📋](./acceptance/1.6.2.md) |
 | 1.6.3 | Protected Route Implementation | [ ] | [📋](./acceptance/1.6.3.md) |
 | 1.7.1 | Dashboard Layout | [ ] | [📋](./acceptance/1.7.1.md) |
 | 1.7.2 | Progress Tracking Component | [ ] | [📋](./acceptance/1.7.2.md) |

@@ -120,8 +120,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes with rate limiting
   app.post("/api/auth/register", authRateLimit, async (req, res) => {
     try {
-      const userData = insertUserSchema.parse(req.body);
-      const { email, password } = userData;
+      const { email, password } = req.body;
+      
+      // Basic validation
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);

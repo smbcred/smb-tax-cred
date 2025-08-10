@@ -23,11 +23,21 @@ import {
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 
+// Type for user creation with just essential fields
+type CreateUserData = {
+  email: string;
+  passwordHash: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  stripeCustomerId?: string;
+};
+
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: CreateUserData): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User>;
 
   // Company operations
@@ -78,8 +88,15 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+  async createUser(userData: CreateUserData): Promise<User> {
+    const [user] = await db.insert(users).values({
+      ...userData,
+      status: "active",
+      accountStatus: "active",
+      createdFromLead: false,
+      emailVerified: false,
+      loginCount: 0,
+    }).returning();
     return user;
   }
 

@@ -22,6 +22,8 @@ import MarketingAgencies from "@/pages/industries/marketing";
 import Ecommerce from "@/pages/industries/ecommerce";
 import ProfessionalServices from "@/pages/industries/services";
 import Healthcare from "@/pages/industries/healthcare";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -40,6 +42,8 @@ function Router() {
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Landing} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
           <Route path="/checkout" component={Checkout} />
           <Route path="/checkout/success" component={CheckoutSuccess} />
           <Route path="/checkout/cancel" component={CheckoutCancel} />

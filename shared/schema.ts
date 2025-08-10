@@ -314,7 +314,6 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  passwordHash: true,
   password: true,
   status: true,
   loginCount: true,
