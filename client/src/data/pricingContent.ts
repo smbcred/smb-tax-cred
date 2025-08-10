@@ -120,8 +120,8 @@ export const pricingContent = {
     title: "Save Thousands vs Traditional Consultants",
     competitor: "Consultants charge 20% on $30K credit",
     competitorPrice: "$6,000",
-    ourPrice: "$750",
-    savings: "You save $5,250"
+    ourPrice: "$1,200",
+    savings: "You save $4,800"
   },
 
   guarantee: "If your final credit is lower than estimated, we automatically refund the difference in pricing tiers."
