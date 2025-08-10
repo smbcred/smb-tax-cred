@@ -78,7 +78,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <i className="fas fa-calculator text-white text-lg"></i>
                   </div>
                   <span className="ml-3 text-xl font-semibold text-slate-900">
-                    R&D Tax Credit Pro
+                    SMBTaxCredits.com
                   </span>
                 </div>
               </Link>
@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-calculator text-white"></i>
                 </div>
-                <span className="ml-2 font-semibold text-slate-900">R&D Tax Credit Pro</span>
+                <span className="ml-2 font-semibold text-slate-900">SMBTaxCredits.com</span>
               </div>
               <p className="text-sm text-slate-600 mb-4">
                 Professional R&D tax credit documentation service for small businesses.
@@ -212,7 +212,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
           <div className="border-t border-slate-200 mt-8 pt-8 text-center">
             <p className="text-sm text-slate-500">
-              © 2024 R&D Tax Credit Pro. All rights reserved.
+              © 2024 SMBTaxCredits.com. All rights reserved.
             </p>
           </div>
         </div>

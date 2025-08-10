@@ -1,4 +1,4 @@
-# R&D Tax Credit SAAS - Replit Development Guide
+# SMBTaxCredits.com - Replit Development Guide
 
 ## Overview
 
@@ -11,6 +11,13 @@ The application follows a structured user journey from discovery through deliver
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+
+### Site Rebranding (January 10, 2025)
+- **RENAMED SITE**: Changed from "R&D Tax Credit Pro" to "SMBTaxCredits.com" throughout the application
+- **UPDATED BRANDING**: Changed all references in navigation, footer, dashboard, and metadata
+- **EMAIL UPDATE**: Changed support email from support@rdtaxcreditpro.com to support@smbtaxcredits.com
+- **URL UPDATE**: Updated Open Graph URLs to https://smbtaxcredits.com
+- **CONSISTENCY**: Ensured consistent branding across all pages and components
 
 ### Comprehensive Design System Overhaul (January 9, 2025)
 - **DESIGN TOKENS**: Created centralized design system with brand colors from visual identity guide

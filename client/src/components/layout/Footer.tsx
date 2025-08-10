@@ -35,7 +35,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <h3 className="text-xl font-bold text-paper mb-4">R&D Tax Credit Pro</h3>
+            <h3 className="text-xl font-bold text-paper mb-4">SMBTaxCredits.com</h3>
             <p className="text-sm text-cloud/80 mb-4">
               Simple, affordable R&D tax credit documentation for SMBs using AI and innovation.
             </p>
@@ -113,12 +113,12 @@ export const Footer = () => {
         <div className="mt-12 pt-8 border-t border-cloud/10">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-cloud/60">
-              © 2025 R&D Tax Credit Pro. All rights reserved.
+              © 2025 SMBTaxCredits.com. All rights reserved.
             </p>
             <div className="flex items-center space-x-6 text-sm text-cloud/60">
-              <a href="mailto:support@rdtaxcreditpro.com" className="flex items-center hover:text-paper transition-colors">
+              <a href="mailto:support@smbtaxcredits.com" className="flex items-center hover:text-paper transition-colors">
                 <FaEnvelope className="w-4 h-4 mr-2" />
-                support@rdtaxcreditpro.com
+                support@smbtaxcredits.com
               </a>
               <a href="tel:1-800-RD-CREDIT" className="flex items-center hover:text-paper transition-colors">
                 <FaPhone className="w-4 h-4 mr-2" />
