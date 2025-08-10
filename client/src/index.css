@@ -1,13 +1,8 @@
-/* Add these at the very top of index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Import the global styles */
+/* All @import statements must come first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import './styles/global-styles.css';
 
-/* Your existing styles below */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Tailwind directives come after imports */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
