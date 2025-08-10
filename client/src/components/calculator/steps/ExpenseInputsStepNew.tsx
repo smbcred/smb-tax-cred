@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { AIExpenseOptimizer } from '../AIExpenseOptimizer';
 
 interface ExpenseInputsStepProps {
   expenses: {
@@ -233,6 +234,37 @@ export const ExpenseInputsStepNew: React.FC<ExpenseInputsStepProps> = ({
             </div>
           </div>
         </div>
+
+        {/* AI Expense Optimization Tooltip */}
+        <AIExpenseOptimizer
+          expenses={{
+            totalEmployees: expenses.totalEmployees,
+            technicalEmployees: expenses.technicalEmployees,
+            averageTechnicalSalary: expenses.averageTechnicalSalary,
+            contractorCosts: expenses.contractorCosts,
+            softwareCosts: expenses.softwareCosts,
+            cloudCosts: expenses.cloudCosts,
+            rdAllocationPercentage: expenses.rdAllocationPercentage ?? 100
+          }}
+          businessType={businessType || 'technology'}
+          onSuggestionApply={(suggestion) => {
+            // Handle suggestion application
+            switch (suggestion.type) {
+              case 'allocation':
+                if (suggestion.id === 'increase-rd-allocation') {
+                  onUpdate({ rdAllocationPercentage: 85 });
+                }
+                break;
+              case 'software':
+                // You could open a modal or provide guidance
+                console.log('Software suggestion:', suggestion);
+                break;
+              default:
+                console.log('Applied suggestion:', suggestion);
+            }
+          }}
+          className="mb-4"
+        />
 
         {/* Live Estimate */}
         {expenses.technicalEmployees > 0 && expenses.averageTechnicalSalary > 0 && (
