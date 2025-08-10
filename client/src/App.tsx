@@ -14,6 +14,10 @@ import SampleDocuments from "@/pages/sample-documents";
 import RDCreditGuide from "@/pages/rd-credit-guide";
 import QualifyingActivities from "@/pages/qualifying-activities";
 import Blog from "@/pages/blog";
+import MarketingAgencies from "@/pages/industries/marketing";
+import Ecommerce from "@/pages/industries/ecommerce";
+import ProfessionalServices from "@/pages/industries/services";
+import Healthcare from "@/pages/industries/healthcare";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -40,6 +44,10 @@ function Router() {
           <Route path="/rd-credit-guide" component={RDCreditGuide} />
           <Route path="/qualifying-activities" component={QualifyingActivities} />
           <Route path="/blog" component={Blog} />
+          <Route path="/industries/marketing" component={MarketingAgencies} />
+          <Route path="/industries/ecommerce" component={Ecommerce} />
+          <Route path="/industries/services" component={ProfessionalServices} />
+          <Route path="/industries/healthcare" component={Healthcare} />
         </>
       ) : (
         <>
@@ -53,6 +61,10 @@ function Router() {
           <Route path="/rd-credit-guide" component={RDCreditGuide} />
           <Route path="/qualifying-activities" component={QualifyingActivities} />
           <Route path="/blog" component={Blog} />
+          <Route path="/industries/marketing" component={MarketingAgencies} />
+          <Route path="/industries/ecommerce" component={Ecommerce} />
+          <Route path="/industries/services" component={ProfessionalServices} />
+          <Route path="/industries/healthcare" component={Healthcare} />
         </>
       )}
       <Route component={NotFound} />
