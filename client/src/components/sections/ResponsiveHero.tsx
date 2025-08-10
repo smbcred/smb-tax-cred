@@ -8,9 +8,21 @@
 import { motion } from 'framer-motion';
 import { FaChevronRight, FaArrowRight } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
+import { HeroContent } from '@/data/heroContent';
 
 interface ResponsiveHeroProps {
   onStartEstimate?: () => void;
+  content?: {
+    headline: string;
+    subheadline: string;
+    primaryCTA: string;
+    secondaryCTA: string;
+    trustSignals?: string[];
+    metrics?: {
+      businesses: string;
+      creditsProcessed: string;
+    };
+  };
 }
 
 const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
@@ -45,37 +57,25 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
             {/* Mobile-first headline sizing */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 
                          font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
-              Claim your federal R&D tax credit—
-              <span className="text-green-600 block mt-2">without the runaround.</span>
+              {HeroContent.headline}
             </h1>
             
             {/* Responsive subheadline */}
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 
                         max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Flat-fee, self-serve documentation for amended 2022–2024 and current 2025 
-              filings—IRS-aligned and CPA-ready.
+              {HeroContent.subheadline}
             </p>
 
             {/* Trust indicators for mobile */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-6 sm:mb-8">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>IRS Compliant</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>CPA-Ready</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Flat-Fee</span>
-              </div>
+              {HeroContent.trustSignals.map((signal, index) => (
+                <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>{signal}</span>
+                </div>
+              ))}
             </div>
             
             {/* Mobile-optimized CTA buttons */}
@@ -88,7 +88,7 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
                          focus:outline-none focus:ring-4 focus:ring-green-500/50
                          flex items-center justify-center gap-2 group"
               >
-                Start your free estimate
+                {HeroContent.primaryCTA}
                 <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               
@@ -98,7 +98,7 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
                           hover:bg-green-50 transition-all
                           text-center inline-flex items-center justify-center gap-2
                           border border-green-200 hover:border-green-300">
-                See how it works
+                {HeroContent.secondaryCTA}
                 <FaChevronRight className="w-4 h-4" />
               </a>
             </div>
@@ -106,13 +106,13 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
             {/* Social proof for mobile */}
             <div className="mt-8 flex items-center justify-center lg:justify-start gap-6">
               <div className="text-center lg:text-left">
-                <p className="text-2xl font-bold text-gray-900">1,000+</p>
-                <p className="text-sm text-gray-600">SMBs Served</p>
+                <p className="text-2xl font-bold text-gray-900">{HeroContent.metrics.businesses}</p>
+                <p className="text-sm text-gray-600">Businesses Served</p>
               </div>
               <div className="border-l border-gray-300 h-12"></div>
               <div className="text-center lg:text-left">
-                <p className="text-2xl font-bold text-gray-900">$10M+</p>
-                <p className="text-sm text-gray-600">Credits Claimed</p>
+                <p className="text-2xl font-bold text-gray-900">{HeroContent.metrics.creditsProcessed}</p>
+                <p className="text-sm text-gray-600">Credits Processed</p>
               </div>
             </div>
           </motion.div>

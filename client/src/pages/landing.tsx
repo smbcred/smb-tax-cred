@@ -151,10 +151,10 @@ export default function LandingPage() {
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Why SMBs Choose SMBTaxCredits.com
+              Why businesses using AI choose us
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Same IRS-compliant documentation, 10x less cost than traditional consultants
+              We understand AI experimentation—from ChatGPT prompts to custom automations
             </p>
           </motion.div>
 
@@ -173,10 +173,10 @@ export default function LandingPage() {
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Your R&D Credit in 3 Simple Steps
+              How we turn your AI work into tax savings
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Our streamlined process gets you from estimate to filing in record time
+              A simple 3-step process that starts with your AI story
             </p>
           </motion.div>
 
@@ -195,10 +195,10 @@ export default function LandingPage() {
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Estimate Your R&D Tax Credit
+              Calculate what your AI experiments may be worth
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600">
-              Use our calculator to see your potential savings in under 2 minutes
+              Quick calculator for businesses using ChatGPT, Claude, and other AI tools
             </p>
           </motion.div>
 
