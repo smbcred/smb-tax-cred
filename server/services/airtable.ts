@@ -229,6 +229,96 @@ export class AirtableService {
     }
   }
 
+  // Trigger webhook for Make.com automation
+  async triggerWebhook(intakeForm: IntakeForm, webhookUrl?: string): Promise<boolean> {
+    const url = webhookUrl || process.env.MAKE_WEBHOOK_URL;
+    
+    if (!url) {
+      console.warn('No webhook URL configured - skipping webhook trigger');
+      return false;
+    }
+
+    try {
+      const payload = {
+        formId: intakeForm.id,
+        companyId: intakeForm.companyId,
+        userId: intakeForm.userId,
+        airtableRecordId: intakeForm.airtableRecordId,
+        status: intakeForm.status,
+        totalQre: intakeForm.totalQre,
+        submittedAt: intakeForm.submittedAt,
+        taxYear: intakeForm.taxYear,
+        companyInfo: intakeForm.companyInfo,
+        calculationData: intakeForm.calculationData,
+        timestamp: new Date().toISOString(),
+        eventType: 'form_submitted'
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Event-Type': 'intake-form-submission',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
+      }
+
+      console.log(`Webhook triggered successfully for form: ${intakeForm.id}`);
+      return true;
+    } catch (error: any) {
+      console.error('Failed to trigger webhook:', error);
+      throw new Error(`Webhook trigger failed: ${error.message}`);
+    }
+  }
+
+  // Sync intake form with calculation results
+  async syncWithCalculationResults(intakeForm: IntakeForm, calculationResults?: any): Promise<string> {
+    this.ensureConfigured();
+
+    try {
+      let recordId = intakeForm.airtableRecordId;
+      
+      // Create new record if it doesn't exist
+      if (!recordId) {
+        recordId = await this.createCustomerRecord(intakeForm);
+      } else {
+        // Update existing record
+        await this.updateCustomerRecord(recordId, intakeForm);
+      }
+
+      // Update with calculation results if provided
+      if (calculationResults) {
+        await this.base(this.tableName).update([
+          {
+            id: recordId,
+            fields: {
+              'Total QRE': calculationResults.totalQre || 0,
+              'Estimated Credit': calculationResults.estimatedCredit || 0,
+              'Processing Status': 'calculation_complete',
+              'Updated At': new Date().toISOString(),
+            }
+          }
+        ], { typecast: true });
+      }
+
+      // Trigger webhook for automation
+      try {
+        await this.triggerWebhook(intakeForm);
+      } catch (webhookError: any) {
+        console.warn('Webhook trigger failed, but sync succeeded:', webhookError.message);
+      }
+
+      return recordId;
+    } catch (error: any) {
+      console.error('Failed to sync with calculation results:', error);
+      throw new Error(`Calculation results sync failed: ${error.message}`);
+    }
+  }
+
   // Test connection to Airtable
   async testConnection(): Promise<boolean> {
     this.ensureConfigured();

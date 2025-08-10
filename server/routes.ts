@@ -516,6 +516,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Submit the form
       const submittedForm = await storage.submitIntakeForm(formId, validatedData);
       
+      // Trigger Airtable sync in background
+      try {
+        await storage.syncToAirtable(formId);
+        console.log(`Airtable sync triggered for form: ${formId}`);
+      } catch (syncError: any) {
+        console.error(`Airtable sync failed for form ${formId}:`, syncError.message);
+        // Don't fail the submission if sync fails
+      }
+      
       res.json({ 
         success: true, 
         message: "Intake form submitted successfully",
@@ -609,6 +618,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ 
         message: error.message || "Failed to update section",
         errors: error.errors || null
+      });
+    }
+  });
+
+  // Manual sync to Airtable endpoint
+  app.post("/api/intake-forms/:id/sync", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      // Trigger Airtable sync
+      const recordId = await storage.syncToAirtable(formId);
+      
+      res.json({ 
+        success: true, 
+        message: "Airtable sync completed successfully",
+        recordId,
+        formId
+      });
+    } catch (error: any) {
+      console.error("Manual sync error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to sync to Airtable",
+        errors: error.errors || null
+      });
+    }
+  });
+
+  // Get sync status endpoint
+  app.get("/api/intake-forms/:id/sync-status", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      res.json({ 
+        success: true,
+        syncStatus: {
+          status: form.airtableSyncStatus || 'not_synced',
+          recordId: form.airtableRecordId || null,
+          syncedAt: form.airtableSyncedAt || null,
+          error: form.airtableSyncError || null
+        }
+      });
+    } catch (error: any) {
+      console.error("Sync status error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to get sync status"
+      });
+    }
+  });
+
+  // Update calculation results and sync to Airtable
+  app.post("/api/intake-forms/:id/calculation-results", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      const { totalQre, estimatedCredit, calculationData } = req.body;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      // Update form with calculation results
+      const updatedForm = await storage.updateIntakeForm(formId, {
+        totalQre: totalQre?.toString(),
+        calculationData: calculationData || null,
+        updatedAt: new Date()
+      });
+      
+      // Update Airtable record if it exists
+      if (form.airtableRecordId) {
+        try {
+          const { getAirtableService } = await import("./services/airtable");
+          const airtableService = getAirtableService();
+          await airtableService.updateCustomerRecord(form.airtableRecordId, updatedForm);
+          
+          await storage.updateAirtableSync(formId, form.airtableRecordId, 'synced');
+          console.log(`Updated Airtable record ${form.airtableRecordId} with calculation results`);
+        } catch (syncError: any) {
+          console.error("Failed to update Airtable with calculation results:", syncError.message);
+          await storage.updateAirtableSync(formId, form.airtableRecordId, 'failed');
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: "Calculation results updated successfully",
+        intakeForm: updatedForm
+      });
+    } catch (error: any) {
+      console.error("Calculation results update error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to update calculation results"
       });
     }
   });

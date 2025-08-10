@@ -211,6 +211,7 @@ export const intakeForms = pgTable("intake_forms", {
   totalContractors: decimal("total_contractors", { precision: 12, scale: 2 }),
   totalCloudSoftware: decimal("total_cloud_software", { precision: 12, scale: 2 }),
   totalQre: decimal("total_qre", { precision: 12, scale: 2 }),
+  calculationData: jsonb("calculation_data"),
   
   // Processing
   submittedAt: timestamp("submitted_at"),
@@ -218,6 +219,8 @@ export const intakeForms = pgTable("intake_forms", {
   completedAt: timestamp("completed_at"),
   airtableRecordId: varchar("airtable_record_id", { length: 255 }).unique(),
   airtableSyncStatus: varchar("airtable_sync_status", { length: 50 }).default("pending"),
+  airtableSyncedAt: timestamp("airtable_synced_at"),
+  airtableSyncError: text("airtable_sync_error"),
   makeWebhookSent: boolean("make_webhook_sent").default(false),
   makeRunId: varchar("make_run_id", { length: 255 }),
   

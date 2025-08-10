@@ -359,13 +359,17 @@ export class DatabaseStorage implements IStorage {
     try {
       const { getAirtableService } = await import("./services/airtable");
       const airtableService = getAirtableService();
-      const recordId = await airtableService.createCustomerRecord(form);
+      
+      // Use enhanced sync method with calculation results
+      const recordId = await airtableService.syncWithCalculationResults(form, form.calculationData);
       
       // Update the intake form with Airtable sync info
       await this.updateIntakeForm(intakeFormId, {
         airtableRecordId: recordId,
         airtableSyncStatus: 'synced',
         airtableSyncedAt: new Date(),
+        airtableSyncError: null,
+        makeWebhookSent: true,
       });
 
       return recordId;
