@@ -1103,5 +1103,55 @@ _Changelog-style documentation of development progress and verification results_
 - ✅ Authentication required for all endpoints with proper error responses
 - ✅ React integration provides user-friendly interface with toast notifications and error handling
 
+## 2025-08-10: Task 3.1.2 Narrative Prompt Templates ✅ COMPLETED
+
+### Implementation Summary
+- **Status**: COMPLETE - Dynamic prompt template engine for AI-powered R&D tax credit documentation generation
+- **Key Features**: Technical narrative templates, variable substitution, context injection, length control, tone consistency, compliance focus
+
+### Technical Implementation Details
+- ✅ **Technical narrative template** - Comprehensive IRS-compliant template for technical R&D documentation with Section 41 focus
+- ✅ **Variable substitution** - Dynamic template engine with company/project data injection using Handlebars-style syntax
+- ✅ **Context injection** - Business-specific context integration with company info, project details, and R&D activities
+- ✅ **Length control** - Configurable output length (brief/standard/detailed) with target word count calculation
+- ✅ **Tone consistency** - Professional, technical, and formal tone options with consistent voice across all narratives
+- ✅ **Compliance focus** - High-compliance templates with IRS Section 41 requirements and four-part test integration
+
+### Template Engine Architecture
+- **Four Pre-Built Templates**: Technical narrative, compliance memo, executive summary, and detailed project documentation
+- **Variable System**: Comprehensive variable extraction and substitution with validation and error handling
+- **Compliance Scoring**: Automated compliance score calculation based on keyword analysis and template compliance level
+- **Handlebars-Style Syntax**: {{variable}} substitution and {{#each array}} iteration support
+- **Template Validation**: Pre-generation validation with error and warning reporting
+- **Token Estimation**: Cost estimation and token usage prediction for Claude API calls
+
+### API Endpoints Added
+- `GET /api/narratives/templates` - Get all available narrative templates with metadata and compliance levels
+- `GET /api/narratives/templates/:templateId` - Get specific template details and configuration
+- `POST /api/narratives/generate` - Generate narrative using template with company/project context and options
+- `POST /api/narratives/validate` - Validate template variables and estimate token usage before generation
+
+### React Integration
+- `useNarrativeService` hook - Complete React integration with template management and generation
+- Template selection and validation with real-time error feedback
+- Cost estimation and token usage tracking with user-friendly formatting utilities
+- Sample request generation for testing and demonstration purposes
+
+### Files Created/Modified
+- `server/services/narrativePrompts.ts` - Comprehensive template engine with four pre-built compliance templates
+- `shared/schema.ts` - Added narrative template validation schemas with Zod
+- `server/routes.ts` - Narrative template and generation endpoints with authentication
+- `client/src/hooks/useNarrativeService.tsx` - React hook for narrative service integration
+
+### Manual QA Results
+- ✅ Technical narrative template creates comprehensive IRS-compliant documentation with Section 41 focus
+- ✅ Variable substitution properly replaces company and project data in templates with validation
+- ✅ Context injection integrates business-specific details with technical challenges and innovations
+- ✅ Length control generates appropriate word counts (500/1000/2000 words) based on selected options
+- ✅ Tone consistency maintains professional voice across all generated content types
+- ✅ Compliance focus ensures all templates meet high IRS compliance standards with keyword analysis
+- ✅ All endpoints require authentication and handle template validation with clear error messages
+- ✅ React integration provides user-friendly interface with cost estimation and template management
+
 ---
-_Last updated: 2025-08-10 23:16_
+_Last updated: 2025-08-10 23:22_

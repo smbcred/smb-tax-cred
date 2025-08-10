@@ -589,6 +589,89 @@ export type ClaudeRequest = z.infer<typeof claudeRequestSchema>;
 export type ClaudeResponse = z.infer<typeof claudeResponseSchema>;
 export type ClaudeError = z.infer<typeof claudeErrorSchema>;
 
+// Narrative prompt schemas
+export const companyContextSchema = z.object({
+  companyName: z.string().min(1, "Company name is required"),
+  industry: z.string().min(1, "Industry is required"),
+  employeeCount: z.number().min(1, "Employee count must be positive"),
+  yearFounded: z.number().min(1800).max(new Date().getFullYear()).optional(),
+  businessType: z.enum(['corporation', 'llc', 'partnership', 'sole_proprietorship']),
+  taxYear: z.number().min(2000).max(new Date().getFullYear() + 1),
+});
+
+export const rdActivitySchema = z.object({
+  activity: z.string().min(1, "Activity name is required"),
+  description: z.string().min(10, "Activity description must be at least 10 characters"),
+  timeSpent: z.number().min(0, "Time spent must be non-negative"),
+  category: z.enum(['experimentation', 'testing', 'analysis', 'development', 'evaluation']),
+});
+
+export const projectContextSchema = z.object({
+  projectName: z.string().min(1, "Project name is required"),
+  projectDescription: z.string().min(50, "Project description must be at least 50 characters"),
+  startDate: z.string().refine((date) => !isNaN(Date.parse(date)), "Invalid start date format"),
+  endDate: z.string().refine((date) => !isNaN(Date.parse(date)), "Invalid end date format"),
+  totalExpenses: z.number().min(0, "Total expenses must be non-negative"),
+  wageExpenses: z.number().min(0, "Wage expenses must be non-negative"),
+  contractorExpenses: z.number().min(0, "Contractor expenses must be non-negative"),
+  supplyExpenses: z.number().min(0, "Supply expenses must be non-negative"),
+  uncertainties: z.array(z.string().min(10, "Uncertainty description must be at least 10 characters")),
+  technicalChallenges: z.array(z.string().min(10, "Technical challenge description must be at least 10 characters")),
+  innovations: z.array(z.string().min(10, "Innovation description must be at least 10 characters")),
+  businessPurpose: z.string().min(20, "Business purpose must be at least 20 characters"),
+  rdActivities: z.array(rdActivitySchema),
+});
+
+export const narrativeOptionsSchema = z.object({
+  length: z.enum(['brief', 'standard', 'detailed']).default('standard'),
+  tone: z.enum(['professional', 'technical', 'formal']).default('professional'),
+  focus: z.enum(['compliance', 'technical', 'business']).default('compliance'),
+  includeMetrics: z.boolean().default(true),
+  includeTimeline: z.boolean().default(true),
+  emphasizeInnovation: z.boolean().default(true),
+});
+
+export const narrativeRequestSchema = z.object({
+  templateId: z.string().min(1, "Template ID is required"),
+  companyContext: companyContextSchema,
+  projectContext: projectContextSchema,
+  options: narrativeOptionsSchema.optional(),
+});
+
+export const narrativeTemplateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  systemPrompt: z.string(),
+  userPrompt: z.string(),
+  variables: z.array(z.string()),
+  maxTokens: z.number(),
+  temperature: z.number(),
+  complianceLevel: z.enum(['high', 'medium', 'low']),
+});
+
+export const generatedNarrativeSchema = z.object({
+  content: z.string(),
+  wordCount: z.number(),
+  tokensUsed: z.number(),
+  complianceScore: z.number(),
+  templateUsed: z.string(),
+  variables: z.record(z.any()),
+  metadata: z.object({
+    generatedAt: z.string(),
+    version: z.string(),
+    model: z.string(),
+  }),
+});
+
+export type CompanyContext = z.infer<typeof companyContextSchema>;
+export type ProjectContext = z.infer<typeof projectContextSchema>;
+export type NarrativeOptions = z.infer<typeof narrativeOptionsSchema>;
+export type NarrativeRequest = z.infer<typeof narrativeRequestSchema>;
+export type NarrativeTemplate = z.infer<typeof narrativeTemplateSchema>;
+export type GeneratedNarrative = z.infer<typeof generatedNarrativeSchema>;
+export type RdActivity = z.infer<typeof rdActivitySchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;

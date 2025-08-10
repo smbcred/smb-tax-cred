@@ -42,7 +42,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 2.4.2 | Workflow Trigger System | [x] | [📋](./acceptance/2.4.2.md) |
 | 2.4.3 | Status Polling Service | [x] | [📋](./acceptance/2.4.3.md) |
 | 3.1.1 | Claude Service Setup | [x] | [📋](./acceptance/3.1.1.md) |
-| 3.1.2 | Narrative Prompt Templates | [ ] | [📋](./acceptance/3.1.2.md) |
+| 3.1.2 | Narrative Prompt Templates | [x] | [📋](./acceptance/3.1.2.md) |
 | 3.1.3 | Compliance Memo Generation | [ ] | [📋](./acceptance/3.1.3.md) |
 | 3.2.1 | Document Orchestrator Service | [ ] | [📋](./acceptance/3.2.1.md) |
 | 3.2.2 | PDF Generation Integration | [ ] | [📋](./acceptance/3.2.2.md) |

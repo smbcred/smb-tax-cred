@@ -1655,6 +1655,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Narrative prompt endpoints
+  app.get("/api/narratives/templates", authenticateToken, async (req: any, res) => {
+    try {
+      const { getNarrativePromptService } = await import("./services/narrativePrompts");
+      const narrativeService = getNarrativePromptService();
+
+      const templates = narrativeService.getAllTemplates();
+
+      res.json({
+        success: true,
+        templates,
+      });
+
+    } catch (error: any) {
+      console.error("Get narrative templates error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get narrative templates"
+      });
+    }
+  });
+
+  app.get("/api/narratives/templates/:templateId", authenticateToken, async (req: any, res) => {
+    try {
+      const { templateId } = req.params;
+      const { getNarrativePromptService } = await import("./services/narrativePrompts");
+      const narrativeService = getNarrativePromptService();
+
+      const template = narrativeService.getTemplate(templateId);
+      
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          error: `Template not found: ${templateId}`
+        });
+      }
+
+      res.json({
+        success: true,
+        template,
+      });
+
+    } catch (error: any) {
+      console.error("Get narrative template error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get narrative template"
+      });
+    }
+  });
+
+  app.post("/api/narratives/generate", authenticateToken, async (req: any, res) => {
+    try {
+      const { narrativeRequestSchema } = await import("@shared/schema");
+      const validatedRequest = narrativeRequestSchema.parse(req.body);
+
+      const { getNarrativePromptService } = await import("./services/narrativePrompts");
+      const { getClaudeService } = await import("./services/claude");
+      
+      const narrativeService = getNarrativePromptService();
+      const claudeService = getClaudeService();
+
+      console.log('Narrative generation request:', {
+        userId: req.user.id,
+        templateId: validatedRequest.templateId,
+        companyName: validatedRequest.companyContext.companyName,
+        projectName: validatedRequest.projectContext.projectName,
+        options: validatedRequest.options,
+      });
+
+      // Validate template and variables
+      const template = narrativeService.getTemplate(validatedRequest.templateId);
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          error: `Template not found: ${validatedRequest.templateId}`
+        });
+      }
+
+      // Generate the prompt with variable substitution
+      const userPrompt = narrativeService.generateNarrative(
+        validatedRequest.templateId,
+        validatedRequest.companyContext,
+        validatedRequest.projectContext,
+        validatedRequest.options || {}
+      );
+
+      // Generate content using Claude
+      const claudeResponse = await claudeService.generateText({
+        prompt: userPrompt,
+        systemPrompt: template.systemPrompt,
+        maxTokens: template.maxTokens,
+        temperature: template.temperature,
+      });
+
+      // Calculate word count and compliance score
+      const wordCount = claudeResponse.content.trim().split(/\s+/).length;
+      const complianceScore = calculateComplianceScore(claudeResponse.content, template);
+
+      const generatedNarrative = {
+        content: claudeResponse.content,
+        wordCount,
+        tokensUsed: claudeResponse.tokensUsed.total,
+        complianceScore,
+        templateUsed: validatedRequest.templateId,
+        variables: {
+          ...validatedRequest.companyContext,
+          ...validatedRequest.projectContext,
+          ...validatedRequest.options,
+        },
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          version: '1.0',
+          model: claudeResponse.model,
+        },
+      };
+
+      res.json({
+        success: true,
+        narrative: generatedNarrative,
+        tokenUsage: claudeService.getTokenUsage(),
+      });
+
+    } catch (error: any) {
+      console.error("Narrative generation error:", error);
+      
+      // Handle validation errors
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      // Handle Claude-specific errors
+      if (error.type) {
+        return res.status(error.type === 'authentication' ? 401 : 
+                         error.type === 'rate_limit' ? 429 :
+                         error.type === 'invalid_request' ? 400 : 500).json({ 
+          success: false,
+          error: error.message,
+          type: error.type,
+          retryAfter: error.retryAfter,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate narrative"
+      });
+    }
+  });
+
+  app.post("/api/narratives/validate", authenticateToken, async (req: any, res) => {
+    try {
+      const { templateId, variables } = req.body;
+      
+      if (!templateId || !variables) {
+        return res.status(400).json({
+          success: false,
+          error: 'Template ID and variables are required'
+        });
+      }
+
+      const { getNarrativePromptService } = await import("./services/narrativePrompts");
+      const narrativeService = getNarrativePromptService();
+
+      const validation = narrativeService.validateTemplate(templateId, variables);
+      const estimatedTokens = validation.isValid ? 
+        narrativeService.estimateTokens(templateId, variables) : 0;
+
+      res.json({
+        success: true,
+        validation: {
+          ...validation,
+          estimatedTokens,
+        },
+      });
+
+    } catch (error: any) {
+      console.error("Narrative validation error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to validate narrative template"
+      });
+    }
+  });
+
+  // Helper function to calculate compliance score
+  function calculateComplianceScore(content: string, template: any): number {
+    const complianceKeywords = [
+      'technological', 'uncertainty', 'experimentation', 'systematic',
+      'business component', 'qualified research', 'section 41',
+      'four-part test', 'innovation', 'development'
+    ];
+
+    const contentLower = content.toLowerCase();
+    const foundKeywords = complianceKeywords.filter(keyword => 
+      contentLower.includes(keyword.toLowerCase())
+    );
+
+    // Base score on keyword coverage and template compliance level
+    const keywordScore = (foundKeywords.length / complianceKeywords.length) * 70;
+    const templateBonus = template.complianceLevel === 'high' ? 30 : 
+                         template.complianceLevel === 'medium' ? 20 : 10;
+
+    return Math.min(100, Math.round(keywordScore + templateBonus));
+  }
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {
