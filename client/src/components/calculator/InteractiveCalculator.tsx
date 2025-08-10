@@ -11,7 +11,13 @@ import {
   ChevronLeft, 
   Sparkles,
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  FileText,
+  DollarSign,
+  Clock,
+  Shield,
+  Award
 } from 'lucide-react';
 import { BusinessTypeStep } from './steps/BusinessTypeStep';
 import { QualifyingActivitiesStep } from './steps/QualifyingActivitiesStep';
@@ -117,6 +123,8 @@ export const InteractiveCalculator: React.FC = () => {
   const [state, dispatch] = useReducer(calculatorReducer, initialState);
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [emailCaptured, setEmailCaptured] = useState(false);
+  const [capturedLeadId, setCapturedLeadId] = useState<string | null>(null);
+  const [showRevealAnimation, setShowRevealAnimation] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
   const [stepErrors, setStepErrors] = useState<Record<number, string[]>>({});
@@ -347,12 +355,135 @@ export const InteractiveCalculator: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                // Show full results after email capture
-                <ResultsDisplayStep
-                  results={state.results}
-                  isBlurred={false}
-                  onCTAClick={() => setShowLeadCapture(true)}
-                />
+                // Show full results after email capture with enhanced CTAs
+                <motion.div
+                  initial={{ opacity: 0, scale: showRevealAnimation ? 0.95 : 1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                >
+                  {/* Success Message */}
+                  {showRevealAnimation && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: 0.2 }}
+                      className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3"
+                    >
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <p className="text-green-800">
+                        Perfect! Your results have been saved. Here's your complete analysis:
+                      </p>
+                    </motion.div>
+                  )}
+                  
+                  {/* Full Results Display */}
+                  <ResultsDisplayStep
+                    results={state.results}
+                    isBlurred={false}
+                    onCTAClick={() => {}}
+                  />
+                  
+                  {/* Enhanced CTAs */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 sm:p-8"
+                  >
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      Ready to Claim Your ${state.results?.federalCredit.toLocaleString()} Credit?
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Choose how you'd like to proceed with your R&D tax credit documentation:
+                    </p>
+                    
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      {/* Option 1: Get Started */}
+                      <button
+                        onClick={() => {
+                          // Track CTA click
+                          if (typeof window !== 'undefined' && window.gtag) {
+                            window.gtag('event', 'cta_click', {
+                              event_category: 'engagement',
+                              event_label: 'get_documents',
+                              lead_id: capturedLeadId
+                            });
+                          }
+                          // Placeholder for navigation to next step
+                          alert('Documentation process coming soon!');
+                        }}
+                        className="flex flex-col items-center p-4 bg-white rounded-lg border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all group"
+                      >
+                        <FileText className="h-8 w-8 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold text-gray-900">Get Documents</span>
+                        <span className="text-xs text-gray-500 mt-1">Start IRS-ready documentation</span>
+                      </button>
+                      
+                      {/* Option 2: Download PDF */}
+                      <button
+                        onClick={() => {
+                          // Track download
+                          if (typeof window !== 'undefined' && window.gtag) {
+                            window.gtag('event', 'download_pdf', {
+                              event_category: 'engagement',
+                              event_label: 'results_pdf',
+                              lead_id: capturedLeadId
+                            });
+                          }
+                          // Placeholder for PDF download
+                          alert('PDF download coming soon!');
+                        }}
+                        className="flex flex-col items-center p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all group"
+                      >
+                        <DollarSign className="h-8 w-8 text-green-600 mb-2 group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold text-gray-900">Download PDF</span>
+                        <span className="text-xs text-gray-500 mt-1">Save your results</span>
+                      </button>
+                      
+                      {/* Option 3: Schedule Call */}
+                      <button
+                        onClick={() => {
+                          // Track consultation request
+                          if (typeof window !== 'undefined' && window.gtag) {
+                            window.gtag('event', 'schedule_consultation', {
+                              event_category: 'engagement',
+                              event_label: 'post_calculator',
+                              lead_id: capturedLeadId
+                            });
+                          }
+                          // Placeholder for scheduling
+                          alert('Consultation scheduling coming soon!');
+                        }}
+                        className="flex flex-col items-center p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all group"
+                      >
+                        <Clock className="h-8 w-8 text-purple-600 mb-2 group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold text-gray-900">Schedule Call</span>
+                        <span className="text-xs text-gray-500 mt-1">Talk to an expert</span>
+                      </button>
+                    </div>
+                    
+                    {/* Trust Badges */}
+                    <div className="mt-6 pt-6 border-t border-blue-100 flex items-center justify-center gap-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-green-600" />
+                        <span>IRS Compliant</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Award className="h-4 w-4 text-blue-600" />
+                        <span>Expert Reviewed</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-purple-600" />
+                        <span>Audit Support</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  {/* Hide reveal animation after a few seconds */}
+                  {showRevealAnimation && setTimeout(() => setShowRevealAnimation(false), 5000)}
+                </motion.div>
               )}
             </motion.div>
           )}
@@ -434,8 +565,20 @@ export const InteractiveCalculator: React.FC = () => {
         calculationResult={state.results}
         onSuccess={(leadId) => {
           console.log('Lead captured with ID:', leadId);
+          setCapturedLeadId(leadId);
           setEmailCaptured(true);
+          setShowRevealAnimation(true);
           setShowLeadCapture(false);
+          
+          // Track conversion event
+          if (typeof window !== 'undefined' && window.gtag) {
+            window.gtag('event', 'lead_captured', {
+              event_category: 'engagement',
+              event_label: 'calculator_lead',
+              value: state.results?.federalCredit || 0,
+              lead_id: leadId
+            });
+          }
         }}
       />
     </div>

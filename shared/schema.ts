@@ -285,10 +285,29 @@ export const leads = pgTable("leads", {
   companyName: varchar("company_name", { length: 255 }),
   phoneNumber: varchar("phone_number", { length: 50 }),
   calculationData: jsonb("calculation_data"),
+  
+  // Tracking fields
+  sessionId: varchar("session_id", { length: 255 }),
+  ipAddress: inet("ip_address"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  
+  // Status
   status: varchar("status", { length: 50 }).default("new"),
   convertedToUser: boolean("converted_to_user").default(false),
+  convertedAt: timestamp("converted_at"),
+  
+  // Airtable sync
+  airtableRecordId: varchar("airtable_record_id", { length: 255 }),
+  airtableSyncStatus: varchar("airtable_sync_status", { length: 50 }).default("pending"),
+  
   createdAt: timestamp("created_at").defaultNow(),
-});
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  emailIdx: index("idx_leads_email").on(table.email),
+  sessionIdx: index("idx_leads_session_id").on(table.sessionId),
+  statusIdx: index("idx_leads_status").on(table.status),
+}));
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -362,6 +381,11 @@ export const insertDocumentSchema = createInsertSchema(documents).omit({
 export const insertLeadSchema = createInsertSchema(leads).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+  status: true,
+  convertedToUser: true,
+  convertedAt: true,
+  airtableSyncStatus: true,
 });
 
 // Select types

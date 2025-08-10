@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
+import crypto from "crypto";
 import { storage } from "./storage";
 import {
   insertUserSchema,
@@ -25,6 +27,24 @@ if (!process.env.JWT_SECRET) {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Rate limiting for lead capture (5 requests per IP per hour)
+const leadCaptureRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: "Too many lead capture attempts from this IP, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Helper to get client IP address
+const getClientIp = (req: any): string => {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.connection.remoteAddress || req.socket.remoteAddress || '';
+};
 
 // Middleware to verify JWT tokens
 const authenticateToken = async (req: any, res: any, next: any) => {
@@ -150,32 +170,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Lead capture route
-  app.post("/api/leads", async (req, res) => {
+  // Lead capture route with rate limiting and tracking
+  app.post("/api/leads", leadCaptureRateLimit, async (req: any, res) => {
     try {
       const leadData = leadCaptureSchema.parse(req.body);
       const calculationData = req.body.calculationData;
       
+      // Generate or retrieve session ID
+      let sessionId = req.cookies?.sessionId;
+      if (!sessionId) {
+        sessionId = crypto.randomBytes(32).toString('hex');
+        res.cookie('sessionId', sessionId, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+      }
+      
+      // Capture tracking data
+      const ipAddress = getClientIp(req);
+      const userAgent = req.headers['user-agent'] || '';
+      const referrer = req.headers['referer'] || req.headers['referrer'] || '';
+      
       // Check if lead already exists
       const existingLead = await storage.getLeadByEmail(leadData.email);
       if (existingLead) {
-        // Update existing lead
+        // Update existing lead with new tracking data
         const updatedLead = await storage.updateLead(existingLead.id, {
           ...leadData,
           calculationData,
+          sessionId,
+          ipAddress,
+          userAgent,
+          referrer,
+          updatedAt: new Date(),
         });
-        return res.json(updatedLead);
+        
+        // Optional: Trigger Airtable sync via webhook (if configured)
+        if (process.env.AIRTABLE_WEBHOOK_URL) {
+          // Fire and forget - don't await
+          fetch(process.env.AIRTABLE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              leadId: updatedLead.id,
+              email: updatedLead.email,
+              companyName: updatedLead.companyName,
+              calculationData,
+            }),
+          }).catch(err => console.error('Airtable webhook failed:', err));
+        }
+        
+        return res.json({ 
+          id: updatedLead.id,
+          success: true,
+          message: 'Lead information updated successfully',
+        });
       }
       
-      // Create new lead
+      // Create new lead with tracking data
       const lead = await storage.createLead({
         ...leadData,
         calculationData,
+        sessionId,
+        ipAddress,
+        userAgent,
+        referrer,
       });
       
-      res.json(lead);
+      // Optional: Trigger Airtable sync via webhook (if configured)
+      if (process.env.AIRTABLE_WEBHOOK_URL) {
+        // Fire and forget - don't await
+        fetch(process.env.AIRTABLE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            leadId: lead.id,
+            email: lead.email,
+            companyName: lead.companyName,
+            calculationData,
+          }),
+        }).catch(err => console.error('Airtable webhook failed:', err));
+      }
+      
+      res.json({ 
+        id: lead.id,
+        success: true,
+        message: 'Your information has been saved successfully',
+      });
     } catch (error: any) {
-      res.status(400).json({ message: error.message || "Failed to capture lead" });
+      // Log error for debugging
+      console.error('Lead capture error:', error);
+      
+      // Return user-friendly error
+      if (error.name === 'ZodError') {
+        res.status(400).json({ 
+          success: false,
+          message: 'Please check your information and try again',
+          errors: error.errors,
+        });
+      } else {
+        res.status(400).json({ 
+          success: false,
+          message: error.message || 'Failed to save your information',
+        });
+      }
     }
   });
 

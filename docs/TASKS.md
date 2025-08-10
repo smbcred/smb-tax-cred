@@ -23,7 +23,7 @@ _Last Verified: 2025-08-10 19:58_
 | 1.3.2 | Implement Calculator Logic Engine | ✅ DONE | Calculator service with ASC method | - ASC calculation<br>- 65% contractor limit<br>- Pricing tiers |
 | 1.3.3 | Create Results Display Component | ✅ DONE | Results in InteractiveCalculator | - Animated counting<br>- Blur overlay<br>- Personalization |
 | 1.4.1 | Build Lead Capture Modal | ✅ DONE | Two modal implementations found | - Form validation<br>- Loading states<br>- Accessibility |
-| 1.4.2 | Implement Lead Storage Backend | ⚠️ PARTIAL | Basic `/api/leads` endpoint exists | ❌ Missing: IP tracking<br>❌ Session cookies<br>❌ Airtable sync |
+| 1.4.2 | Implement Lead Storage Backend | ✅ DONE | Full `/api/leads` endpoint with tracking | ✅ IP tracking<br>✅ Session cookies<br>✅ Rate limiting<br>✅ Airtable webhook |
 | 1.4.3 | Post-Capture Experience | ❌ TO DO | Not implemented | - Results reveal animation<br>- Enhanced display<br>- Clear CTAs |
 | 1.5.1 | Stripe Checkout Setup | ❌ TO DO | Not implemented | - Stripe configuration<br>- Product/price IDs<br>- Webhook setup |
 | 1.5.2 | Create Checkout API | ❌ TO DO | Not implemented | - Session creation<br>- Price calculation<br>- Webhook handler |
@@ -34,8 +34,8 @@ _Last Verified: 2025-08-10 19:58_
 
 ## Summary Statistics
 
-- **✅ DONE**: 10 tasks (fully complete and verified)
-- **⚠️ PARTIAL**: 2 tasks (basic implementation but missing features)
+- **✅ DONE**: 11 tasks (fully complete and verified)
+- **⚠️ PARTIAL**: 1 task (basic implementation but missing features)
 - **❌ TO DO**: 6 tasks (not started)
 - **🚫 BLOCKED**: 0 tasks
 
