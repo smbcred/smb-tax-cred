@@ -282,6 +282,35 @@ export const documents = pgTable("documents", {
   accessExpiresIdx: index("idx_documents_access_expires_at").on(table.accessExpiresAt),
 }));
 
+// Webhook events table for tracking and logging
+export const webhookEvents = pgTable("webhook_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  source: varchar("source", { length: 50 }).notNull(), // 'make', 'stripe', 'external'
+  eventType: varchar("event_type", { length: 100 }).notNull(),
+  payload: jsonb("payload").notNull(),
+  signature: varchar("signature", { length: 500 }),
+  verified: boolean("verified").default(false),
+  processed: boolean("processed").default(false),
+  processingError: text("processing_error"),
+  
+  // Related entities
+  intakeFormId: varchar("intake_form_id").references(() => intakeForms.id),
+  userId: varchar("user_id").references(() => users.id),
+  
+  // Processing metadata
+  processingStartedAt: timestamp("processing_started_at"),
+  processingCompletedAt: timestamp("processing_completed_at"),
+  retryCount: integer("retry_count").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  sourceIdx: index("idx_webhook_events_source").on(table.source),
+  eventTypeIdx: index("idx_webhook_events_event_type").on(table.eventType),
+  processedIdx: index("idx_webhook_events_processed").on(table.processed),
+  intakeFormIdIdx: index("idx_webhook_events_intake_form_id").on(table.intakeFormId),
+}));
+
 // Leads table for email capture
 export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -392,6 +421,30 @@ export const insertLeadSchema = createInsertSchema(leads).omit({
   airtableSyncStatus: true,
 });
 
+export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  verified: true,
+  processed: true,
+  retryCount: true,
+});
+
+// Webhook payload validation schemas
+export const makeWebhookPayloadSchema = z.object({
+  eventType: z.enum(['form_submitted', 'document_generated', 'processing_completed', 'processing_failed']),
+  timestamp: z.string(),
+  data: z.object({
+    formId: z.string().optional(),
+    userId: z.string().optional(),
+    companyId: z.string().optional(),
+    documentId: z.string().optional(),
+    status: z.string().optional(),
+    error: z.string().optional(),
+    metadata: z.record(z.any()).optional(),
+  }),
+});
+
 // Select types
 export type User = typeof users.$inferSelect;
 export type Company = typeof companies.$inferSelect;
@@ -401,6 +454,7 @@ export type Payment = typeof payments.$inferSelect;
 export type IntakeForm = typeof intakeForms.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
+export type WebhookEvent = typeof webhookEvents.$inferSelect;
 
 // Insert types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -411,6 +465,8 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type InsertIntakeForm = z.infer<typeof insertIntakeFormSchema>;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type InsertLead = z.infer<typeof insertLeadSchema>;
+export type InsertWebhookEvent = z.infer<typeof insertWebhookEventSchema>;
+export type MakeWebhookPayload = z.infer<typeof makeWebhookPayloadSchema>;
 
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;

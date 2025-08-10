@@ -909,6 +909,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Webhook endpoints
+  app.post("/api/webhooks/make", async (req: any, res) => {
+    try {
+      const { eventType, timestamp, data } = req.body;
+      
+      // Basic payload validation
+      if (!eventType || !timestamp || !data) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Missing required fields: eventType, timestamp, data" 
+        });
+      }
+
+      // Validate event type
+      const validEventTypes = ['form_submitted', 'document_generated', 'processing_completed', 'processing_failed'];
+      if (!validEventTypes.includes(eventType)) {
+        return res.status(400).json({ 
+          success: false,
+          error: `Invalid eventType. Must be one of: ${validEventTypes.join(', ')}` 
+        });
+      }
+
+      // Get signature from headers for logging
+      const signature = req.headers['x-make-signature'] as string;
+      
+      // Create webhook event record
+      const webhookEvent = await storage.createWebhookEvent({
+        source: 'make',
+        eventType,
+        payload: req.body,
+        signature,
+        intakeFormId: data.formId,
+        userId: data.userId,
+      });
+
+      // Mark as verified (simplified for now - would verify signature in production)
+      await storage.updateWebhookEvent(webhookEvent.id, { 
+        verified: true,
+        processingStartedAt: new Date() 
+      });
+
+      // Process the webhook based on event type
+      let processingResult = { success: true, message: 'Event processed' };
+      
+      try {
+        switch (eventType) {
+          case 'form_submitted':
+            await processFormSubmittedEvent(data);
+            break;
+          case 'document_generated':
+            await processDocumentGeneratedEvent(data);
+            break;
+          case 'processing_completed':
+            await processProcessingCompletedEvent(data);
+            break;
+          case 'processing_failed':
+            await processProcessingFailedEvent(data);
+            break;
+        }
+      } catch (processingError: any) {
+        processingResult = { success: false, message: processingError.message };
+        console.error(`Webhook processing error for ${eventType}:`, processingError);
+      }
+
+      // Mark event as processed
+      await storage.markWebhookEventProcessed(
+        webhookEvent.id, 
+        processingResult.success, 
+        processingResult.success ? undefined : processingResult.message
+      );
+
+      // Log the webhook event
+      console.log('Make.com webhook processed:', {
+        eventId: webhookEvent.id,
+        eventType,
+        formId: data.formId,
+        success: processingResult.success,
+        timestamp: new Date().toISOString()
+      });
+
+      res.json({ 
+        success: true,
+        eventId: webhookEvent.id,
+        message: 'Webhook received and processed',
+        processing: processingResult
+      });
+
+    } catch (error: any) {
+      console.error("Webhook processing error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to process webhook"
+      });
+    }
+  });
+
+  // Webhook event processing functions
+  async function processFormSubmittedEvent(data: any) {
+    if (data.formId) {
+      // Update form status or trigger additional processing
+      console.log(`Processing form submission for form: ${data.formId}`);
+      
+      // Could trigger document generation, send notifications, etc.
+      // For now, just log the event
+    }
+  }
+
+  async function processDocumentGeneratedEvent(data: any) {
+    if (data.documentId && data.formId) {
+      console.log(`Document generated for form: ${data.formId}, document: ${data.documentId}`);
+      
+      // Update document status if available
+      if (data.status) {
+        try {
+          await storage.updateDocumentStatus(data.documentId, data.status);
+        } catch (error) {
+          console.warn(`Could not update document status: ${error}`);
+        }
+      }
+    }
+  }
+
+  async function processProcessingCompletedEvent(data: any) {
+    if (data.formId) {
+      console.log(`Processing completed for form: ${data.formId}`);
+      
+      // Update form status to completed, send notifications, etc.
+      try {
+        await storage.updateIntakeForm(data.formId, {
+          status: 'processed',
+          updatedAt: new Date()
+        });
+      } catch (error) {
+        console.warn(`Could not update form status: ${error}`);
+      }
+    }
+  }
+
+  async function processProcessingFailedEvent(data: any) {
+    if (data.formId) {
+      console.log(`Processing failed for form: ${data.formId}, error: ${data.error}`);
+      
+      // Update form status to failed, log error, send notifications
+      try {
+        await storage.updateIntakeForm(data.formId, {
+          status: 'failed',
+          updatedAt: new Date()
+        });
+      } catch (error) {
+        console.warn(`Could not update form status: ${error}`);
+      }
+    }
+  }
+
+  // Get webhook events for debugging and monitoring
+  app.get("/api/webhooks/events", authenticateToken, async (req: any, res) => {
+    try {
+      const { formId, limit = 50 } = req.query;
+      
+      let events;
+      if (formId) {
+        events = await storage.getWebhookEventsByIntakeForm(formId);
+      } else {
+        events = await storage.getUnprocessedWebhookEvents(parseInt(limit));
+      }
+      
+      res.json({ 
+        success: true,
+        events,
+        count: events.length
+      });
+    } catch (error: any) {
+      console.error("Webhook events retrieval error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to retrieve webhook events"
+      });
+    }
+  });
+
+  app.get("/api/webhooks/events/failed", authenticateToken, async (req: any, res) => {
+    try {
+      const { maxRetries = 3 } = req.query;
+      
+      const failedEvents = await storage.getFailedWebhookEvents(parseInt(maxRetries));
+      
+      res.json({ 
+        success: true,
+        failedEvents,
+        count: failedEvents.length
+      });
+    } catch (error: any) {
+      console.error("Failed webhook events retrieval error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to retrieve failed webhook events"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

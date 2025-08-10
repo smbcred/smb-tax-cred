@@ -6,6 +6,7 @@ import {
   intakeForms,
   documents,
   leads,
+  webhookEvents,
   type User,
   type Company,
   type Calculation,
@@ -13,6 +14,7 @@ import {
   type IntakeForm,
   type Document,
   type Lead,
+  type WebhookEvent,
   type InsertUser,
   type InsertCompany,
   type InsertCalculation,
@@ -21,7 +23,7 @@ import {
   type InsertLead,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql, gte, isNotNull, lt } from "drizzle-orm";
 
 // Type for user creation with just essential fields
 type CreateUserData = {
@@ -504,6 +506,93 @@ export class DatabaseStorage implements IStorage {
       const airtableService = getAirtableService();
       await airtableService.updateDocumentUrls(form.airtableRecordId, documentUrls);
     }
+  }
+
+  // Webhook event management
+  async createWebhookEvent(eventData: {
+    source: string;
+    eventType: string;
+    payload: any;
+    signature?: string;
+    intakeFormId?: string;
+    userId?: string;
+  }): Promise<WebhookEvent> {
+    const event = await db.insert(webhookEvents).values({
+      id: generateId(),
+      ...eventData,
+      verified: false,
+      processed: false,
+      retryCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning().then(rows => rows[0]);
+
+    return event;
+  }
+
+  async updateWebhookEvent(eventId: string, updates: Partial<WebhookEvent>): Promise<WebhookEvent> {
+    const event = await db.update(webhookEvents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(webhookEvents.id, eventId))
+      .returning()
+      .then(rows => rows[0]);
+
+    if (!event) {
+      throw new Error(`Webhook event not found: ${eventId}`);
+    }
+
+    return event;
+  }
+
+  async markWebhookEventProcessed(eventId: string, success: boolean, error?: string): Promise<WebhookEvent> {
+    const updates: Partial<WebhookEvent> = {
+      processed: true,
+      processingCompletedAt: new Date(),
+    };
+
+    if (!success && error) {
+      updates.processingError = error;
+      updates.retryCount = sql`${webhookEvents.retryCount} + 1`;
+    }
+
+    return this.updateWebhookEvent(eventId, updates);
+  }
+
+  async getWebhookEvent(eventId: string): Promise<WebhookEvent | null> {
+    const result = await db.select()
+      .from(webhookEvents)
+      .where(eq(webhookEvents.id, eventId))
+      .limit(1);
+    
+    return result[0] || null;
+  }
+
+  async getWebhookEventsByIntakeForm(intakeFormId: string): Promise<WebhookEvent[]> {
+    return db.select()
+      .from(webhookEvents)
+      .where(eq(webhookEvents.intakeFormId, intakeFormId))
+      .orderBy(desc(webhookEvents.createdAt));
+  }
+
+  async getUnprocessedWebhookEvents(limit = 50): Promise<WebhookEvent[]> {
+    return db.select()
+      .from(webhookEvents)
+      .where(eq(webhookEvents.processed, false))
+      .orderBy(desc(webhookEvents.createdAt))
+      .limit(limit);
+  }
+
+  async getFailedWebhookEvents(maxRetries = 3): Promise<WebhookEvent[]> {
+    return db.select()
+      .from(webhookEvents)
+      .where(
+        and(
+          eq(webhookEvents.processed, false),
+          gte(webhookEvents.retryCount, maxRetries),
+          isNotNull(webhookEvents.processingError)
+        )
+      )
+      .orderBy(desc(webhookEvents.createdAt));
   }
 }
 
