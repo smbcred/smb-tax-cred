@@ -71,7 +71,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <a href="/" className="text-xl sm:text-2xl font-bold text-green-600">
+            <a href="/" className="text-xl sm:text-2xl font-bold text-secondary">
               SMBTaxCredits.com
             </a>
           </div>
@@ -82,7 +82,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
               <Link 
                 key={link.href}
                 href={link.href} 
-                className="text-gray-700 hover:text-green-600 transition font-medium"
+                className="text-heading hover:text-secondary transition font-medium"
               >
                 {link.label}
               </Link>
@@ -94,7 +94,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
                 onClick={() => setResourcesOpen(!resourcesOpen)}
                 onMouseEnter={() => setResourcesOpen(true)}
                 onMouseLeave={() => setResourcesOpen(false)}
-                className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition font-medium"
+                className="flex items-center gap-1 text-heading hover:text-secondary transition font-medium"
               >
                 Resources
                 <FaChevronDown className={`text-xs transition-transform ${resourcesOpen ? 'rotate-180' : ''}`} />
@@ -110,7 +110,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition"
+                      className="block px-4 py-2 text-sm text-heading hover:bg-secondary-light hover:text-secondary transition"
                     >
                       {link.label}
                     </Link>
@@ -121,9 +121,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
             
             <button 
               onClick={handleStartEstimate}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 
-                       transition-all transform hover:scale-105 focus:outline-none 
-                       focus:ring-2 focus:ring-green-500"
+              className="btn-primary"
             >
               Start Your Estimate
             </button>
@@ -132,8 +130,8 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 
-                     focus:outline-none focus:ring-2 focus:ring-green-600
+            className="lg:hidden p-2 rounded-md text-heading hover:bg-gray-100 
+                     focus:outline-none focus:ring-2 focus:ring-secondary
                      transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={isOpen}

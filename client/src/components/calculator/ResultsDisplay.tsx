@@ -342,7 +342,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1 }}
-              className="bg-primary text-white rounded-xl p-6 mb-8 card-shadow-lg"
+              className="bg-graphite text-white rounded-xl p-6 mb-8 card-shadow-lg"
             >
               <h3 className="text-lg font-semibold mb-2">Your Service Package</h3>
               <div className="flex justify-between items-start mb-4">

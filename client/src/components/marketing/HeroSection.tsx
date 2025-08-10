@@ -14,16 +14,16 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onGetStarted }: HeroSectionProps) {
   return (
-    <section className="relative gradient-hero py-20">
+    <section className="relative bg-gradient-to-br from-gray-50 to-gray-100 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 animate-fade-in">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+              <h1 className="text-4xl lg:text-5xl font-bold text-heading leading-tight">
                 Calculate Your R&D Tax Credit in{" "}
-                <span className="text-gradient">Minutes</span>
+                <span className="text-primary font-bold">Minutes</span>
               </h1>
-              <p className="text-xl text-slate-600 leading-relaxed">
+              <p className="text-xl text-muted leading-relaxed">
                 Professional R&D tax credit documentation service for small businesses. 
                 Get IRS-compliant forms and maximize your federal tax credits with our 
                 AI-powered platform.
@@ -32,17 +32,17 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
             
             {/* Trust Signals */}
             <div className="grid grid-cols-3 gap-4 py-6">
-              <div className="trust-signal">
-                <div className="trust-signal-value trust-signal-primary">$2.3M+</div>
-                <div className="text-sm text-slate-600">Credits Calculated</div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">$2.3M+</div>
+                <div className="text-sm text-muted">Credits Calculated</div>
               </div>
-              <div className="trust-signal">
-                <div className="trust-signal-value trust-signal-secondary">500+</div>
-                <div className="text-sm text-slate-600">Happy Businesses</div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-secondary">500+</div>
+                <div className="text-sm text-muted">Happy Businesses</div>
               </div>
-              <div className="trust-signal">
-                <div className="trust-signal-value text-blue-600">99.2%</div>
-                <div className="text-sm text-slate-600">IRS Compliance</div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">99.2%</div>
+                <div className="text-sm text-muted">IRS Compliance</div>
               </div>
             </div>
 
@@ -67,10 +67,10 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
               alt="Professional business dashboard with financial calculations" 
               className="rounded-xl shadow-2xl w-full h-auto card-hover" 
             />
-            <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg border border-slate-200">
+            <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg border border-gray-200">
               <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-rd-secondary-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-slate-700">Live Calculation</span>
+                <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-heading">Live Calculation</span>
               </div>
             </div>
           </div>
