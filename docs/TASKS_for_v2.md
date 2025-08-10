@@ -24,7 +24,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 1.6.1 | Implement JWT Authentication | [x] | [📋](./acceptance/1.6.1.md) |
 | 1.6.2 | Create Login/Register Pages | [x] | [📋](./acceptance/1.6.2.md) |
 | 1.6.3 | Protected Route Implementation | [x] | [📋](./acceptance/1.6.3.md) |
-| 1.7.1 | Dashboard Layout | [ ] | [📋](./acceptance/1.7.1.md) |
+| 1.7.1 | Dashboard Layout | [x] | [📋](./acceptance/1.7.1.md) |
 | 1.7.2 | Progress Tracking Component | [ ] | [📋](./acceptance/1.7.2.md) |
 | 1.7.3 | Dashboard API Integration | [ ] | [📋](./acceptance/1.7.3.md) |
 | 2.1.1 | Multi-Step Form Component | [ ] | [📋](./acceptance/2.1.1.md) |
