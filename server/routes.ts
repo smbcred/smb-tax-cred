@@ -1107,6 +1107,266 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workflow trigger endpoints
+  app.post("/api/workflows/trigger", authenticateToken, async (req: any, res) => {
+    try {
+      const { intakeFormId, priority = 'normal' } = req.body;
+      
+      if (!intakeFormId) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Missing required field: intakeFormId" 
+        });
+      }
+
+      // Get intake form with all related data
+      const form = await storage.getIntakeForm(intakeFormId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Intake form not found or access denied" 
+        });
+      }
+
+      // Check if form is complete
+      if (form.status !== 'completed') {
+        return res.status(400).json({ 
+          success: false,
+          error: "Intake form must be completed before triggering workflow" 
+        });
+      }
+
+      // Get company info
+      const company = form.companyId ? await storage.getCompany(form.companyId) : null;
+
+      // Construct workflow payload
+      const triggerPayload = {
+        intakeFormId: form.id,
+        airtableRecordId: form.airtableRecordId,
+        companyInfo: {
+          name: company?.name || 'Unknown Company',
+          ein: company?.ein,
+          industry: company?.industry,
+          address: company?.address,
+        },
+        rdActivities: form.formData?.rdActivities || [],
+        expenses: form.formData?.expenses || {
+          wages: 0,
+          contractors: 0,
+          supplies: 0,
+          other: 0,
+          total: 0,
+        },
+        metadata: {
+          formVersion: '2.0',
+          submissionDate: form.updatedAt?.toISOString() || new Date().toISOString(),
+          priority: priority as 'normal' | 'high' | 'urgent',
+        },
+      };
+
+      // Create workflow trigger record
+      const trigger = await storage.createWorkflowTrigger({
+        intakeFormId: form.id,
+        airtableRecordId: form.airtableRecordId,
+        triggerPayload,
+        workflowName: 'document_generation',
+        timeoutAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minute timeout
+      });
+
+      // Import and trigger workflow service
+      const { getWorkflowService } = await import("./services/makeWorkflow");
+      const workflowService = getWorkflowService();
+      
+      const result = await workflowService.triggerDocumentGeneration(triggerPayload);
+
+      if (result.success) {
+        // Mark as triggered
+        await storage.markWorkflowTriggered(trigger.id, {
+          executionId: result.executionId,
+          scenarioId: result.scenarioId,
+          responseData: result,
+        });
+
+        console.log('Workflow triggered successfully:', {
+          triggerId: trigger.id,
+          intakeFormId: form.id,
+          executionId: result.executionId,
+        });
+
+        res.json({
+          success: true,
+          triggerId: trigger.id,
+          executionId: result.executionId,
+          message: 'Workflow triggered successfully',
+        });
+      } else {
+        // Mark as failed, enable retry
+        await storage.markWorkflowFailed(trigger.id, result.error || 'Unknown error', true);
+
+        console.error('Workflow trigger failed:', {
+          triggerId: trigger.id,
+          intakeFormId: form.id,
+          error: result.error,
+        });
+
+        res.status(500).json({
+          success: false,
+          triggerId: trigger.id,
+          error: result.error,
+          message: 'Workflow trigger failed, will retry automatically',
+        });
+      }
+
+    } catch (error: any) {
+      console.error("Workflow trigger error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to trigger workflow"
+      });
+    }
+  });
+
+  app.get("/api/workflows/triggers/:formId", authenticateToken, async (req: any, res) => {
+    try {
+      const { formId } = req.params;
+      
+      // Verify form ownership
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Intake form not found or access denied" 
+        });
+      }
+
+      const triggers = await storage.getWorkflowTriggersByIntakeForm(formId);
+      
+      res.json({ 
+        success: true,
+        triggers,
+        count: triggers.length
+      });
+    } catch (error: any) {
+      console.error("Workflow triggers retrieval error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to retrieve workflow triggers"
+      });
+    }
+  });
+
+  app.get("/api/workflows/triggers", authenticateToken, async (req: any, res) => {
+    try {
+      const { status = 'all', limit = 50 } = req.query;
+      
+      let triggers;
+      if (status === 'pending') {
+        triggers = await storage.getPendingWorkflowTriggers(parseInt(limit));
+      } else if (status === 'retryable') {
+        triggers = await storage.getRetryableWorkflowTriggers();
+      } else if (status === 'timeout') {
+        triggers = await storage.getTimedOutWorkflowTriggers();
+      } else {
+        // Get all triggers for the user's forms
+        const userForms = await storage.getIntakeFormsByUserId(req.user.id);
+        const formIds = userForms.map(f => f.id);
+        
+        triggers = [];
+        for (const formId of formIds.slice(0, parseInt(limit))) {
+          const formTriggers = await storage.getWorkflowTriggersByIntakeForm(formId);
+          triggers.push(...formTriggers);
+        }
+        
+        // Sort by creation date
+        triggers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      }
+      
+      res.json({ 
+        success: true,
+        triggers,
+        count: triggers.length
+      });
+    } catch (error: any) {
+      console.error("Workflow triggers retrieval error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to retrieve workflow triggers"
+      });
+    }
+  });
+
+  app.post("/api/workflows/retry/:triggerId", authenticateToken, async (req: any, res) => {
+    try {
+      const { triggerId } = req.params;
+      
+      const trigger = await storage.getWorkflowTrigger(triggerId);
+      if (!trigger) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Workflow trigger not found" 
+        });
+      }
+
+      // Verify form ownership
+      const form = await storage.getIntakeForm(trigger.intakeFormId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(403).json({ 
+          success: false,
+          error: "Access denied" 
+        });
+      }
+
+      if (trigger.status !== 'failed' && trigger.status !== 'timeout') {
+        return res.status(400).json({ 
+          success: false,
+          error: "Only failed or timed out workflows can be retried" 
+        });
+      }
+
+      // Reset trigger status
+      await storage.updateWorkflowTrigger(triggerId, {
+        status: 'pending',
+        nextRetryAt: null,
+        lastError: null,
+      });
+
+      // Trigger workflow
+      const { getWorkflowService } = await import("./services/makeWorkflow");
+      const workflowService = getWorkflowService();
+      
+      const result = await workflowService.triggerDocumentGeneration(trigger.triggerPayload);
+
+      if (result.success) {
+        await storage.markWorkflowTriggered(triggerId, {
+          executionId: result.executionId,
+          scenarioId: result.scenarioId,
+          responseData: result,
+        });
+
+        res.json({
+          success: true,
+          triggerId,
+          executionId: result.executionId,
+          message: 'Workflow retry successful',
+        });
+      } else {
+        await storage.markWorkflowFailed(triggerId, result.error || 'Retry failed', false);
+        
+        res.status(500).json({
+          success: false,
+          triggerId,
+          error: result.error,
+          message: 'Workflow retry failed',
+        });
+      }
+
+    } catch (error: any) {
+      console.error("Workflow retry error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to retry workflow"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

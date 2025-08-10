@@ -7,6 +7,7 @@ import {
   documents,
   leads,
   webhookEvents,
+  workflowTriggers,
   type User,
   type Company,
   type Calculation,
@@ -15,12 +16,14 @@ import {
   type Document,
   type Lead,
   type WebhookEvent,
+  type WorkflowTrigger,
   type InsertUser,
   type InsertCompany,
   type InsertCalculation,
   type InsertPayment,
   type InsertIntakeForm,
   type InsertLead,
+  type WorkflowTriggerPayload,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, isNotNull, lt } from "drizzle-orm";
@@ -593,6 +596,152 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(webhookEvents.createdAt));
+  }
+
+  // Workflow trigger management
+  async createWorkflowTrigger(triggerData: {
+    intakeFormId: string;
+    airtableRecordId?: string;
+    triggerPayload: WorkflowTriggerPayload;
+    workflowId?: string;
+    workflowName?: string;
+    webhookUrl?: string;
+    maxRetries?: number;
+    timeoutAt?: Date;
+  }): Promise<WorkflowTrigger> {
+    const trigger = await db.insert(workflowTriggers).values({
+      id: generateId(),
+      ...triggerData,
+      status: 'pending',
+      retryCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning().then(rows => rows[0]);
+
+    return trigger;
+  }
+
+  async updateWorkflowTrigger(triggerId: string, updates: Partial<WorkflowTrigger>): Promise<WorkflowTrigger> {
+    const trigger = await db.update(workflowTriggers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(workflowTriggers.id, triggerId))
+      .returning()
+      .then(rows => rows[0]);
+
+    if (!trigger) {
+      throw new Error(`Workflow trigger not found: ${triggerId}`);
+    }
+
+    return trigger;
+  }
+
+  async markWorkflowTriggered(triggerId: string, makeData?: {
+    executionId?: string;
+    scenarioId?: string;
+    responseData?: any;
+  }): Promise<WorkflowTrigger> {
+    const updates: Partial<WorkflowTrigger> = {
+      status: 'triggered',
+      triggeredAt: new Date(),
+    };
+
+    if (makeData) {
+      updates.makeExecutionId = makeData.executionId;
+      updates.makeScenarioId = makeData.scenarioId;
+      updates.responseData = makeData.responseData;
+    }
+
+    return this.updateWorkflowTrigger(triggerId, updates);
+  }
+
+  async markWorkflowCompleted(triggerId: string, responseData?: any): Promise<WorkflowTrigger> {
+    return this.updateWorkflowTrigger(triggerId, {
+      status: 'completed',
+      completedAt: new Date(),
+      responseData,
+    });
+  }
+
+  async markWorkflowFailed(triggerId: string, error: string, shouldRetry = false): Promise<WorkflowTrigger> {
+    const trigger = await this.getWorkflowTrigger(triggerId);
+    if (!trigger) {
+      throw new Error(`Workflow trigger not found: ${triggerId}`);
+    }
+
+    const updates: Partial<WorkflowTrigger> = {
+      lastError: error,
+      retryCount: trigger.retryCount + 1,
+    };
+
+    if (shouldRetry && trigger.retryCount < trigger.maxRetries) {
+      // Calculate next retry time with exponential backoff
+      const delayMs = Math.min(1000 * Math.pow(2, trigger.retryCount), 30000);
+      updates.nextRetryAt = new Date(Date.now() + delayMs);
+      updates.status = 'pending'; // Will be retried
+    } else {
+      updates.status = 'failed';
+    }
+
+    return this.updateWorkflowTrigger(triggerId, updates);
+  }
+
+  async markWorkflowTimeout(triggerId: string): Promise<WorkflowTrigger> {
+    return this.updateWorkflowTrigger(triggerId, {
+      status: 'timeout',
+      completedAt: new Date(),
+    });
+  }
+
+  async getWorkflowTrigger(triggerId: string): Promise<WorkflowTrigger | null> {
+    const result = await db.select()
+      .from(workflowTriggers)
+      .where(eq(workflowTriggers.id, triggerId))
+      .limit(1);
+    
+    return result[0] || null;
+  }
+
+  async getWorkflowTriggersByIntakeForm(intakeFormId: string): Promise<WorkflowTrigger[]> {
+    return db.select()
+      .from(workflowTriggers)
+      .where(eq(workflowTriggers.intakeFormId, intakeFormId))
+      .orderBy(desc(workflowTriggers.createdAt));
+  }
+
+  async getPendingWorkflowTriggers(limit = 50): Promise<WorkflowTrigger[]> {
+    return db.select()
+      .from(workflowTriggers)
+      .where(eq(workflowTriggers.status, 'pending'))
+      .orderBy(desc(workflowTriggers.createdAt))
+      .limit(limit);
+  }
+
+  async getRetryableWorkflowTriggers(): Promise<WorkflowTrigger[]> {
+    const now = new Date();
+    return db.select()
+      .from(workflowTriggers)
+      .where(
+        and(
+          eq(workflowTriggers.status, 'pending'),
+          isNotNull(workflowTriggers.nextRetryAt),
+          lt(workflowTriggers.nextRetryAt, now)
+        )
+      )
+      .orderBy(desc(workflowTriggers.nextRetryAt));
+  }
+
+  async getTimedOutWorkflowTriggers(): Promise<WorkflowTrigger[]> {
+    const now = new Date();
+    return db.select()
+      .from(workflowTriggers)
+      .where(
+        and(
+          eq(workflowTriggers.status, 'triggered'),
+          isNotNull(workflowTriggers.timeoutAt),
+          lt(workflowTriggers.timeoutAt, now)
+        )
+      )
+      .orderBy(desc(workflowTriggers.timeoutAt));
   }
 }
 

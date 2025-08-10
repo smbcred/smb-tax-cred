@@ -343,6 +343,17 @@ export const leads = pgTable("leads", {
 }));
 
 // Insert schemas
+export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  verified: true,
+  processed: true,
+  retryCount: true,
+});
+
+
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -421,13 +432,56 @@ export const insertLeadSchema = createInsertSchema(leads).omit({
   airtableSyncStatus: true,
 });
 
-export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
+
+
+// Workflow triggers table for tracking Make.com workflow executions
+export const workflowTriggers = pgTable("workflow_triggers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  intakeFormId: varchar("intake_form_id").notNull().references(() => intakeForms.id),
+  airtableRecordId: varchar("airtable_record_id", { length: 255 }),
+  
+  // Workflow execution details
+  workflowId: varchar("workflow_id", { length: 255 }), // Make.com scenario ID
+  workflowName: varchar("workflow_name", { length: 255 }).default("document_generation"),
+  webhookUrl: text("webhook_url"), // Make.com webhook URL
+  
+  // Payload and response tracking
+  triggerPayload: jsonb("trigger_payload").notNull(),
+  responseData: jsonb("response_data"),
+  
+  // Status and timing
+  status: varchar("status", { length: 50 }).default("pending"), // pending, triggered, completed, failed, timeout
+  triggeredAt: timestamp("triggered_at"),
+  completedAt: timestamp("completed_at"),
+  timeoutAt: timestamp("timeout_at"),
+  
+  // Retry handling
+  retryCount: integer("retry_count").default(0),
+  maxRetries: integer("max_retries").default(3),
+  nextRetryAt: timestamp("next_retry_at"),
+  lastError: text("last_error"),
+  
+  // Make.com execution tracking
+  makeExecutionId: varchar("make_execution_id", { length: 255 }),
+  makeScenarioId: varchar("make_scenario_id", { length: 255 }),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  intakeFormIdIdx: index("idx_workflow_triggers_intake_form_id").on(table.intakeFormId),
+  statusIdx: index("idx_workflow_triggers_status").on(table.status),
+  nextRetryIdx: index("idx_workflow_triggers_next_retry_at").on(table.nextRetryAt),
+  airtableRecordIdIdx: index("idx_workflow_triggers_airtable_record_id").on(table.airtableRecordId),
+}));
+
+export const insertWorkflowTriggerSchema = createInsertSchema(workflowTriggers).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  verified: true,
-  processed: true,
+  status: true,
   retryCount: true,
+  triggeredAt: true,
+  completedAt: true,
 });
 
 // Webhook payload validation schemas
@@ -445,6 +499,36 @@ export const makeWebhookPayloadSchema = z.object({
   }),
 });
 
+// Workflow trigger payload schema
+export const workflowTriggerPayloadSchema = z.object({
+  intakeFormId: z.string(),
+  airtableRecordId: z.string().optional(),
+  companyInfo: z.object({
+    name: z.string(),
+    ein: z.string().optional(),
+    industry: z.string().optional(),
+    address: z.string().optional(),
+  }),
+  rdActivities: z.array(z.object({
+    description: z.string(),
+    category: z.string(),
+    timeframe: z.string(),
+    employees: z.number().optional(),
+  })),
+  expenses: z.object({
+    wages: z.number(),
+    contractors: z.number(),
+    supplies: z.number(),
+    other: z.number(),
+    total: z.number(),
+  }),
+  metadata: z.object({
+    formVersion: z.string().optional(),
+    submissionDate: z.string(),
+    priority: z.enum(['normal', 'high', 'urgent']).default('normal'),
+  }),
+});
+
 // Select types
 export type User = typeof users.$inferSelect;
 export type Company = typeof companies.$inferSelect;
@@ -455,6 +539,7 @@ export type IntakeForm = typeof intakeForms.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
+export type WorkflowTrigger = typeof workflowTriggers.$inferSelect;
 
 // Insert types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -466,7 +551,9 @@ export type InsertIntakeForm = z.infer<typeof insertIntakeFormSchema>;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type InsertWebhookEvent = z.infer<typeof insertWebhookEventSchema>;
+export type InsertWorkflowTrigger = z.infer<typeof insertWorkflowTriggerSchema>;
 export type MakeWebhookPayload = z.infer<typeof makeWebhookPayloadSchema>;
+export type WorkflowTriggerPayload = z.infer<typeof workflowTriggerPayloadSchema>;
 
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
