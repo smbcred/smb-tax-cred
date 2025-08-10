@@ -6,8 +6,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'wouter';
 
 interface ResponsiveNavProps {
   onStartEstimate?: () => void;
@@ -16,6 +17,7 @@ interface ResponsiveNavProps {
 const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
 
   // Handle scroll for navbar background
   useEffect(() => {
@@ -48,10 +50,16 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
   };
 
   const navLinks = [
-    { href: "#how-it-works", label: "How It Works" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#faq", label: "FAQ" },
-    { href: "#resources", label: "Resources" },
+    { href: "/how-it-works", label: "How It Works", external: false },
+    { href: "/pricing", label: "Pricing", external: false },
+    { href: "/faq", label: "FAQ", external: false },
+  ];
+
+  const resourceLinks = [
+    { href: "/rd-credit-guide", label: "R&D Credit Guide" },
+    { href: "/qualifying-activities", label: "Qualifying Activities" },
+    { href: "/sample-documents", label: "Sample Documents" },
+    { href: "/blog", label: "Blog" },
   ];
 
   return (
@@ -71,14 +79,46 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a 
+              <Link 
                 key={link.href}
                 href={link.href} 
                 className="text-gray-700 hover:text-green-600 transition font-medium"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
+            
+            {/* Resources Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setResourcesOpen(!resourcesOpen)}
+                onMouseEnter={() => setResourcesOpen(true)}
+                onMouseLeave={() => setResourcesOpen(false)}
+                className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition font-medium"
+              >
+                Resources
+                <FaChevronDown className={`text-xs transition-transform ${resourcesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {resourcesOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                  onMouseEnter={() => setResourcesOpen(true)}
+                  onMouseLeave={() => setResourcesOpen(false)}
+                >
+                  {resourceLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <button 
               onClick={handleStartEstimate}
               className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 
@@ -142,7 +182,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
 
                 <div className="mt-12 space-y-6">
                   {navLinks.map((link) => (
-                    <a 
+                    <Link 
                       key={link.href}
                       href={link.href} 
                       onClick={() => setIsOpen(false)}
@@ -150,8 +190,25 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
                                py-2 transition-colors"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   ))}
+                  
+                  {/* Resources Section */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <p className="text-sm font-semibold text-gray-500 uppercase mb-3">Resources</p>
+                    {resourceLinks.map((link) => (
+                      <Link 
+                        key={link.href}
+                        href={link.href} 
+                        onClick={() => setIsOpen(false)}
+                        className="block text-lg font-medium text-gray-900 hover:text-green-600
+                                 py-2 transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                  
                   <button 
                     onClick={handleStartEstimate}
                     className="w-full bg-green-600 text-white py-3 rounded-lg 

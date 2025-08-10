@@ -11,6 +11,9 @@ import HowItWorks from "@/pages/how-it-works";
 import PricingPage from "@/pages/pricing";
 import FAQPage from "@/pages/faq";
 import SampleDocuments from "@/pages/sample-documents";
+import RDCreditGuide from "@/pages/rd-credit-guide";
+import QualifyingActivities from "@/pages/qualifying-activities";
+import Blog from "@/pages/blog";
 import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
@@ -34,6 +37,9 @@ function Router() {
           <Route path="/pricing" component={PricingPage} />
           <Route path="/faq" component={FAQPage} />
           <Route path="/sample-documents" component={SampleDocuments} />
+          <Route path="/rd-credit-guide" component={RDCreditGuide} />
+          <Route path="/qualifying-activities" component={QualifyingActivities} />
+          <Route path="/blog" component={Blog} />
         </>
       ) : (
         <>
@@ -44,6 +50,9 @@ function Router() {
           <Route path="/pricing" component={PricingPage} />
           <Route path="/faq" component={FAQPage} />
           <Route path="/sample-documents" component={SampleDocuments} />
+          <Route path="/rd-credit-guide" component={RDCreditGuide} />
+          <Route path="/qualifying-activities" component={QualifyingActivities} />
+          <Route path="/blog" component={Blog} />
         </>
       )}
       <Route component={NotFound} />

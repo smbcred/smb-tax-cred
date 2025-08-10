@@ -10,7 +10,7 @@ export const Footer = () => {
       { name: "Start Free Estimate", href: "/#calculator" },
     ],
     resources: [
-      { name: "R&D Credit Guide", href: "/guide" },
+      { name: "R&D Credit Guide", href: "/rd-credit-guide" },
       { name: "Qualifying Activities", href: "/qualifying-activities" },
       { name: "FAQ", href: "/faq" },
       { name: "Blog", href: "/blog" },
