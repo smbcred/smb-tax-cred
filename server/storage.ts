@@ -64,6 +64,7 @@ export interface IStorage {
   getIntakeFormByCompanyId(companyId: string): Promise<IntakeForm | undefined>;
   createIntakeForm(intakeForm: InsertIntakeForm): Promise<IntakeForm>;
   updateIntakeForm(id: string, updates: Partial<IntakeForm>): Promise<IntakeForm>;
+  updateIntakeFormSection(id: string, section: string, data: any, userId: string): Promise<IntakeForm>;
   submitIntakeForm(id: string, submissionData: any): Promise<IntakeForm>;
 
   // Document operations
@@ -223,6 +224,50 @@ export class DatabaseStorage implements IStorage {
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(intakeForms.id, id))
       .returning();
+    return intakeForm;
+  }
+
+  async updateIntakeFormSection(id: string, section: string, data: any, userId: string): Promise<IntakeForm> {
+    // First verify the form belongs to the user
+    const existingForm = await this.getIntakeForm(id);
+    if (!existingForm || existingForm.userId !== userId) {
+      throw new Error('Intake form not found or access denied');
+    }
+
+    // Build the update object based on the section
+    const updates: Partial<IntakeForm> = {
+      lastSavedSection: section,
+      updatedAt: new Date(),
+    };
+
+    // Map section names to database columns
+    switch (section) {
+      case 'company-info':
+        updates.companyInfo = data;
+        break;
+      case 'rd-activities':
+        updates.rdActivities = data;
+        break;
+      case 'expense-breakdown':
+        updates.expenseBreakdown = data;
+        break;
+      case 'supporting-info':
+        updates.supportingInfo = data;
+        break;
+      default:
+        throw new Error(`Invalid section: ${section}`);
+    }
+
+    const [intakeForm] = await db
+      .update(intakeForms)
+      .set(updates)
+      .where(and(eq(intakeForms.id, id), eq(intakeForms.userId, userId)))
+      .returning();
+    
+    if (!intakeForm) {
+      throw new Error('Failed to update intake form section');
+    }
+    
     return intakeForm;
   }
 

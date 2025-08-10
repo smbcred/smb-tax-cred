@@ -48,6 +48,16 @@ const authRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiting for auto-save endpoints (100 requests per user per 5 minutes)
+const autoSaveRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 100,
+  message: "Too many auto-save attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: any) => req.user?.id || req.ip, // Rate limit by user ID
+});
+
 // Helper to get client IP address
 const getClientIp = (req: any): string => {
   const forwarded = req.headers['x-forwarded-for'];
@@ -516,6 +526,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Submission error:", error);
       res.status(400).json({ 
         message: error.message || "Failed to submit intake form",
+        errors: error.errors || null
+      });
+    }
+  });
+
+  // Auto-save endpoint for partial form section updates
+  app.post("/api/intake-forms/:id/save", authenticateToken, autoSaveRateLimit, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      const { section, data } = req.body;
+      
+      // Validate required fields
+      if (!section || !data) {
+        return res.status(400).json({ 
+          message: "Section and data are required for auto-save",
+          errors: { section: !section ? "Section is required" : null, data: !data ? "Data is required" : null }
+        });
+      }
+      
+      // Validate section name
+      const validSections = ['company-info', 'rd-activities', 'expense-breakdown', 'supporting-info'];
+      if (!validSections.includes(section)) {
+        return res.status(400).json({ 
+          message: `Invalid section. Must be one of: ${validSections.join(', ')}`,
+          errors: { section: "Invalid section name" }
+        });
+      }
+      
+      // Use the new section-specific update method
+      const updatedForm = await storage.updateIntakeFormSection(formId, section, data, req.user.id);
+      
+      // Return compressed response for performance
+      res.setHeader('Content-Encoding', 'gzip');
+      res.json({ 
+        success: true,
+        message: "Section auto-saved successfully",
+        section,
+        timestamp: updatedForm.updatedAt,
+        lastSavedSection: updatedForm.lastSavedSection
+      });
+    } catch (error: any) {
+      console.error("Auto-save error:", error);
+      res.status(400).json({ 
+        message: error.message || "Failed to auto-save section",
+        errors: error.errors || null
+      });
+    }
+  });
+
+  // PATCH endpoint for individual section updates (alternative to POST)
+  app.patch("/api/intake-forms/:id/sections/:section", authenticateToken, autoSaveRateLimit, async (req: any, res) => {
+    try {
+      const { id: formId, section } = req.params;
+      const data = req.body;
+      
+      // Validate section name
+      const validSections = ['company-info', 'rd-activities', 'expense-breakdown', 'supporting-info'];
+      if (!validSections.includes(section)) {
+        return res.status(400).json({ 
+          message: `Invalid section. Must be one of: ${validSections.join(', ')}`,
+          errors: { section: "Invalid section name" }
+        });
+      }
+      
+      // Use the new section-specific update method
+      const updatedForm = await storage.updateIntakeFormSection(formId, section, data, req.user.id);
+      
+      // Return compressed response for performance
+      res.setHeader('Content-Encoding', 'gzip');
+      res.json({ 
+        success: true,
+        message: "Section updated successfully",
+        section,
+        timestamp: updatedForm.updatedAt,
+        lastSavedSection: updatedForm.lastSavedSection,
+        formData: {
+          [section]: data
+        }
+      });
+    } catch (error: any) {
+      console.error("Section update error:", error);
+      res.status(400).json({ 
+        message: error.message || "Failed to update section",
         errors: error.errors || null
       });
     }
