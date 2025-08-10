@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import crypto from "crypto";
 import { storage } from "./storage";
+import checkoutRoutes from "./routes/checkout.js";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -103,6 +104,9 @@ const calculateRDTaxCredit = (expenses: CalculatorExpenses) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Register checkout routes
+  app.use("/api/checkout", checkoutRoutes);
   
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {

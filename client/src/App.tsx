@@ -8,6 +8,9 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Checkout from "@/pages/checkout";
+import CheckoutSuccess from "@/pages/checkout/success";
+import CheckoutCancel from "@/pages/checkout/cancel";
+import CheckoutDemo from "@/pages/checkout-demo";
 import HowItWorks from "@/pages/how-it-works";
 import PricingPage from "@/pages/pricing";
 import FAQPage from "@/pages/faq";
@@ -38,6 +41,9 @@ function Router() {
         <>
           <Route path="/" component={Landing} />
           <Route path="/checkout" component={Checkout} />
+          <Route path="/checkout/success" component={CheckoutSuccess} />
+          <Route path="/checkout/cancel" component={CheckoutCancel} />
+          <Route path="/checkout/demo" component={CheckoutDemo} />
           <Route path="/how-it-works" component={HowItWorks} />
           <Route path="/pricing" component={PricingPage} />
           <Route path="/faq" component={FAQPage} />
