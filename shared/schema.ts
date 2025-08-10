@@ -790,6 +790,110 @@ export type QREJustification = z.infer<typeof qreJustificationSchema>;
 export type ComplianceMemoRequest = z.infer<typeof complianceMemoRequestSchema>;
 export type ComplianceMemo = z.infer<typeof complianceMemoSchema>;
 
+// Document orchestrator schemas
+export const documentJobProgressSchema = z.object({
+  currentStep: z.string(),
+  completedSteps: z.array(z.string()),
+  totalSteps: z.number(),
+  percentage: z.number().min(0).max(100),
+});
+
+export const documentServiceStatusSchema = z.object({
+  status: z.enum(['pending', 'in_progress', 'completed', 'failed']),
+  result: z.any().optional(),
+  error: z.string().optional(),
+});
+
+export const documentJobSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  status: z.enum(['pending', 'in_progress', 'completed', 'failed', 'timeout']),
+  priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
+  createdAt: z.string(),
+  startedAt: z.string().optional(),
+  completedAt: z.string().optional(),
+  estimatedDuration: z.number().optional(),
+  actualDuration: z.number().optional(),
+  progress: documentJobProgressSchema,
+  services: z.object({
+    narrative: documentServiceStatusSchema,
+    complianceMemo: documentServiceStatusSchema,
+    pdfGeneration: documentServiceStatusSchema,
+  }),
+  request: z.any(),
+  result: z.any().optional(),
+  errors: z.array(z.object({
+    service: z.string(),
+    error: z.string(),
+    timestamp: z.string(),
+    retryCount: z.number().default(0),
+  })),
+  retryCount: z.number().default(0),
+  maxRetries: z.number().default(3),
+  timeoutMs: z.number().default(300000),
+});
+
+export const documentGenerationRequestSchema = z.object({
+  companyContext: z.object({
+    companyName: z.string().min(1, "Company name is required"),
+    taxYear: z.number().min(2000).max(new Date().getFullYear() + 1),
+    industry: z.string().min(1, "Industry is required"),
+    businessType: z.enum(['corporation', 'llc', 'partnership', 'sole_proprietorship']),
+  }),
+  projectContext: z.object({
+    projectName: z.string().min(1, "Project name is required"),
+    projectDescription: z.string().min(50, "Project description must be at least 50 characters"),
+    rdActivities: z.array(rdActivitySchema),
+    technicalChallenges: z.array(z.string().min(10, "Technical challenge must be at least 10 characters")),
+    uncertainties: z.array(z.string().min(10, "Uncertainty must be at least 10 characters")),
+    innovations: z.array(z.string().min(10, "Innovation must be at least 10 characters")),
+    businessPurpose: z.string().min(20, "Business purpose must be at least 20 characters"),
+  }),
+  expenseContext: z.object({
+    totalExpenses: z.number().min(0, "Total expenses must be non-negative"),
+    wageExpenses: z.number().min(0, "Wage expenses must be non-negative"),
+    contractorExpenses: z.number().min(0, "Contractor expenses must be non-negative"),
+    supplyExpenses: z.number().min(0, "Supply expenses must be non-negative"),
+  }),
+  documentOptions: z.object({
+    includeNarrative: z.boolean().default(true),
+    includeComplianceMemo: z.boolean().default(true),
+    includePDF: z.boolean().default(true),
+    narrativeTemplate: z.string().default('technical_narrative'),
+    narrativeOptions: z.object({
+      length: z.enum(['brief', 'standard', 'detailed']).default('standard'),
+      tone: z.enum(['professional', 'technical', 'formal']).default('professional'),
+      focus: z.enum(['compliance', 'technical', 'business']).default('compliance'),
+    }),
+    memoOptions: z.object({
+      includeRiskAssessment: z.boolean().default(true),
+      includeFourPartTest: z.boolean().default(true),
+      includeQREAnalysis: z.boolean().default(true),
+      detailLevel: z.enum(['summary', 'standard', 'comprehensive']).default('standard'),
+    }),
+  }),
+  priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
+});
+
+export const documentGenerationResultSchema = z.object({
+  narrative: z.any().optional(),
+  complianceMemo: z.any().optional(),
+  pdfUrl: z.string().optional(),
+  summary: z.object({
+    totalDocuments: z.number(),
+    generatedAt: z.string(),
+    processingTime: z.number(),
+    complianceScore: z.number().optional(),
+    estimatedCredit: z.number().optional(),
+  }),
+});
+
+export type DocumentJobProgress = z.infer<typeof documentJobProgressSchema>;
+export type DocumentServiceStatus = z.infer<typeof documentServiceStatusSchema>;
+export type DocumentJob = z.infer<typeof documentJobSchema>;
+export type DocumentGenerationRequest = z.infer<typeof documentGenerationRequestSchema>;
+export type DocumentGenerationResult = z.infer<typeof documentGenerationResultSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;

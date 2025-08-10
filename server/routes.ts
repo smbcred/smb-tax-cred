@@ -1990,6 +1990,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return 'low';
   }
 
+  // Document orchestrator endpoints
+  app.post("/api/documents/generate", authenticateToken, async (req: any, res) => {
+    try {
+      const { documentGenerationRequestSchema } = await import("@shared/schema");
+      const validatedRequest = documentGenerationRequestSchema.parse(req.body);
+
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      console.log('Document generation request:', {
+        userId: req.user.id,
+        companyName: validatedRequest.companyContext.companyName,
+        projectName: validatedRequest.projectContext.projectName,
+        priority: validatedRequest.priority,
+        options: validatedRequest.documentOptions,
+      });
+
+      const { jobId, estimatedDuration } = await orchestrator.startDocumentGeneration(
+        req.user.id,
+        validatedRequest
+      );
+
+      res.json({
+        success: true,
+        jobId,
+        estimatedDuration,
+        status: 'queued',
+        message: 'Document generation started',
+      });
+
+    } catch (error: any) {
+      console.error("Document generation request error:", error);
+      
+      // Handle validation errors
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to start document generation"
+      });
+    }
+  });
+
+  app.get("/api/documents/job/:jobId", authenticateToken, async (req: any, res) => {
+    try {
+      const { jobId } = req.params;
+
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      const job = await orchestrator.getJobStatus(jobId);
+      
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job not found',
+        });
+      }
+
+      // Verify user owns this job
+      if (job.userId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied',
+        });
+      }
+
+      res.json({
+        success: true,
+        job: {
+          id: job.id,
+          status: job.status,
+          progress: job.progress,
+          createdAt: job.createdAt,
+          startedAt: job.startedAt,
+          completedAt: job.completedAt,
+          estimatedDuration: job.estimatedDuration,
+          actualDuration: job.actualDuration,
+          services: job.services,
+          errors: job.errors,
+          retryCount: job.retryCount,
+          result: job.result,
+        },
+      });
+
+    } catch (error: any) {
+      console.error("Job status request error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get job status"
+      });
+    }
+  });
+
+  app.post("/api/documents/job/:jobId/cancel", authenticateToken, async (req: any, res) => {
+    try {
+      const { jobId } = req.params;
+
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      const cancelled = await orchestrator.cancelJob(jobId, req.user.id);
+      
+      if (!cancelled) {
+        return res.status(400).json({
+          success: false,
+          error: 'Job cannot be cancelled',
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Job cancelled successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Job cancellation error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to cancel job"
+      });
+    }
+  });
+
+  app.post("/api/documents/job/:jobId/retry", authenticateToken, async (req: any, res) => {
+    try {
+      const { jobId } = req.params;
+
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      const retried = await orchestrator.retryJob(jobId, req.user.id);
+      
+      if (!retried) {
+        return res.status(400).json({
+          success: false,
+          error: 'Job cannot be retried',
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Job retry queued successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Job retry error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to retry job"
+      });
+    }
+  });
+
+  app.get("/api/documents/jobs", authenticateToken, async (req: any, res) => {
+    try {
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      const userJobs = orchestrator.getUserJobs(req.user.id);
+      
+      // Return simplified job information
+      const jobs = userJobs.map(job => ({
+        id: job.id,
+        status: job.status,
+        priority: job.priority,
+        progress: job.progress,
+        createdAt: job.createdAt,
+        completedAt: job.completedAt,
+        estimatedDuration: job.estimatedDuration,
+        actualDuration: job.actualDuration,
+        companyName: job.request?.companyContext?.companyName,
+        projectName: job.request?.projectContext?.projectName,
+        documentsRequested: {
+          narrative: job.request?.documentOptions?.includeNarrative || false,
+          complianceMemo: job.request?.documentOptions?.includeComplianceMemo || false,
+          pdf: job.request?.documentOptions?.includePDF || false,
+        },
+        hasErrors: job.errors.length > 0,
+        retryCount: job.retryCount,
+      }));
+
+      res.json({
+        success: true,
+        jobs,
+        total: jobs.length,
+      });
+
+    } catch (error: any) {
+      console.error("User jobs request error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get user jobs"
+      });
+    }
+  });
+
+  app.get("/api/documents/queue/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const { getDocumentOrchestrator } = await import("./services/documentOrchestrator");
+      const orchestrator = getDocumentOrchestrator();
+
+      const stats = orchestrator.getQueueStats();
+
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString(),
+      });
+
+    } catch (error: any) {
+      console.error("Queue stats request error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get queue stats"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {
