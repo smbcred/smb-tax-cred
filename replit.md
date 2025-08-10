@@ -2,9 +2,15 @@
 
 ## Overview
 
-This is a comprehensive R&D Tax Credit documentation service for small businesses built as a full-stack web application. The platform helps SMBs calculate their potential R&D tax credits, captures leads through an interactive calculator, processes payments via Stripe, collects detailed business information through smart forms, and generates IRS-compliant documentation using AI.
+SMBTaxCredits.com is a self-serve SaaS platform that helps small businesses document their AI experimentation work to claim federal R&D tax credits. We convert practical test-and-learn activities with ChatGPT, Claude, custom GPTs, and automations into IRS-compliant documentation worth 10-16% of project costs.
 
-The application follows a structured user journey from discovery through delivery: users start with an interactive calculator, provide contact information to see results, make payment based on dynamic pricing tiers, complete comprehensive intake forms, and receive professionally generated tax documentation packages.
+**Core Mission**: "Turn everyday AI experiments into tax savings" - We serve businesses USING AI tools, not building them. The platform helps SMBs calculate their potential R&D tax credits, captures leads through an interactive calculator, processes payments via Stripe, collects detailed business information through smart forms, and generates IRS-compliant documentation using AI.
+
+**CRITICAL COMPLIANCE**: 
+- We are a documentation service, NOT tax advisors
+- Never guarantee credits or audit outcomes
+- Always use "may qualify" language with disclaimers
+- Section 174 Warning: For 2022-2025, R&D expenses must be capitalized and amortized over 5 years (domestic) which significantly impacts cash flow
 
 ## User Preferences
 
@@ -67,6 +73,15 @@ Preferred communication style: Simple, everyday language.
 - Enhanced validation with business-friendly warnings and error messages
 - Added detailed calculation breakdowns showing wage, contractor, and supply calculations
 - Improved UI labels from "AI" to "Innovation" for broader appeal
+
+### Instructions.md Integration (January 10, 2025)
+- Added comprehensive project instructions and compliance guidelines
+- Critical updates on Section 174 capitalization requirement for 2022-2025
+- Established calculation accuracy rules using ASC method (6% first-time, 14% with prior QREs)
+- Contractor costs LIMITED to 65% per IRC Section 41
+- Legal compliance: documentation service only, never guarantee credits
+- Brand voice: "The Smart Friend Who Knows Taxes"
+- Focus on businesses USING AI tools, not building them
 
 ### Enhanced Calculator UI with 4-Step Flow (January 9, 2025)
 - Implemented comprehensive 4-step calculator flow with visual progress indicator

@@ -1,144 +1,196 @@
-# SMBTaxCredits.com - AI Assistant Instructions
+# SMBTaxCredits.com - Complete Project Instructions
 
-## Project Overview
-This platform helps small businesses document their AI experimentation work to claim federal R&D tax credits. We convert practical test-and-learn activities into IRS-compliant documentation packages.
+## 🎯 Project Overview
 
-## Core Business Context
+SMBTaxCredits.com is a self-serve SaaS platform that helps small businesses document their AI experimentation work to claim federal R&D tax credits. We convert practical test-and-learn activities with ChatGPT, Claude, custom GPTs, and automations into IRS-compliant documentation worth 10-16% of project costs.
 
-### What We Do
-- Help SMBs claim 10-16% of AI experimentation costs as federal tax credits
-- Generate IRS Form 6765, technical narratives, and compliance memos
-- Provide flat-fee pricing ($500-$2,000) based on credit amount
-- Deliver complete filing packages in 48 hours
+### Core Mission
+**"Turn everyday AI experiments into tax savings"** - We serve businesses USING AI tools, not building them. No special degree required—if you tested, measured, and improved, you may qualify.
 
-### Who We Serve
-Small businesses experimenting with AI tools:
-- **Marketing Agencies**: Custom GPTs, prompt libraries, AI workflows
-- **E-commerce**: Chatbots, recommendation engines, automations
+### Target Audience
+- **Marketing/Creative Agencies**: Custom GPTs, prompt libraries, AI workflows
+- **E-commerce Brands**: Chatbots, recommendation engines, automations
 - **Consultants**: AI analysis tools, automated reporting
 - **Service Businesses**: AI scheduling, operations automation
 - **Content Creators**: AI content systems, custom workflows
 
-## Key Technical Details
+## ⚠️ CRITICAL UPDATES - MUST READ
 
-## Project Knowledge Index
-- **Business Logic**: See inline comments in `/src/services/`
-- **UI Components**: Context in `/src/components/` headers
-- **API Specs**: Documented in route handlers `/src/routes/`
-- **Database Schema**: See `/database/schema.sql`
+### Recent Law Changes (2022-2025)
+**SECTION 174 CAPITALIZATION REQUIREMENT**: For tax years 2022-2025, R&D expenses must be capitalized and amortized over 5 years (domestic) or 15 years (foreign) instead of immediate expensing. This significantly impacts cash flow. Always warn users about this when discussing credits for these years.
 
-### Architecture
-- Frontend: React + TypeScript + Tailwind CSS
-- Backend: Node.js + Express + PostgreSQL
-- Integrations: Stripe, Airtable, Make.com, Claude API, Documint, AWS S3
+### Calculation Accuracy Rules
+- Use Alternative Simplified Credit (ASC) method for most SMBs
+- First-time filers with no prior QREs: 6% credit rate
+- With prior year QREs: 14% of excess over 50% of 3-year average
+- **Contractor costs LIMITED to 65%** per IRC Section 41
+- Startup payroll offset increased to $500,000 (was $250,000)
+- Federal credits only (no state credits)
 
-### User Flow
-1. Interactive calculator → Lead capture → Stripe payment
-2. Smart intake forms → Progress dashboard
-3. Automated generation → Document delivery
+### Legal Compliance Requirements
+- **NEVER** guarantee credits or audit outcomes
+- **NEVER** provide tax advice
+- **ALWAYS** include disclaimers
+- **NEVER** claim IRS approval or certification
+- Use "may qualify" not "will qualify"
+- We are a documentation service, NOT tax advisors
 
-## AI-Specific Context
+## 📁 Project Structure
 
-### What Qualifies as R&D
-Focus on TEST-AND-LEARN activities:
-- **Prompt Engineering**: Iterating prompts to improve accuracy
-- **Custom GPTs**: Building specialized assistants with retrieval
-- **Chatbot Tuning**: Testing responses, reducing error rates
-- **Automation Workflows**: LLM-based routing and classification
-- **Data Processing**: AI-powered cleanup and normalization
+```
+/smbtaxcredits-platform
+├── /client                    # React frontend application
+│   ├── /src
+│   │   ├── /components       # UI components by feature
+│   │   ├── /providers        # Context providers (Theme, Auth)
+│   │   ├── /styles          # Global styles and design system
+│   │   ├── /pages           # Route-level components
+│   │   ├── /services        # API integration layer
+│   │   ├── /hooks           # Custom React hooks
+│   │   └── /data            # Static data and constants
+│   ├── tailwind.config.js    # Tailwind configuration
+│   └── index.html
+├── /server                    # Node.js/Express backend
+│   ├── /src
+│   │   ├── /routes          # API endpoints
+│   │   ├── /controllers     # Request handlers
+│   │   ├── /services        # Business logic
+│   │   ├── /database        # Schemas & migrations
+│   │   └── /middleware      # Auth, validation, etc.
+│   └── /integrations        # External service adapters
+├── /docs                      # Project documentation
+│   ├── project-specs.md
+│   ├── api-documentation.md
+│   ├── business-rules.md
+│   ├── ai-examples.md
+│   ├── design-system.md
+│   ├── development-guide.md
+│   ├── code-standards.md
+│   ├── deployment-checklist.md
+│   ├── integration-guide.md
+│   ├── database-guide.md
+│   ├── monitoring-guide.md
+│   ├── credit-calculation-guide.md
+│   ├── legal-compliance-guide.md
+│   └── marketing-copywriting-playbook.md
+└── /shared                    # Shared types and utilities
+```
 
-### Required Documentation
-Users need to provide:
-- Prompt/version history with change notes
-- Small evaluation sets (10-50 examples)
-- Before/after metrics (error rates, time saved)
-- Test logs with dates and participants
+## 🎨 Design System Implementation
 
-## Voice and Messaging Guidelines
+### Setup
+The design system is implemented through:
+- **Global Styles**: `/client/src/styles/global-styles.css`
+- **Tailwind Config**: `/client/tailwind.config.js`
+- **Theme Provider**: `/client/src/providers/ThemeProvider.tsx`
 
-### Language Rules
-- **Reading Level**: Grade 7-9, sentences ≤20-22 words
-- **AI Mentions**: Max 2 per 150-200 words
-- **Synonyms**: Rotate: assistant, automation, workflow, integration
-- **Examples**: 1 concrete use case per 120-150 words
+### Core Design Tokens
+```css
+/* Colors */
+--color-ink: #0B0C0E;        /* Primary text */
+--color-blue: #2E5AAC;       /* Primary brand/CTAs */
+--color-emerald: #1E8E5A;    /* Success states */
+--color-cloud: #F5F7FA;      /* Backgrounds */
 
-### Message Balance
-- 60% outcomes (tax savings, business improvement)
-- 25% process/qualification
-- 15% technology
+/* Typography */
+--font-sans: 'Inter', system-ui;
+--fs-h1: 2.25rem;            /* Page titles */
+--fs-body: 1rem;             /* Default text */
 
-### Plain Language Terms
-- R&D activities → "innovation projects"
-- QREs → "eligible project costs"
-- Technical uncertainty → "problems you hadn't solved before"
-- Four-part test → "qualification criteria"
-- Process of experimentation → "test-and-learn cycles"
+/* Spacing (4px base) */
+--space-4: 1rem;             /* 16px */
+--space-6: 1.5rem;           /* 24px */
+```
 
-## Development Guidelines
+### Component Classes
+```css
+.btn-primary     /* Blue CTA buttons */
+.btn-secondary   /* Bordered buttons */
+.card           /* Content cards */
+.form-input     /* Form inputs */
+.alert          /* Alert boxes */
+```
 
-### Code Standards
-- TypeScript throughout (strict mode)
-- Functional React components with hooks
-- Comprehensive error handling
-- Mobile-first responsive design
-- Accessibility (WCAG AA compliance)
+### Using the Design System
+```jsx
+// With Tailwind utilities
+<button className="bg-blue text-paper px-6 py-3 rounded-md hover:bg-blue-600">
+  Calculate Credit
+</button>
 
-### Testing Requirements
-- Unit tests for calculation logic
-- Integration tests for API endpoints
-- E2E tests for critical user flows
-- Manual QA for form workflows
+// With component classes
+<button className="btn btn-primary">
+  Calculate Credit
+</button>
 
-### Security Priorities
-- JWT authentication with bcrypt
-- Input sanitization on all forms
-- Rate limiting on API endpoints
-- Secure file storage in S3
-- PCI compliance for payments
+// With Theme Provider
+import { useTheme } from '@/providers/ThemeProvider';
+const { theme, mode, toggleMode } = useTheme();
+```
 
-## Common Tasks
+## 📚 Documentation Guide
 
-### When Adding Features
-1. Check project knowledge base for specs
-2. Follow existing patterns in codebase
-3. Add appropriate tests
-4. Update documentation
-5. Consider mobile experience
+### How to Use the Docs
 
-### When Fixing Bugs
-1. Reproduce in development
-2. Check error logs
-3. Test edge cases
-4. Verify fix doesn't break existing features
-5. Add regression test
+Each document serves a specific purpose. Reference them as needed:
 
-### When Helping Users
-1. Use plain language (no tax jargon)
-2. Provide AI-specific examples
-3. Emphasize documentation importance
-4. Focus on business outcomes
-5. Keep federal-only scope clear
+#### Core Product Documentation
+- **`project-specs.md`** - System architecture, database schema, key components
+- **`api-documentation.md`** - All API endpoints with request/response examples
+- **`business-rules.md`** - R&D qualification rules, pricing tiers, user flow
+- **`ai-examples.md`** - 50+ examples of qualifying AI experimentation
+- **`design-system.md`** - Complete UI/UX guidelines and component library
 
-## Integration Points
+#### Development & Operations
+- **`development-guide.md`** - Environment setup, workflow, testing, deployment
+- **`code-standards.md`** - TypeScript/React conventions, Git workflow
+- **`deployment-checklist.md`** - Pre-launch checklist, rollback procedures
 
-### External Services
-- **Stripe**: Payment processing, dynamic pricing tiers
-- **Airtable**: Lead tracking, workflow management
-- **Make.com**: Automation orchestration
-- **Claude API**: Narrative generation
-- **Documint**: PDF creation
-- **SendGrid**: Email delivery
-- **AWS S3**: Document storage
+#### Infrastructure & Integrations
+- **`integration-guide.md`** - Stripe, Airtable, Make.com, Claude, SendGrid, S3 setup
+- **`database-guide.md`** - PostgreSQL schema, migrations, optimization
+- **`monitoring-guide.md`** - Sentry, analytics, alerts, incident response
 
-### Webhook Flows
-1. Stripe payment → Create user account
-2. Intake complete → Trigger Make.com workflow
-3. Documents ready → Send email notification
+#### Compliance & Business
+- **`credit-calculation-guide.md`** - IRS rules, calculation methods, validation
+- **`legal-compliance-guide.md`** - Required disclaimers, prohibited claims
+- **`marketing-copywriting-playbook.md`** - Brand voice, messaging, templates
 
-## Quick Reference
+### Quick Reference Links
+- Setting up environment: See `development-guide.md#environment-setup`
+- Adding new component: See `code-standards.md#react-component-standards`
+- Styling guidelines: See `design-system.md`
+- API integration: See `api-documentation.md`
+- Deployment steps: See `deployment-checklist.md`
 
-### Pricing Tiers
-- Tier 1: $0-4,999 credit → $500
+## 💡 Key Business Rules
+
+### What Qualifies as R&D (Four-Part Test)
+All four must be met:
+1. **Technological in Nature** - Computer science, engineering
+2. **Elimination of Uncertainty** - Technical uncertainty existed
+3. **Process of Experimentation** - Systematic testing/iteration
+4. **Business Component** - New/improved functionality
+
+### Qualified Research Expenses (QREs)
+```
+✅ INCLUDE:
+- W-2 wages (100% if substantially engaged)
+- Contractor costs (LIMITED to 65%)
+- Supplies used in R&D
+- Cloud computing for R&D
+- Software licenses for R&D
+
+❌ EXCLUDE:
+- Land or buildings
+- General admin costs
+- Marketing expenses
+- Foreign research
+- Funded research
+```
+
+### Pricing Tiers (Based on Federal Credit)
+- Tier 1: $0-4,999 → $500
 - Tier 2: $5,000-9,999 → $700
 - Tier 3: $10,000-19,999 → $900
 - Tier 4: $20,000-39,999 → $1,200
@@ -146,16 +198,212 @@ Users need to provide:
 - Tier 6: $75,000-149,999 → $1,800
 - Tier 7: $150,000+ → $2,000
 
-### Key Metrics
-- Calculator completion rate
-- Lead-to-payment conversion
-- Intake form completion time
-- Document generation success rate
-- Customer satisfaction score
+## ✍️ Marketing & Copywriting
 
-## Remember
-- This is for businesses USING AI, not building it
-- Emphasize test-and-learn work, not one-time setup
-- Keep federal-only to reduce complexity
-- Make users feel their everyday AI work has value
-- Always cite knowledge base documents when available
+### Brand Voice: "The Smart Friend Who Knows Taxes"
+- **Approachable**: Conversational, not corporate
+- **Confident**: Know our stuff without talking down
+- **Practical**: Real outcomes, not theory
+- **Encouraging**: "You've got this, and we'll help"
+
+### Key Messaging
+1. **AI-Forward Positioning**: "The only R&D platform built for businesses using AI, not building it"
+2. **Simplicity Promise**: "30 minutes from experiments to IRS-ready documents"
+3. **Transparent Pricing**: "Flat fee based on your credit. No percentages, no surprises."
+
+### Copy Quick Reference
+```
+✅ ALWAYS SAY:
+- "Calculate your potential credit"
+- "Based on your AI experiments"
+- "May qualify for federal credits"
+- "Turn tests into tax savings"
+
+❌ NEVER SAY:
+- "Guaranteed approval/savings"
+- "Maximize your refund"
+- "IRS-approved methods"
+- "We are tax experts"
+```
+
+### Required Disclaimer (Every Page)
+```
+This tool provides estimates based on current federal tax law. 
+Actual credits depend on your specific circumstances and IRS 
+examination. Consult a tax professional before claiming credits.
+```
+
+## 🔧 Technical Stack
+
+### Frontend
+- **Framework**: React 18 + TypeScript
+- **Styling**: Tailwind CSS + Custom Design System
+- **State**: Zustand + React Query
+- **Forms**: React Hook Form + Zod
+- **Build**: Vite
+
+### Backend
+- **Runtime**: Node.js + Express + TypeScript
+- **Database**: PostgreSQL (Neon) + Drizzle ORM
+- **Auth**: JWT + bcrypt
+- **Validation**: Express Validator
+
+### Integrations
+- **Payments**: Stripe
+- **Workflow**: Airtable + Make.com
+- **AI**: Claude API
+- **Documents**: Documint
+- **Storage**: AWS S3
+- **Email**: SendGrid
+
+## 🚀 Development Workflow
+
+### Getting Started
+```bash
+# Install dependencies
+npm install
+cd client && npm install
+cd ../server && npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your credentials
+
+# Run development
+npm run dev
+```
+
+### Git Workflow
+```bash
+# Create feature branch
+git checkout -b feature/your-feature
+
+# Commit with conventional format
+git commit -m "feat(calculator): add multi-year support"
+
+# Types: feat, fix, docs, style, refactor, test, chore
+```
+
+### Testing Requirements
+- Unit tests for calculation logic
+- Integration tests for API endpoints
+- E2E tests for critical user flows
+- Accessibility testing (WCAG AA)
+
+## 📊 Key User Flows
+
+### 1. Discovery → Conversion
+```
+Landing Page → Calculator → Lead Capture → Results → Payment
+```
+
+### 2. Documentation Collection
+```
+Dashboard → Company Info → R&D Activities → Expenses → Review → Submit
+```
+
+### 3. Document Generation
+```
+Intake Complete → Airtable Sync → Make.com Trigger → Claude Generation → PDF Creation → S3 Upload → Email Delivery
+```
+
+## 🎯 Component-Specific Guidelines
+
+### Calculator Component
+- Use ASC calculation method
+- Include Section 174 warnings
+- Validate contractor 65% limit
+- Show confidence scoring
+- Display all required disclaimers
+
+### Dashboard
+- Show progress percentage
+- Auto-save every 30 seconds
+- Clear next steps
+- Helpful empty states
+
+### Intake Forms
+- One section at a time
+- Progress indicator
+- Contextual help text
+- Save and resume functionality
+
+## 🔍 Common Implementation Patterns
+
+### API Calls
+```typescript
+// Use the API service layer
+import { calculatorService } from '@/services/calculator.service';
+
+const result = await calculatorService.estimate({
+  businessType: 'agency',
+  qualifyingActivities: ['custom_gpt', 'prompt_engineering'],
+  wages: { w2Wages: 500000, rdAllocation: 0.4 }
+});
+```
+
+### Error Handling
+```typescript
+try {
+  const result = await generateDocuments(intakeFormId);
+} catch (error) {
+  // User-friendly message
+  showError('Unable to generate documents. Please try again.');
+  
+  // Log for debugging
+  captureException(error, { intakeFormId });
+}
+```
+
+### Form Validation
+```typescript
+// Use Zod schemas
+const schema = z.object({
+  companyName: z.string().min(2, 'Company name required'),
+  ein: z.string().regex(/^\d{2}-\d{7}$/, 'Format: 12-3456789'),
+});
+```
+
+## 📝 Testing Checklist
+
+Before any deployment:
+- [ ] All calculations match IRS formulas
+- [ ] Disclaimers appear on all pages
+- [ ] No prohibited marketing language
+- [ ] Section 174 warnings present
+- [ ] Contractor 65% limit enforced
+- [ ] Mobile responsive
+- [ ] Accessibility compliant
+- [ ] Error states handled
+- [ ] Loading states smooth
+
+## 🆘 Quick Answers to Common Questions
+
+### "Will I definitely get this credit?"
+"The calculator shows your potential credit based on the information provided. Actual IRS approval depends on meeting all requirements and proper documentation. We recommend consulting a tax professional."
+
+### "Is this IRS-approved?"
+"We follow IRS guidelines for R&D credit calculations, but we are not affiliated with or endorsed by the IRS. Our tool helps you prepare documentation to support your claim."
+
+### "What about Section 174?"
+"Important: For 2022-2025, you must capitalize and amortize R&D expenses over 5 years instead of deducting them immediately. This affects your cash flow even if you get the credit. Consult your tax advisor."
+
+### "Do you guarantee audit protection?"
+"We cannot guarantee audit outcomes. We provide documentation to support your R&D activities, but the IRS makes final determinations. Keep all original records and consider professional representation if audited."
+
+## 🎉 Final Reminders
+
+1. **We translate, not complicate** - Bridge AI experimentation and tax code
+2. **Examples over explanations** - Show what qualifies with stories
+3. **Compliance is critical** - Always include disclaimers
+4. **SMB language always** - Their words, not tax jargon
+5. **Test everything** - Calculations, copy, and user flows
+
+When building features, ask:
+- Is the calculation accurate?
+- Are disclaimers visible?
+- Does copy match our voice?
+- Is the next step clear?
+- Would an SMB understand?
+
+**Remember**: We help businesses document their AI experiments for tax credits. We do not provide tax advice or guarantee outcomes. When in doubt, err on the side of caution and transparency.
