@@ -201,7 +201,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="relative bg-gradient-to-br from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl">
+              <div className="relative bg-primary text-white p-6 rounded-t-2xl">
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 p-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
@@ -228,7 +228,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                   </div>
                   
                   <p className="text-sm text-blue-100">
-                    Get your complete analysis & documentation guide
+                    Get your complete documentation package for tax filing
                   </p>
                 </div>
               </div>

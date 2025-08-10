@@ -91,15 +91,15 @@ export class RDTaxCalculator {
   private static readonly ASC_BASE_REDUCTION = 0.50; // 50% of prior average
   private static readonly CONTRACTOR_LIMIT = 0.65; // 65% qualification limit
   
-  // Unified pricing tiers from pricing_strategy_rd_platform.md
+  // Pricing tiers per instructions.md requirements
   private static readonly PRICING_TIERS = [
-    { tier: 1, min: 0, max: 10000, price: 500, name: 'Starter' },
-    { tier: 2, min: 10000, max: 20000, price: 750, name: 'Growth' },
-    { tier: 3, min: 20000, max: 30000, price: 1000, name: 'Professional' },
-    { tier: 4, min: 30000, max: 40000, price: 1250, name: 'Scale' },
-    { tier: 5, min: 40000, max: 50000, price: 1500, name: 'Advanced' },
-    { tier: 6, min: 50000, max: 60000, price: 1750, name: 'Premium' },
-    { tier: 7, min: 60000, max: Infinity, price: 2000, name: 'Enterprise' }
+    { tier: 1, min: 0, max: 5000, price: 500, name: 'Starter' },
+    { tier: 2, min: 5000, max: 10000, price: 700, name: 'Growth' },
+    { tier: 3, min: 10000, max: 20000, price: 900, name: 'Professional' },
+    { tier: 4, min: 20000, max: 40000, price: 1200, name: 'Scale' },
+    { tier: 5, min: 40000, max: 75000, price: 1500, name: 'Advanced' },
+    { tier: 6, min: 75000, max: 150000, price: 1800, name: 'Premium' },
+    { tier: 7, min: 150000, max: Infinity, price: 2000, name: 'Enterprise' }
   ];
 
   /**

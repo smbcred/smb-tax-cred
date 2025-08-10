@@ -122,6 +122,19 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             💵 Federal Credit Only - No state credit calculations included
           </p>
         </div>
+        
+        {/* QRE Exclusions - Critical Compliance */}
+        <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-sm font-semibold text-amber-900 mb-2">⚠️ Important: Expenses NOT Eligible for R&D Credit</p>
+          <ul className="text-xs text-amber-800 space-y-1">
+            <li>• Land or buildings</li>
+            <li>• General administrative costs</li>
+            <li>• Marketing and advertising expenses</li>
+            <li>• Foreign research (conducted outside U.S.)</li>
+            <li>• Funded research (paid by others)</li>
+            <li>• Contractor costs are limited to 65% of amount paid</li>
+          </ul>
+        </div>
       </div>
 
       <div className="space-y-6">

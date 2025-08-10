@@ -84,8 +84,43 @@ export const QualifyingActivitiesStep: React.FC<QualifyingActivitiesStepProps> =
           Which innovation activities does your business do?
         </h3>
         <p className="text-gray-600">
-          Select all that apply - these technology innovation activities qualify for R&D credits
+          Select all that apply - these technology innovation activities may qualify for R&D credits
         </p>
+      </div>
+
+      {/* Four-Part Test Display - Critical Compliance */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <h4 className="font-semibold text-blue-900 mb-2">IRS Four-Part Test for R&D Credits</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 font-bold">1.</span>
+            <div>
+              <strong className="text-blue-900">Technological in Nature</strong>
+              <p className="text-blue-700">Relies on computer science, engineering, or physical sciences</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 font-bold">2.</span>
+            <div>
+              <strong className="text-blue-900">Elimination of Uncertainty</strong>
+              <p className="text-blue-700">Addresses technical capability or methodology challenges</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 font-bold">3.</span>
+            <div>
+              <strong className="text-blue-900">Process of Experimentation</strong>
+              <p className="text-blue-700">Involves testing, trial and error, or iterative development</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 font-bold">4.</span>
+            <div>
+              <strong className="text-blue-900">Business Component</strong>
+              <p className="text-blue-700">Creates new or improved functionality, performance, or quality</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-3 max-h-96 overflow-y-auto pr-2">

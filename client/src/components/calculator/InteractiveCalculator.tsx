@@ -252,10 +252,10 @@ export const InteractiveCalculator: React.FC = () => {
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center">
-          Calculate Your R&D Tax Credit
+          Calculate Your Potential Innovation Tax Credit
         </h2>
         <p className="text-gray-600 text-center mt-2 text-sm sm:text-base">
-          See your potential federal credit in under 2 minutes
+          Based on your AI experiments. See what you may qualify for in under 2 minutes
         </p>
       </div>
 
@@ -409,8 +409,18 @@ export const InteractiveCalculator: React.FC = () => {
         </motion.div>
       )}
 
+      {/* Required Disclaimer - Compliance */}
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+        <p className="text-xs text-gray-600 text-center">
+          <strong>Important Disclaimer:</strong> This tool provides estimates based on current federal tax law. 
+          Actual credits depend on your specific circumstances and IRS examination. 
+          Consult a tax professional before claiming credits. SMBTaxCredits.com provides documentation 
+          services only and does not offer tax advice.
+        </p>
+      </div>
+      
       {/* Help text footer */}
-      <div className="mt-8 text-center text-sm text-gray-500">
+      <div className="mt-4 text-center text-sm text-gray-500">
         <p>All calculations based on federal R&D tax credit rules (IRS Section 41)</p>
         <p className="mt-1">
           Questions? <button className="text-blue-600 hover:underline">Chat with us</button>

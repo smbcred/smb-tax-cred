@@ -29,7 +29,8 @@ import {
   Sparkles,
   Clock,
   Shield,
-  FileText
+  FileText,
+  AlertCircle
 } from 'lucide-react';
 import { CountUpAnimation } from './CountUpAnimation';
 import { formatCurrency } from '@/utils/calculations';
@@ -196,15 +197,35 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </div>
 
             <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-              Your work on {getExampleActivity()} qualifies for federal R&D tax credits
+              Your work on {getExampleActivity()} may qualify for federal R&D tax credits
             </p>
+          </motion.div>
+
+          {/* Section 174 Warning - Critical Compliance */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-amber-50 border border-amber-300 rounded-xl p-6 mb-8"
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Important Section 174 Notice</h3>
+                <p className="text-sm text-gray-700">
+                  For tax years 2022-2025, R&D expenses must be capitalized and amortized over 5 years (domestic) or 15 years (foreign) 
+                  instead of immediate expensing. This significantly impacts cash flow even with the R&D credit. 
+                  Consult your tax professional about the impact on your specific situation.
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* ROI Highlight Box */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.6 }}
             className="bg-secondary-light border border-secondary rounded-xl p-6 mb-8"
           >
             <div className="flex items-center justify-between flex-wrap gap-4">

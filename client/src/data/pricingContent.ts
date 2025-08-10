@@ -6,14 +6,14 @@
 
 export const pricingContent = {
   headline: "Simple, Transparent Pricing",
-  subheadline: "One flat fee based on your credit size. No surprises.",
+  subheadline: "One flat fee based on your potential credit size. No percentages, no surprises.",
   
   tiers: [
     {
       tier: "Starter",
-      creditRange: "Credits under $10K",
+      creditRange: "$0 - $4,999",
       price: "$500",
-      example: "$8K credit = 16x ROI",
+      example: "$3K credit = 6x ROI",
       features: [
         "Federal credit documentation",
         "AI experimentation narrative",
@@ -22,52 +22,91 @@ export const pricingContent = {
         "48-hour delivery"
       ],
       highlighted: false,
-      bestFor: "Perfect for: Consultants and small teams experimenting with AI"
+      bestFor: "Perfect for: Solopreneurs and consultants testing AI tools"
     },
     {
       tier: "Growth",
-      creditRange: "Credits $10K-$50K",
-      price: "$750",
-      example: "$30K credit = 40x ROI",
+      creditRange: "$5,000 - $9,999",
+      price: "$700",
+      example: "$7K credit = 10x ROI",
       features: [
         "Everything in Starter",
         "Multiple AI projects",
         "Priority processing",
-        "Email support",
-        "Complex implementations"
+        "Email support"
       ],
-      highlighted: true,
-      bestFor: "Perfect for: Growing businesses and agencies using AI extensively"
+      highlighted: false,
+      bestFor: "Perfect for: Small teams experimenting with AI"
     },
     {
-      tier: "Scale",
-      creditRange: "Credits $50K-$100K",
-      price: "$1,000",
-      example: "$75K credit = 75x ROI",
+      tier: "Professional",
+      creditRange: "$10,000 - $19,999",
+      price: "$900",
+      example: "$15K credit = 16x ROI",
       features: [
         "Everything in Growth",
         "Unlimited AI projects",
-        "Multi-year documentation",
-        "Phone support",
-        "Dedicated assistance"
+        "Complex implementations",
+        "Phone support"
       ],
-      highlighted: false,
-      bestFor: "Perfect for: Established companies with major AI initiatives"
+      highlighted: true,
+      bestFor: "Perfect for: Growing agencies using AI extensively"
     },
     {
-      tier: "Enterprise",
-      creditRange: "Credits over $100K",
+      tier: "Scale",
+      creditRange: "$20,000 - $39,999",
+      price: "$1,200",
+      example: "$30K credit = 25x ROI",
+      features: [
+        "Everything in Professional",
+        "Multi-year documentation",
+        "Dedicated assistance",
+        "Expedited processing"
+      ],
+      highlighted: false,
+      bestFor: "Perfect for: Established businesses with AI initiatives"
+    },
+    {
+      tier: "Advanced",
+      creditRange: "$40,000 - $74,999",
       price: "$1,500",
-      example: "$150K credit = 100x ROI",
+      example: "$60K credit = 40x ROI",
       features: [
         "Everything in Scale",
         "Custom documentation",
         "White-glove service",
-        "Audit defense prep",
-        "Priority handling"
+        "Audit preparation support"
       ],
       highlighted: false,
-      bestFor: "Perfect for: Large-scale AI transformations"
+      bestFor: "Perfect for: Companies with major AI transformations"
+    },
+    {
+      tier: "Premium",
+      creditRange: "$75,000 - $149,999",
+      price: "$1,800",
+      example: "$100K credit = 55x ROI",
+      features: [
+        "Everything in Advanced",
+        "Priority handling",
+        "Executive summary",
+        "Quarterly reviews"
+      ],
+      highlighted: false,
+      bestFor: "Perfect for: Large-scale AI implementations"
+    },
+    {
+      tier: "Enterprise",
+      creditRange: "$150,000+",
+      price: "$2,000",
+      example: "$200K credit = 100x ROI",
+      features: [
+        "Everything in Premium",
+        "Dedicated account manager",
+        "Custom reporting",
+        "Full audit defense prep"
+      ],
+      highlighted: false,
+      bestFor: "Perfect for: Enterprise AI transformations"
     }
   ],
   
