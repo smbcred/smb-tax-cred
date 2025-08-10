@@ -28,41 +28,35 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   onUpdate,
   businessType
 }) => {
-  const [localExpenses, setLocalExpenses] = useState(expenses);
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
   const [warnings, setWarnings] = useState<string[]>([]);
 
-  // Sync local state with parent props when they change
+  // Update showPriorYears when first-time filer status changes
   useEffect(() => {
-    setLocalExpenses(expenses);
     setShowPriorYears(!expenses.isFirstTimeFiler);
-  }, [expenses]);
+  }, [expenses.isFirstTimeFiler]);
 
-  // Debounced update to parent and validation
+  // Validate expenses when they change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onUpdate(localExpenses);
-      validateExpenses();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [localExpenses, onUpdate]);
+    validateExpenses();
+  }, [expenses.rdAllocationPercentage, expenses.averageTechnicalSalary, expenses.contractorCosts, expenses.technicalEmployees]);
 
   const validateExpenses = () => {
     const newWarnings: string[] = [];
     
-    if (localExpenses.rdAllocationPercentage && localExpenses.rdAllocationPercentage > 80) {
+    if (expenses.rdAllocationPercentage && expenses.rdAllocationPercentage > 80) {
       newWarnings.push('Allocating over 80% to R&D may require additional documentation');
     }
     
-    if (localExpenses.averageTechnicalSalary > 0 && localExpenses.averageTechnicalSalary < 30000) {
+    if (expenses.averageTechnicalSalary > 0 && expenses.averageTechnicalSalary < 30000) {
       newWarnings.push('Average salary seems low for technical employees');
     }
     
-    if (localExpenses.averageTechnicalSalary > 300000) {
+    if (expenses.averageTechnicalSalary > 300000) {
       newWarnings.push('Average salary is unusually high - ensure this reflects actual wages');
     }
     
-    if (localExpenses.contractorCosts > (localExpenses.technicalEmployees * localExpenses.averageTechnicalSalary)) {
+    if (expenses.contractorCosts > (expenses.technicalEmployees * expenses.averageTechnicalSalary)) {
       newWarnings.push('Contractor costs exceed employee wages - ensure proper documentation');
     }
     
@@ -71,48 +65,36 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
 
   const handleChange = (field: string, value: string | boolean | number) => {
     if (typeof value === 'boolean') {
-      setLocalExpenses(prev => ({
-        ...prev,
-        [field]: value
-      }));
+      onUpdate({ [field]: value });
       if (field === 'isFirstTimeFiler') {
         setShowPriorYears(!value);
         if (value) {
-          setLocalExpenses(prev => ({ ...prev, priorYearQREs: [] }));
+          onUpdate({ priorYearQREs: [] });
         }
       }
     } else if (typeof value === 'number') {
-      setLocalExpenses(prev => ({
-        ...prev,
-        [field]: value
-      }));
+      onUpdate({ [field]: value });
     } else {
-      // Handle string input - preserve original value for display, convert for calculation
+      // Handle string input - convert for calculation
       const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
-      setLocalExpenses(prev => ({
-        ...prev,
-        [field]: numValue
-      }));
+      onUpdate({ [field]: numValue });
     }
   };
 
   const handlePriorYearChange = (yearIndex: number, value: string) => {
     const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
-    const priorYears = localExpenses.priorYearQREs || [0, 0, 0];
+    const priorYears = [...(expenses.priorYearQREs || [0, 0, 0])];
     priorYears[yearIndex] = numValue;
-    setLocalExpenses(prev => ({
-      ...prev,
-      priorYearQREs: priorYears
-    }));
+    onUpdate({ priorYearQREs: priorYears });
   };
 
   // Quick estimate display - FIXED calculation
-  const rdAllocation = (localExpenses.rdAllocationPercentage ?? 100) / 100;
-  const wageQRE = localExpenses.technicalEmployees * localExpenses.averageTechnicalSalary * rdAllocation;
-  const contractorQRE = localExpenses.contractorCosts * 0.65; // Only contractors limited to 65%
-  const suppliesQRE = localExpenses.softwareCosts + localExpenses.cloudCosts;
+  const rdAllocation = (expenses.rdAllocationPercentage ?? 100) / 100;
+  const wageQRE = expenses.technicalEmployees * expenses.averageTechnicalSalary * rdAllocation;
+  const contractorQRE = expenses.contractorCosts * 0.65; // Only contractors limited to 65%
+  const suppliesQRE = expenses.softwareCosts + expenses.cloudCosts;
   const totalQRE = wageQRE + contractorQRE + suppliesQRE;
-  const creditRate = localExpenses.isFirstTimeFiler ? 0.06 : 0.14;
+  const creditRate = expenses.isFirstTimeFiler ? 0.06 : 0.14;
   const estimatedCredit = Math.round(totalQRE * creditRate);
 
   return (
@@ -155,7 +137,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </label>
               <input
                 type="number"
-                value={localExpenses.totalEmployees || ''}
+                value={expenses.totalEmployees || ''}
                 onChange={(e) => handleChange('totalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 25"
@@ -167,7 +149,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </label>
               <input
                 type="number"
-                value={localExpenses.technicalEmployees || ''}
+                value={expenses.technicalEmployees || ''}
                 onChange={(e) => handleChange('technicalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 10"
@@ -186,7 +168,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={localExpenses.averageTechnicalSalary ? localExpenses.averageTechnicalSalary.toLocaleString() : ''}
+                  value={expenses.averageTechnicalSalary ? expenses.averageTechnicalSalary.toLocaleString() : ''}
                   onChange={(e) => handleChange('averageTechnicalSalary', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 95,000"
@@ -201,7 +183,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
-                    value={localExpenses.rdAllocationPercentage ?? 100}
+                    value={expenses.rdAllocationPercentage ?? 100}
                     onChange={(e) => handleChange('rdAllocationPercentage', parseInt(e.target.value))}
                     min="0"
                     max="100"
@@ -211,7 +193,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   <div className="relative w-20">
                     <input
                       type="number"
-                      value={localExpenses.rdAllocationPercentage ?? 100}
+                      value={expenses.rdAllocationPercentage ?? 100}
                       onChange={(e) => handleChange('rdAllocationPercentage', e.target.value)}
                       min="0"
                       max="100"
@@ -235,7 +217,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             <label className="flex items-center gap-3">
               <input
                 type="checkbox"
-                checked={localExpenses.isFirstTimeFiler ?? true}
+                checked={expenses.isFirstTimeFiler ?? true}
                 onChange={(e) => handleChange('isFirstTimeFiler', e.target.checked)}
                 className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
               />
@@ -244,7 +226,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </span>
             </label>
             
-            {!localExpenses.isFirstTimeFiler && (
+            {!expenses.isFirstTimeFiler && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -264,7 +246,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                         <span className="absolute left-2 top-2 text-gray-500 text-sm">$</span>
                         <input
                           type="text"
-                          value={(localExpenses.priorYearQREs?.[yearIndex] || 0).toLocaleString()}
+                          value={(expenses.priorYearQREs?.[yearIndex] || 0).toLocaleString()}
                           onChange={(e) => handlePriorYearChange(yearIndex, e.target.value)}
                           className="w-full pl-6 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                           placeholder="0"
@@ -290,7 +272,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={localExpenses.contractorCosts ? localExpenses.contractorCosts.toLocaleString() : ''}
+                  value={expenses.contractorCosts ? expenses.contractorCosts.toLocaleString() : ''}
                   onChange={(e) => handleChange('contractorCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 50,000"
@@ -313,7 +295,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={localExpenses.softwareCosts ? localExpenses.softwareCosts.toLocaleString() : ''}
+                  value={expenses.softwareCosts ? expenses.softwareCosts.toLocaleString() : ''}
                   onChange={(e) => handleChange('softwareCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 25,000"
@@ -331,7 +313,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={localExpenses.cloudCosts ? localExpenses.cloudCosts.toLocaleString() : ''}
+                  value={expenses.cloudCosts ? expenses.cloudCosts.toLocaleString() : ''}
                   onChange={(e) => handleChange('cloudCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 15,000"
@@ -363,7 +345,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
         )}
 
         {/* Live Estimate */}
-        {localExpenses.technicalEmployees > 0 && localExpenses.averageTechnicalSalary > 0 && (
+        {expenses.technicalEmployees > 0 && expenses.averageTechnicalSalary > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
