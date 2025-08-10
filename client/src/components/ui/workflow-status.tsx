@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Button } from './button';
 import { Badge } from './badge';
-import { apiRequest } from '@/lib/queryClient';
+import { ProgressMonitor } from './progress-monitor';
 import { Loader2, RefreshCw, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -292,6 +292,20 @@ export function WorkflowStatus({ intakeFormId, canTrigger = false, className }: 
                 Showing latest 3 of {triggers.length} workflow runs
               </p>
             )}
+          </div>
+        )}
+
+        {/* Progress Monitor for Latest Active Workflow */}
+        {latestTrigger && hasActiveWorkflow && (
+          <div className="mt-6">
+            <ProgressMonitor 
+              triggerId={latestTrigger.id}
+              autoStart={true}
+              showControls={true}
+              onCompleted={() => {
+                queryClient.invalidateQueries({ queryKey: ['/api/workflows/triggers', intakeFormId] });
+              }}
+            />
           </div>
         )}
       </CardContent>

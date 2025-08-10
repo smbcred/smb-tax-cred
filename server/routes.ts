@@ -1367,6 +1367,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Status polling endpoints
+  app.post("/api/workflows/polling/start/:triggerId", authenticateToken, async (req: any, res) => {
+    try {
+      const { triggerId } = req.params;
+      
+      const trigger = await storage.getWorkflowTrigger(triggerId);
+      if (!trigger) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Workflow trigger not found" 
+        });
+      }
+
+      // Verify form ownership
+      const form = await storage.getIntakeForm(trigger.intakeFormId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(403).json({ 
+          success: false,
+          error: "Access denied" 
+        });
+      }
+
+      // Import and start polling service
+      const { getPollingService } = await import("./services/statusPolling");
+      const pollingService = getPollingService();
+      
+      await pollingService.startPolling(triggerId);
+
+      console.log('Status polling started:', {
+        triggerId,
+        intakeFormId: trigger.intakeFormId,
+        userId: req.user.id,
+      });
+
+      res.json({
+        success: true,
+        triggerId,
+        message: 'Status polling started',
+        pollingInterval: 10000, // 10 seconds
+      });
+
+    } catch (error: any) {
+      console.error("Start polling error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to start status polling"
+      });
+    }
+  });
+
+  app.post("/api/workflows/polling/stop/:triggerId", authenticateToken, async (req: any, res) => {
+    try {
+      const { triggerId } = req.params;
+      
+      const trigger = await storage.getWorkflowTrigger(triggerId);
+      if (!trigger) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Workflow trigger not found" 
+        });
+      }
+
+      // Verify form ownership
+      const form = await storage.getIntakeForm(trigger.intakeFormId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(403).json({ 
+          success: false,
+          error: "Access denied" 
+        });
+      }
+
+      // Import and stop polling service
+      const { getPollingService } = await import("./services/statusPolling");
+      const pollingService = getPollingService();
+      
+      await pollingService.stopPolling(triggerId);
+
+      console.log('Status polling stopped:', {
+        triggerId,
+        intakeFormId: trigger.intakeFormId,
+        userId: req.user.id,
+      });
+
+      res.json({
+        success: true,
+        triggerId,
+        message: 'Status polling stopped',
+      });
+
+    } catch (error: any) {
+      console.error("Stop polling error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to stop status polling"
+      });
+    }
+  });
+
+  app.get("/api/workflows/status/:triggerId", authenticateToken, async (req: any, res) => {
+    try {
+      const { triggerId } = req.params;
+      
+      const trigger = await storage.getWorkflowTrigger(triggerId);
+      if (!trigger) {
+        return res.status(404).json({ 
+          success: false,
+          error: "Workflow trigger not found" 
+        });
+      }
+
+      // Verify form ownership
+      const form = await storage.getIntakeForm(trigger.intakeFormId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(403).json({ 
+          success: false,
+          error: "Access denied" 
+        });
+      }
+
+      // Import and get current status
+      const { getPollingService } = await import("./services/statusPolling");
+      const pollingService = getPollingService();
+      
+      const currentStatus = await pollingService.getCurrentStatus(triggerId);
+
+      res.json({
+        success: true,
+        triggerId,
+        status: currentStatus,
+        trigger: {
+          id: trigger.id,
+          status: trigger.status,
+          workflowName: trigger.workflowName,
+          createdAt: trigger.createdAt,
+          triggeredAt: trigger.triggeredAt,
+          completedAt: trigger.completedAt,
+          retryCount: trigger.retryCount,
+          maxRetries: trigger.maxRetries,
+          lastError: trigger.lastError,
+          makeExecutionId: trigger.makeExecutionId,
+          makeScenarioId: trigger.makeScenarioId,
+        },
+      });
+
+    } catch (error: any) {
+      console.error("Get status error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get workflow status"
+      });
+    }
+  });
+
+  app.get("/api/workflows/polling/active", authenticateToken, async (req: any, res) => {
+    try {
+      // Import and get active polls
+      const { getPollingService } = await import("./services/statusPolling");
+      const pollingService = getPollingService();
+      
+      const activePolls = await pollingService.getActivePolls();
+      
+      // Filter to only polls the user owns
+      const userPolls = [];
+      for (const triggerId of activePolls) {
+        const trigger = await storage.getWorkflowTrigger(triggerId);
+        if (trigger) {
+          const form = await storage.getIntakeForm(trigger.intakeFormId);
+          if (form && form.userId === req.user.id) {
+            userPolls.push(triggerId);
+          }
+        }
+      }
+
+      res.json({
+        success: true,
+        activePolls: userPolls,
+        count: userPolls.length,
+      });
+
+    } catch (error: any) {
+      console.error("Get active polls error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get active polls"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

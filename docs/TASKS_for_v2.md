@@ -40,7 +40,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 2.3.3 | Document URL Management | [x] | [📋](./acceptance/2.3.3.md) |
 | 2.4.1 | Webhook Endpoint Creation | [x] | [📋](./acceptance/2.4.1.md) |
 | 2.4.2 | Workflow Trigger System | [x] | [📋](./acceptance/2.4.2.md) |
-| 2.4.3 | Status Polling Service | [ ] | [📋](./acceptance/2.4.3.md) |
+| 2.4.3 | Status Polling Service | [x] | [📋](./acceptance/2.4.3.md) |
 | 3.1.1 | Claude Service Setup | [ ] | [📋](./acceptance/3.1.1.md) |
 | 3.1.2 | Narrative Prompt Templates | [ ] | [📋](./acceptance/3.1.2.md) |
 | 3.1.3 | Compliance Memo Generation | [ ] | [📋](./acceptance/3.1.3.md) |
