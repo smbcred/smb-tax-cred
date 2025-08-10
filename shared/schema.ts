@@ -16,7 +16,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  password: varchar("password", { length: 255 }).notNull(), // For compatibility
+  password: varchar("password", { length: 255 }), // For compatibility - nullable
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   phone: varchar("phone", { length: 20 }),
@@ -314,6 +314,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  passwordHash: true,
   password: true,
   status: true,
   loginCount: true,

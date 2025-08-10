@@ -38,6 +38,15 @@ const leadCaptureRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiting for auth endpoints (5 attempts per IP per 15 minutes)
+const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: "Too many authentication attempts from this IP, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Helper to get client IP address
 const getClientIp = (req: any): string => {
   const forwarded = req.headers['x-forwarded-for'];
@@ -108,8 +117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register checkout routes
   app.use("/api/checkout", checkoutRoutes);
   
-  // Auth routes
-  app.post("/api/auth/register", async (req, res) => {
+  // Auth routes with rate limiting
+  app.post("/api/auth/register", authRateLimit, async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
       const { email, password } = userData;
@@ -123,8 +132,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const passwordHash = await bcrypt.hash(password, 10);
       
-      // Create user
-      const user = await storage.createUser({ email, passwordHash, password });
+      // Create user with hashed password
+      const user = await storage.createUser({ email, passwordHash });
       
       // Generate JWT token
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
@@ -138,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", authRateLimit, async (req, res) => {
     try {
       const { email, password } = req.body;
       
@@ -172,6 +181,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       email: req.user.email,
       accountStatus: req.user.accountStatus,
     });
+  });
+
+  // Logout endpoint (stateless JWT, so we just confirm the action)
+  app.post("/api/auth/logout", authenticateToken, async (req: any, res) => {
+    try {
+      res.json({ 
+        message: "Successfully logged out",
+        user: { id: req.user.id, email: req.user.email }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
+  // Refresh token endpoint - generates new token with same user data
+  app.post("/api/auth/refresh", authRateLimit, async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.split(" ")[1];
+
+      if (!token) {
+        return res.status(401).json({ message: "Refresh token required" });
+      }
+
+      // Verify existing token (even if expired, we want to check structure)
+      let decoded: any;
+      try {
+        decoded = jwt.verify(token, JWT_SECRET) as any;
+      } catch (error: any) {
+        // For refresh, allow expired tokens but not invalid ones
+        if (error.name === 'TokenExpiredError') {
+          decoded = jwt.decode(token) as any;
+        } else {
+          return res.status(401).json({ message: "Invalid refresh token" });
+        }
+      }
+
+      // Get fresh user data
+      const user = await storage.getUser(decoded.userId);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      // Generate new token
+      const newToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
+
+      res.json({
+        user: { id: user.id, email: user.email },
+        token: newToken,
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Token refresh failed" });
+    }
   });
 
   // Lead capture route with rate limiting and tracking
