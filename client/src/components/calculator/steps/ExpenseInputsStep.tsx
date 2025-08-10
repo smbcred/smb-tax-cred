@@ -32,6 +32,12 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
   const [warnings, setWarnings] = useState<string[]>([]);
 
+  // Sync local state with parent props when they change
+  useEffect(() => {
+    setLocalExpenses(expenses);
+    setShowPriorYears(!expenses.isFirstTimeFiler);
+  }, [expenses]);
+
   // Debounced update to parent and validation
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,7 +45,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
       validateExpenses();
     }, 500);
     return () => clearTimeout(timer);
-  }, [localExpenses]);
+  }, [localExpenses, onUpdate]);
 
   const validateExpenses = () => {
     const newWarnings: string[] = [];
@@ -81,6 +87,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
         [field]: value
       }));
     } else {
+      // Handle string input - preserve original value for display, convert for calculation
       const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
       setLocalExpenses(prev => ({
         ...prev,
@@ -174,16 +181,17 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Average Salary of Innovation Employees
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-2 text-gray-500">$</span>
-              <input
-                type="text"
-                value={localExpenses.averageTechnicalSalary ? localExpenses.averageTechnicalSalary.toLocaleString() : ''}
-                onChange={(e) => handleChange('averageTechnicalSalary', e.target.value)}
-                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="e.g., 95,000"
-              />
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                <input
+                  type="text"
+                  value={localExpenses.averageTechnicalSalary ? localExpenses.averageTechnicalSalary.toLocaleString() : ''}
+                  onChange={(e) => handleChange('averageTechnicalSalary', e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="e.g., 95,000"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -216,7 +224,6 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   Percentage of time spent on experimentation & testing
                 </p>
               </div>
-            </div>
             </div>
           </div>
         </div>
