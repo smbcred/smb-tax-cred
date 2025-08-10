@@ -463,6 +463,31 @@ export const companyInfoSchema = z.object({
   website: z.string().url("Website must be a valid URL").optional().or(z.literal("")),
 });
 
+export const rdProjectSchema = z.object({
+  id: z.string().optional(),
+  projectName: z.string().min(1, "Project name is required"),
+  projectDescription: z.string().min(50, "Project description must be at least 50 characters"),
+  technicalChallenges: z.string().min(50, "Technical challenges must be at least 50 characters"),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Start date is required"),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "End date is required"),
+  successCriteria: z.string().min(30, "Success criteria must be at least 30 characters"),
+  // Four-part test alignment
+  businessPurpose: z.string().min(30, "Business purpose must be at least 30 characters"),
+  technicalUncertainty: z.string().min(30, "Technical uncertainty must be at least 30 characters"),
+  processOfExperimentation: z.string().min(30, "Process of experimentation must be at least 30 characters"),
+  technologicalNature: z.string().min(30, "Technological nature must be at least 30 characters"),
+}).refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
+  message: "End date must be after start date",
+  path: ["endDate"],
+});
+
+export const rdActivitiesSchema = z.object({
+  projects: z.array(rdProjectSchema).min(1, "At least one R&D project is required"),
+  overallObjectives: z.string().min(50, "Overall R&D objectives must be at least 50 characters"),
+  aiToolsUsed: z.array(z.string()).optional(),
+  rdMethodology: z.string().min(50, "R&D methodology must be at least 50 characters"),
+});
+
 export type LeadCaptureData = z.infer<typeof leadCaptureSchema>;
 export type CalculatorExpenses = z.infer<typeof calculatorExpensesSchema>;
 export type CompanyInfoData = z.infer<typeof companyInfoSchema>;

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CompanyInfoSection from './sections/CompanyInfoSection';
+import RDActivitiesSection from './sections/RDActivitiesSection';
 
 interface FormSectionProps {
   sectionId: string;
@@ -38,7 +39,8 @@ export default function FormSection({
     
     switch (sectionId) {
       case 'rd-activities':
-        isValid = !!(data.primaryActivities && data.technicalChallenges && data.systematicProcess);
+        // Validation handled by RDActivitiesSection component
+        return;
         break;
       case 'expense-breakdown':
         isValid = !!(data.totalWages || data.contractorCosts || data.supplies || data.cloudSoftware);
@@ -62,88 +64,11 @@ export default function FormSection({
   );
 
   const renderRDActivitiesSection = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Primary R&D Activities</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="primaryActivities">Describe your primary research and development activities *</Label>
-            <Textarea
-              id="primaryActivities"
-              value={data.primaryActivities || ''}
-              onChange={(e) => handleInputChange('primaryActivities', e.target.value)}
-              placeholder="Describe the main R&D activities your company engages in..."
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="technicalChallenges">Technical challenges addressed *</Label>
-            <Textarea
-              id="technicalChallenges"
-              value={data.technicalChallenges || ''}
-              onChange={(e) => handleInputChange('technicalChallenges', e.target.value)}
-              placeholder="What technical challenges are you trying to solve?"
-              rows={3}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="systematicProcess">Systematic process of experimentation *</Label>
-            <Textarea
-              id="systematicProcess"
-              value={data.systematicProcess || ''}
-              onChange={(e) => handleInputChange('systematicProcess', e.target.value)}
-              placeholder="Describe your systematic approach to R&D..."
-              rows={3}
-              required
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">AI & Technology Usage</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <Label>Which AI tools does your company use for R&D activities?</Label>
-            {['ChatGPT', 'Claude', 'GitHub Copilot', 'Custom AI Models', 'Machine Learning Frameworks'].map((tool) => (
-              <div key={tool} className="flex items-center space-x-2">
-                <Checkbox
-                  id={tool}
-                  checked={data.aiTools?.includes(tool) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTools = data.aiTools || [];
-                    const newTools = checked 
-                      ? [...currentTools, tool]
-                      : currentTools.filter((t: string) => t !== tool);
-                    handleInputChange('aiTools', newTools);
-                  }}
-                />
-                <Label htmlFor={tool}>{tool}</Label>
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="aiUsageDescription">How do you use AI in your R&D process?</Label>
-            <Textarea
-              id="aiUsageDescription"
-              value={data.aiUsageDescription || ''}
-              onChange={(e) => handleInputChange('aiUsageDescription', e.target.value)}
-              placeholder="Describe how AI tools support your R&D activities..."
-              rows={3}
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <RDActivitiesSection 
+      data={data} 
+      onDataChange={onDataChange} 
+      onValidationChange={onValidationChange}
+    />
   );
 
   const renderExpenseBreakdownSection = () => (
