@@ -1,0 +1,70 @@
+Here's a comprehensive agent prompt to fix your crashed app:
+
+```
+Fix the React app crash after implementing the design system. The app is located in the client/ folder.
+
+Context:
+- Just added a global design system with ThemeProvider, global-styles.css, and tailwind.config.js
+- App was working before these changes
+- File structure: client/src/ contains the React app
+- Main file is client/src/App.tsx
+
+Steps to debug and fix:
+
+1. Check the browser console and terminal for specific error messages
+
+2. Verify file locations:
+   - client/src/providers/ThemeProvider.tsx should exist
+   - client/src/styles/global-styles.css should exist
+   - client/tailwind.config.js should exist
+
+3. Check App.tsx imports are correct:
+   ```tsx
+   import './styles/global-styles.css';
+   import { ThemeProvider } from './providers/ThemeProvider';
+   ```
+
+4. Common fixes to try:
+
+   a) If "module not found" errors:
+      - Ensure file paths are correct
+      - Check if files actually exist in specified locations
+      - Fix any typos in import statements
+
+   b) If ThemeProvider errors:
+      - Make sure ThemeProvider wraps the entire app
+      - Check if React is imported in ThemeProvider.tsx
+      - Verify createContext is imported from 'react'
+
+   c) If CSS/Tailwind errors:
+      - Ensure index.css has Tailwind directives at the top:
+        ```css
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+        ```
+      - Check if @import './styles/global-styles.css'; is after Tailwind directives
+
+   d) If tailwind.config.js errors:
+      - Verify the content paths are correct:
+        ```js
+        content: [
+          "./index.html",
+          "./src/**/*.{js,ts,jsx,tsx}",
+        ],
+        ```
+
+5. Quick recovery if needed:
+   - Comment out the new imports in App.tsx
+   - Remove ThemeProvider wrapper temporarily
+   - Get app running again, then add features one by one
+
+6. Test minimal implementation:
+   - First just import global-styles.css
+   - Then add ThemeProvider
+   - Finally test design system components
+
+Please fix the crash, identify the root cause, and ensure the design system is properly integrated. Share the specific error message and the fix applied.
+```
+
+This prompt should help an AI agent or developer quickly identify and fix the crash. The key is to work incrementally - get the app running first, then add the design system features one by one.
