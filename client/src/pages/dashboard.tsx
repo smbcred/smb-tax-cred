@@ -16,6 +16,7 @@ import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import ProgressOverview from "@/components/dashboard/ProgressOverview";
 import ActionItemsChecklist from "@/components/dashboard/ActionItemsChecklist";
 import DocumentStatus from "@/components/dashboard/DocumentStatus";
+import ProgressTracker from "@/components/dashboard/ProgressTracker";
 import { DashboardData } from "@/types";
 
 export default function Dashboard() {
@@ -78,6 +79,66 @@ export default function Dashboard() {
             {/* Document Status */}
             <DocumentStatus hasDocuments={false} />
           </div>
+        </div>
+
+        {/* Progress Tracker */}
+        <div className="mt-8">
+          <ProgressTracker 
+            sections={[
+              {
+                id: 'company-info',
+                title: 'Company Information',
+                description: 'Basic company details and business structure',
+                status: 'completed',
+                estimatedMinutes: 5,
+                completedFields: 8,
+                totalFields: 8,
+                icon: 'fas fa-building'
+              },
+              {
+                id: 'rd-activities',
+                title: 'R&D Activities',
+                description: 'Document your research and development activities',
+                status: 'in_progress',
+                estimatedMinutes: 15,
+                completedFields: 6,
+                totalFields: 12,
+                icon: 'fas fa-flask'
+              },
+              {
+                id: 'expenses',
+                title: 'Expense Breakdown',
+                description: 'Detailed breakdown of R&D related expenses',
+                status: 'not_started',
+                estimatedMinutes: 10,
+                completedFields: 0,
+                totalFields: 10,
+                icon: 'fas fa-calculator'
+              },
+              {
+                id: 'supporting-docs',
+                title: 'Supporting Information',
+                description: 'Additional documentation and evidence',
+                status: 'not_started',
+                estimatedMinutes: 8,
+                completedFields: 0,
+                totalFields: 6,
+                icon: 'fas fa-file-upload'
+              }
+            ]}
+            overallProgress={38.9} // (8 + 6) / (8 + 12 + 10 + 6) * 100
+            currentSection="rd-activities"
+            isSaving={false}
+            lastSavedAt={new Date()}
+            onSectionClick={(sectionId) => {
+              console.log('Navigate to section:', sectionId);
+              // TODO: Navigate to intake form section
+            }}
+            onContinue={() => {
+              console.log('Continue with current section');
+              // TODO: Navigate to current section
+            }}
+          />
         </div>
       </div>
     </DashboardLayout>
