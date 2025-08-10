@@ -188,12 +188,12 @@ const FAQPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cloud">
+    <div className="min-h-screen bg-gray-50">
       {/* Global Navigation */}
       <ResponsiveNav />
       
       {/* Hero Section with padding for fixed nav */}
-      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-20 pt-32">
+      <section className="bg-gradient-to-b from-blue-50 to-white py-16 lg:py-20 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -201,16 +201,16 @@ const FAQPage = () => {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-4xl lg:text-5xl font-bold text-ink mb-6">
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Frequently Asked Questions
             </h1>
-            <p className="text-xl text-ash max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Everything you need to know about R&D tax credits and our documentation service
             </p>
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto relative">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-ash" />
+              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <Input
                 type="text"
                 placeholder="Search for answers..."
@@ -224,7 +224,7 @@ const FAQPage = () => {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 bg-paper border-b">
+      <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
             {categories.map((category) => (
@@ -247,10 +247,10 @@ const FAQPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {filteredFAQs.length === 0 ? (
             <Card className="p-8 text-center">
-              <p className="text-lg text-ash mb-4">
+              <p className="text-lg text-gray-600 mb-4">
                 No questions found matching your search.
               </p>
-              <p className="text-sm text-ash">
+              <p className="text-sm text-gray-500">
                 Try searching with different keywords or browse by category.
               </p>
             </Card>
@@ -269,13 +269,13 @@ const FAQPage = () => {
                   >
                     <div className="p-6">
                       <div className="flex justify-between items-start">
-                        <h3 className="font-semibold text-ink pr-4">
+                        <h3 className="font-semibold text-gray-900 pr-4">
                           {item.question}
                         </h3>
                         {expandedItems.includes(index) ? (
-                          <FaChevronUp className="text-ash flex-shrink-0 mt-1" />
+                          <FaChevronUp className="text-gray-500 flex-shrink-0 mt-1" />
                         ) : (
-                          <FaChevronDown className="text-ash flex-shrink-0 mt-1" />
+                          <FaChevronDown className="text-gray-500 flex-shrink-0 mt-1" />
                         )}
                       </div>
                       

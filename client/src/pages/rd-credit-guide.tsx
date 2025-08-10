@@ -9,19 +9,19 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function RDCreditGuide() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cloud-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Global Navigation */}
       <ResponsiveNav />
       
       {/* Hero Section with padding for fixed nav */}
-      <section className="bg-gradient-to-r from-ink-900 to-ink-800 text-white py-16 pt-32">
+      <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 pt-32">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-emerald-500 text-white">Comprehensive Guide</Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               R&D Tax Credit Guide for Small Businesses
             </h1>
-            <p className="text-xl text-ash-200 mb-8">
+            <p className="text-xl text-gray-200 mb-8">
               Everything you need to know about claiming innovation tax credits in 2025
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -32,7 +32,7 @@ export default function RDCreditGuide() {
                 </Button>
               </Link>
               <Link href="/qualifying-activities">
-                <Button size="lg" variant="outline" className="bg-white text-ink-900 hover:bg-ash-50">
+                <Button size="lg" variant="outline" className="bg-white text-gray-900 hover:bg-gray-50">
                   View Qualifying Activities
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -49,7 +49,7 @@ export default function RDCreditGuide() {
             <CardHeader>
               <CardTitle className="text-2xl">What is the R&D Tax Credit?</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-ash max-w-none">
+            <CardContent className="prose prose-gray max-w-none">
               <p className="text-lg leading-relaxed mb-4">
                 The Research & Development (R&D) tax credit is a federal tax incentive designed to reward U.S. companies for increasing their investment in innovation. Created in 1981 and made permanent in 2015, this credit can reduce your tax liability dollar-for-dollar.
               </p>
@@ -65,14 +65,14 @@ export default function RDCreditGuide() {
       </section>
 
       {/* Who Qualifies */}
-      <section className="py-16 bg-cloud-50">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-12">Who Qualifies for R&D Credits?</h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <Building2 className="h-8 w-8 text-ink-600 mb-2" />
+                <Building2 className="h-8 w-8 text-gray-600 mb-2" />
                 <CardTitle>Professional Services</CardTitle>
               </CardHeader>
               <CardContent>
@@ -95,7 +95,7 @@ export default function RDCreditGuide() {
 
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <Code2 className="h-8 w-8 text-ink-600 mb-2" />
+                <Code2 className="h-8 w-8 text-gray-600 mb-2" />
                 <CardTitle>Technology Companies</CardTitle>
               </CardHeader>
               <CardContent>
@@ -118,7 +118,7 @@ export default function RDCreditGuide() {
 
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <FlaskConical className="h-8 w-8 text-ink-600 mb-2" />
+                <FlaskConical className="h-8 w-8 text-gray-600 mb-2" />
                 <CardTitle>Healthcare & Life Sciences</CardTitle>
               </CardHeader>
               <CardContent>
@@ -216,7 +216,7 @@ export default function RDCreditGuide() {
       </section>
 
       {/* Calculation Methods */}
-      <section className="py-16 bg-cloud-50">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-12">Credit Calculation Methods</h2>
           

@@ -113,12 +113,12 @@ const PricingPage = () => {
   const savings = calculateSavings(selectedCredit);
 
   return (
-    <div className="min-h-screen bg-cloud">
+    <div className="min-h-screen bg-gray-50">
       {/* Global Navigation */}
       <ResponsiveNav />
       
       {/* Hero Section with padding for fixed nav */}
-      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-24 pt-32">
+      <section className="bg-gradient-to-b from-blue-50 to-white py-16 lg:py-24 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

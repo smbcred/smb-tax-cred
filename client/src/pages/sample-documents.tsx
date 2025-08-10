@@ -107,12 +107,12 @@ const SampleDocuments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cloud">
+    <div className="min-h-screen bg-gray-50">
       {/* Global Navigation */}
       <ResponsiveNav />
       
       {/* Hero Section with padding for fixed nav */}
-      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-24 pt-32">
+      <section className="bg-gradient-to-b from-blue-50 to-white py-16 lg:py-24 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -120,10 +120,10 @@ const SampleDocuments = () => {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-4xl lg:text-5xl font-bold text-ink mb-6">
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               See Exactly What You'll Receive
             </h1>
-            <p className="text-xl text-ash max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Professional, IRS-compliant documentation that your CPA will love. 
               Every package includes these comprehensive documents.
             </p>
@@ -134,7 +134,7 @@ const SampleDocuments = () => {
                 <FaLock className="text-blue-600 mr-2" />
                 <span className="text-sm font-semibold text-blue-600">SAMPLE DOCUMENTATION</span>
               </div>
-              <p className="text-sm text-graphite">
+              <p className="text-sm text-gray-700">
                 Based on a real client: <strong>{sampleData.company}</strong> • 
                 {" "}{sampleData.year} Tax Year • 
                 {" "}{sampleData.projects} Projects • 
@@ -162,14 +162,14 @@ const SampleDocuments = () => {
                     {/* Document Header */}
                     <div className="flex items-start justify-between mb-4">
                       <FaFileAlt className="text-3xl text-blue-500" />
-                      <span className="text-sm text-ash">{doc.pages} pages</span>
+                      <span className="text-sm text-gray-500">{doc.pages} pages</span>
                     </div>
                     
                     {/* Document Title & Description */}
-                    <h3 className="text-lg font-bold text-ink mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {doc.title}
                     </h3>
-                    <p className="text-sm text-ash mb-4">
+                    <p className="text-sm text-gray-600 mb-4">
                       {doc.description}
                     </p>
                     
@@ -178,7 +178,7 @@ const SampleDocuments = () => {
                       {doc.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <FaCheck className="text-emerald-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs text-graphite">{feature}</span>
+                          <span className="text-xs text-gray-700">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -213,59 +213,59 @@ const SampleDocuments = () => {
       {/* Package Details */}
       <section className="bg-blue-50 py-16 lg:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-ink mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Complete Documentation Package Includes
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* IRS Forms */}
             <Card className="p-6">
-              <h3 className="font-bold text-ink mb-4 flex items-center">
-                <span className="w-8 h-8 bg-blue-500 text-paper rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
                 IRS Forms
               </h3>
-              <p className="text-sm text-ash mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 All required federal forms completed and ready for filing
               </p>
               <ul className="space-y-2">
-                <li className="text-sm text-graphite">• Form 6765 (main credit form)</li>
-                <li className="text-sm text-graphite">• Schedule C adjustments</li>
-                <li className="text-sm text-graphite">• Carryforward worksheets</li>
-                <li className="text-sm text-graphite">• Amendment forms (if applicable)</li>
+                <li className="text-sm text-gray-700">• Form 6765 (main credit form)</li>
+                <li className="text-sm text-gray-700">• Schedule C adjustments</li>
+                <li className="text-sm text-gray-700">• Carryforward worksheets</li>
+                <li className="text-sm text-gray-700">• Amendment forms (if applicable)</li>
               </ul>
             </Card>
             
             {/* Supporting Documents */}
             <Card className="p-6">
-              <h3 className="font-bold text-ink mb-4 flex items-center">
-                <span className="w-8 h-8 bg-emerald-500 text-paper rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
                 Supporting Documents
               </h3>
-              <p className="text-sm text-ash mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 Comprehensive documentation to support your credit claim
               </p>
               <ul className="space-y-2">
-                <li className="text-sm text-graphite">• Technical narratives</li>
-                <li className="text-sm text-graphite">• QRE calculations</li>
-                <li className="text-sm text-graphite">• Project timelines</li>
-                <li className="text-sm text-graphite">• Four-part test analysis</li>
+                <li className="text-sm text-gray-700">• Technical narratives</li>
+                <li className="text-sm text-gray-700">• QRE calculations</li>
+                <li className="text-sm text-gray-700">• Project timelines</li>
+                <li className="text-sm text-gray-700">• Four-part test analysis</li>
               </ul>
             </Card>
             
             {/* Professional Guidance */}
             <Card className="p-6">
-              <h3 className="font-bold text-ink mb-4 flex items-center">
-                <span className="w-8 h-8 bg-purple-500 text-paper rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
                 Professional Guidance
               </h3>
-              <p className="text-sm text-ash mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 Everything your CPA needs to file with confidence
               </p>
               <ul className="space-y-2">
-                <li className="text-sm text-graphite">• Executive summary</li>
-                <li className="text-sm text-graphite">• CPA filing instructions</li>
-                <li className="text-sm text-graphite">• Audit defense guide</li>
-                <li className="text-sm text-graphite">• Best practices checklist</li>
+                <li className="text-sm text-gray-700">• Executive summary</li>
+                <li className="text-sm text-gray-700">• CPA filing instructions</li>
+                <li className="text-sm text-gray-700">• Audit defense guide</li>
+                <li className="text-sm text-gray-700">• Best practices checklist</li>
               </ul>
             </Card>
           </div>

@@ -100,12 +100,12 @@ const HowItWorks = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-cloud">
+    <div className="min-h-screen bg-gray-50">
       {/* Global Navigation */}
       <ResponsiveNav />
       
       {/* Hero Section with padding for fixed nav */}
-      <section className="bg-gradient-to-b from-blue-50 to-paper py-16 lg:py-24 pt-32">
+      <section className="bg-gradient-to-b from-blue-50 to-white py-16 lg:py-24 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -113,10 +113,10 @@ const HowItWorks = () => {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-4xl lg:text-5xl font-bold text-ink mb-6">
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Get Your R&D Tax Credits in <span className="text-blue-500">3 Simple Steps</span>
             </h1>
-            <p className="text-xl text-ash max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Turn your AI experimentation and innovation into valuable tax credits. 
               Our streamlined process takes you from estimate to IRS-ready documents in just 48 hours.
             </p>
@@ -127,12 +127,12 @@ const HowItWorks = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center bg-paper rounded-lg px-4 py-3 shadow-sm"
+                  className="flex items-center bg-white rounded-lg px-4 py-3 shadow-sm"
                 >
                   <span className="text-emerald-500 mr-3">{signal.icon}</span>
                   <div className="text-left">
-                    <p className="font-semibold text-ink text-sm">{signal.text}</p>
-                    <p className="text-xs text-ash">{signal.subtext}</p>
+                    <p className="font-semibold text-gray-900 text-sm">{signal.text}</p>
+                    <p className="text-xs text-gray-500">{signal.subtext}</p>
                   </div>
                 </motion.div>
               ))}
@@ -161,7 +161,7 @@ const HowItWorks = () => {
                 {/* Step Number Circle */}
                 <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 
                   w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 
-                  rounded-full flex items-center justify-center text-paper 
+                  rounded-full flex items-center justify-center text-white 
                   font-bold text-xl shadow-lg z-10 
                   ${index % 2 === 0 ? 'lg:left-1/2' : 'lg:left-1/2'}`}>
                   {step.number}
@@ -176,18 +176,18 @@ const HowItWorks = () => {
                   }`}>
                     <div className="text-blue-500">{step.icon}</div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-ink mb-1">{step.title}</h3>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">{step.title}</h3>
                       <p className="text-sm text-emerald-600 font-semibold">{step.subtitle}</p>
                     </div>
                   </div>
                   
-                  <p className="text-ash mb-4">{step.description}</p>
+                  <p className="text-gray-600 mb-4">{step.description}</p>
                   
                   <ul className="space-y-2 mb-4">
                     {step.details.map((detail, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <FaCheckCircle className="text-emerald-500 mt-1 flex-shrink-0" />
-                        <span className="text-sm text-graphite">{detail}</span>
+                        <span className="text-sm text-gray-700">{detail}</span>
                       </li>
                     ))}
                   </ul>
@@ -210,10 +210,10 @@ const HowItWorks = () => {
       <section className="bg-blue-50 py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-ink mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Real AI Projects That Qualified
             </h2>
-            <p className="text-lg text-ash">
+            <p className="text-lg text-gray-600">
               See how businesses like yours turned innovation into tax savings
             </p>
           </div>
@@ -230,13 +230,13 @@ const HowItWorks = () => {
                   <div className="text-sm text-blue-600 font-semibold mb-2">
                     {example.industry}
                   </div>
-                  <h4 className="text-xl font-bold text-ink mb-2">
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">
                     {example.activity}
                   </h4>
                   <p className="text-3xl font-bold text-emerald-600 mb-3">
                     {example.credit}
                   </p>
-                  <p className="text-sm text-ash">
+                  <p className="text-sm text-gray-600">
                     {example.description}
                   </p>
                 </Card>
@@ -249,7 +249,7 @@ const HowItWorks = () => {
       {/* FAQ Section */}
       <section className="py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-ink mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Frequently Asked Questions
           </h2>
           
