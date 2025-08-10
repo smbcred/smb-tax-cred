@@ -3,7 +3,7 @@
  * @description Step 3: Innovation expense inputs for calculation
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '@/utils/calculations';
 
@@ -28,24 +28,38 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
   onUpdate,
   businessType
 }) => {
-  const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  // Use controlled inputs with form values that persist during typing
+  const [formValues, setFormValues] = useState({
+    totalEmployees: expenses.totalEmployees || '',
+    technicalEmployees: expenses.technicalEmployees || '',
+    averageTechnicalSalary: expenses.averageTechnicalSalary || '',
+    contractorCosts: expenses.contractorCosts || '',
+    softwareCosts: expenses.softwareCosts || '',
+    cloudCosts: expenses.cloudCosts || ''
+  });
+  
   const [showPriorYears, setShowPriorYears] = useState(!expenses.isFirstTimeFiler);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const updateTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
+
+  // Initialize form values from props only on mount
+  useEffect(() => {
+    setFormValues({
+      totalEmployees: expenses.totalEmployees > 0 ? expenses.totalEmployees.toString() : '',
+      technicalEmployees: expenses.technicalEmployees > 0 ? expenses.technicalEmployees.toString() : '',
+      averageTechnicalSalary: expenses.averageTechnicalSalary > 0 ? expenses.averageTechnicalSalary.toLocaleString() : '',
+      contractorCosts: expenses.contractorCosts > 0 ? expenses.contractorCosts.toLocaleString() : '',
+      softwareCosts: expenses.softwareCosts > 0 ? expenses.softwareCosts.toLocaleString() : '',
+      cloudCosts: expenses.cloudCosts > 0 ? expenses.cloudCosts.toLocaleString() : ''
+    });
+  }, []); // Only run on mount
 
   // Update showPriorYears when first-time filer status changes
   useEffect(() => {
     setShowPriorYears(!expenses.isFirstTimeFiler);
   }, [expenses.isFirstTimeFiler]);
 
-  // Debounced update to parent
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      validateExpenses();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [expenses]);
-
-  const validateExpenses = () => {
+  const validateExpenses = useCallback(() => {
     const newWarnings: string[] = [];
     
     if (expenses.rdAllocationPercentage && expenses.rdAllocationPercentage > 80) {
@@ -65,42 +79,37 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     }
     
     setWarnings(newWarnings);
-  };
+  }, [expenses]);
 
-  // Get display value for input fields
-  const getDisplayValue = (field: string, value: number): string => {
-    if (localValues[field] !== undefined) {
-      return localValues[field];
+  // Debounced validation
+  useEffect(() => {
+    const timer = setTimeout(validateExpenses, 300);
+    return () => clearTimeout(timer);
+  }, [validateExpenses]);
+
+  const handleInputChange = (field: string, value: string) => {
+    // Update local form state immediately for UI responsiveness
+    setFormValues(prev => ({ ...prev, [field]: value }));
+    
+    // Clear any existing timeout for this field
+    if (updateTimeouts.current[field]) {
+      clearTimeout(updateTimeouts.current[field]);
     }
-    return value > 0 ? value.toLocaleString() : '';
+    
+    // Set up debounced update to parent
+    updateTimeouts.current[field] = setTimeout(() => {
+      const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
+      onUpdate({ [field]: numValue });
+    }, 750); // Longer delay to prevent interference
   };
 
-  const handleChange = (field: string, value: string | boolean | number) => {
-    if (typeof value === 'boolean') {
-      onUpdate({ [field]: value });
-      if (field === 'isFirstTimeFiler') {
-        setShowPriorYears(!value);
-        if (value) {
-          onUpdate({ priorYearQREs: [] });
-        }
+  const handleNonStringChange = (field: string, value: boolean | number) => {
+    onUpdate({ [field]: value });
+    if (field === 'isFirstTimeFiler' && typeof value === 'boolean') {
+      setShowPriorYears(!value);
+      if (value) {
+        onUpdate({ priorYearQREs: [] });
       }
-    } else if (typeof value === 'number') {
-      onUpdate({ [field]: value });
-    } else {
-      // Handle string input - store for display, convert for calculation
-      setLocalValues(prev => ({ ...prev, [field]: value }));
-      const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
-      
-      // Debounced update to parent
-      setTimeout(() => {
-        onUpdate({ [field]: numValue });
-        // Clear local value after successful update
-        setLocalValues(prev => {
-          const newValues = { ...prev };
-          delete newValues[field];
-          return newValues;
-        });
-      }, 500);
     }
   };
 
@@ -110,6 +119,13 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
     priorYears[yearIndex] = numValue;
     onUpdate({ priorYearQREs: priorYears });
   };
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(updateTimeouts.current).forEach(timeout => clearTimeout(timeout));
+    };
+  }, []);
 
   // Quick estimate display - FIXED calculation
   const rdAllocation = (expenses.rdAllocationPercentage ?? 100) / 100;
@@ -160,8 +176,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </label>
               <input
                 type="text"
-                value={getDisplayValue('totalEmployees', expenses.totalEmployees)}
-                onChange={(e) => handleChange('totalEmployees', e.target.value)}
+                value={formValues.totalEmployees}
+                onChange={(e) => handleInputChange('totalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 25"
               />
@@ -172,8 +188,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               </label>
               <input
                 type="text"
-                value={getDisplayValue('technicalEmployees', expenses.technicalEmployees)}
-                onChange={(e) => handleChange('technicalEmployees', e.target.value)}
+                value={formValues.technicalEmployees}
+                onChange={(e) => handleInputChange('technicalEmployees', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="e.g., 10"
               />
@@ -191,8 +207,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={getDisplayValue('averageTechnicalSalary', expenses.averageTechnicalSalary)}
-                  onChange={(e) => handleChange('averageTechnicalSalary', e.target.value)}
+                  value={formValues.averageTechnicalSalary}
+                  onChange={(e) => handleInputChange('averageTechnicalSalary', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 95,000"
                 />
@@ -207,7 +223,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                   <input
                     type="range"
                     value={expenses.rdAllocationPercentage ?? 100}
-                    onChange={(e) => handleChange('rdAllocationPercentage', parseInt(e.target.value))}
+                    onChange={(e) => handleNonStringChange('rdAllocationPercentage', parseInt(e.target.value))}
                     min="0"
                     max="100"
                     step="5"
@@ -217,7 +233,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                     <input
                       type="number"
                       value={expenses.rdAllocationPercentage ?? 100}
-                      onChange={(e) => handleChange('rdAllocationPercentage', e.target.value)}
+                      onChange={(e) => handleNonStringChange('rdAllocationPercentage', parseInt(e.target.value))}
                       min="0"
                       max="100"
                       className="w-full pr-6 px-2 py-1 border border-gray-300 rounded text-center"
@@ -241,7 +257,7 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
               <input
                 type="checkbox"
                 checked={expenses.isFirstTimeFiler ?? true}
-                onChange={(e) => handleChange('isFirstTimeFiler', e.target.checked)}
+                onChange={(e) => handleNonStringChange('isFirstTimeFiler', e.target.checked)}
                 className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
               />
               <span className="text-sm font-medium text-gray-700">
@@ -295,8 +311,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={getDisplayValue('contractorCosts', expenses.contractorCosts)}
-                  onChange={(e) => handleChange('contractorCosts', e.target.value)}
+                  value={formValues.contractorCosts}
+                  onChange={(e) => handleInputChange('contractorCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 50,000"
                 />
@@ -318,8 +334,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={getDisplayValue('softwareCosts', expenses.softwareCosts)}
-                  onChange={(e) => handleChange('softwareCosts', e.target.value)}
+                  value={formValues.softwareCosts}
+                  onChange={(e) => handleInputChange('softwareCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 25,000"
                 />
@@ -336,8 +352,8 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
                 <input
                   type="text"
-                  value={getDisplayValue('cloudCosts', expenses.cloudCosts)}
-                  onChange={(e) => handleChange('cloudCosts', e.target.value)}
+                  value={formValues.cloudCosts}
+                  onChange={(e) => handleInputChange('cloudCosts', e.target.value)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 15,000"
                 />
