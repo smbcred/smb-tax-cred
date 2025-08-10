@@ -765,6 +765,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auto-save endpoints for intake forms
+  app.post("/api/intake-forms/:id/save", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { section, data } = req.body;
+      
+      // Validate section name
+      const validSections = ['company-info', 'rd-activities', 'expense-breakdown', 'supporting-info'];
+      if (!validSections.includes(section)) {
+        return res.status(400).json({ message: "Invalid section name" });
+      }
+
+      // Get existing intake form
+      const existingForm = await storage.getIntakeFormById(id);
+      if (!existingForm || existingForm.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+
+      // Update the specific section data
+      const sectionMapping: { [key: string]: string } = {
+        'company-info': 'companyInfo',
+        'rd-activities': 'rdActivities', 
+        'expense-breakdown': 'expenseBreakdown',
+        'supporting-info': 'supportingInfo'
+      };
+
+      const sectionField = sectionMapping[section];
+      const updateData = {
+        [sectionField]: JSON.stringify(data),
+        lastSavedSection: section,
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Update intake form
+      await storage.updateIntakeForm(id, updateData);
+
+      res.json({ 
+        success: true, 
+        message: "Section saved successfully",
+        savedAt: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Auto-save error:", error);
+      res.status(500).json({ message: "Failed to save form data" });
+    }
+  });
+
+  // Get intake form data
+  app.get("/api/intake-forms/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const intakeForm = await storage.getIntakeFormById(id);
+      
+      if (!intakeForm || intakeForm.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+
+      // Parse JSON fields
+      const formData = {
+        ...intakeForm,
+        companyInfo: intakeForm.companyInfo ? JSON.parse(intakeForm.companyInfo as string) : {},
+        rdActivities: intakeForm.rdActivities ? JSON.parse(intakeForm.rdActivities as string) : {},
+        expenseBreakdown: intakeForm.expenseBreakdown ? JSON.parse(intakeForm.expenseBreakdown as string) : {},
+        supportingInfo: intakeForm.supportingInfo ? JSON.parse(intakeForm.supportingInfo as string) : {},
+      };
+
+      res.json(formData);
+    } catch (error: any) {
+      console.error("Get intake form error:", error);
+      res.status(500).json({ message: "Failed to fetch intake form" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -194,6 +194,11 @@ export class DatabaseStorage implements IStorage {
     return intakeForm;
   }
 
+  async getIntakeFormById(id: string): Promise<IntakeForm | undefined> {
+    const [intakeForm] = await db.select().from(intakeForms).where(eq(intakeForms.id, id));
+    return intakeForm;
+  }
+
   async getIntakeFormsByUserId(userId: string): Promise<IntakeForm[]> {
     return db.select().from(intakeForms).where(eq(intakeForms.userId, userId));
   }

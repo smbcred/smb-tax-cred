@@ -408,6 +408,29 @@ export type InsertIntakeForm = z.infer<typeof insertIntakeFormSchema>;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 
+// Form progress types
+export type FormSection = z.infer<typeof formSectionSchema>;
+export type FormProgress = z.infer<typeof formProgressSchema>;
+
+// Form progress and multi-step validation schemas
+export const formSectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  isCompleted: z.boolean(),
+  isValid: z.boolean(),
+  currentStep: z.number().optional(),
+  totalSteps: z.number().optional(),
+});
+
+export const formProgressSchema = z.object({
+  currentSection: z.string(),
+  sections: z.array(formSectionSchema),
+  overallProgress: z.number().min(0).max(100),
+  isAutoSaving: z.boolean().default(false),
+  lastSavedAt: z.string().nullable(),
+});
+
 // Additional validation schemas
 export const leadCaptureSchema = z.object({
   email: z.string().email("Please enter a valid email address"),

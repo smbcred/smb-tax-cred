@@ -24,6 +24,7 @@ import ProfessionalServices from "@/pages/industries/services";
 import Healthcare from "@/pages/industries/healthcare";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import IntakeFormPage from "@/pages/IntakeFormPage";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -76,6 +77,16 @@ function Router() {
           <Route path="/checkout">
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/intake-form/:id">
+            <ProtectedRoute>
+              <IntakeFormPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/intake-form">
+            <ProtectedRoute>
+              <IntakeFormPage />
             </ProtectedRoute>
           </Route>
           <Route path="/how-it-works" component={HowItWorks} />

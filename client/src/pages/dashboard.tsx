@@ -136,12 +136,12 @@ export default function Dashboard() {
             isSaving={false}
             lastSavedAt={dashboardData.intakeForms[0] ? new Date(dashboardData.intakeForms[0].updatedAt) : new Date()}
             onSectionClick={(sectionId) => {
-              console.log('Navigate to section:', sectionId);
-              // TODO: Navigate to intake form section
+              // Navigate to intake form with section anchor
+              window.location.href = `/intake-form#${sectionId}`;
             }}
             onContinue={() => {
-              console.log('Continue with current section');
-              // TODO: Navigate to current section
+              // Navigate to intake form
+              window.location.href = '/intake-form';
             }}
           />
         </div>

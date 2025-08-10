@@ -13,9 +13,9 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom design system variables and shadcn/ui.
 - **State Management**: TanStack React Query for server state and caching.
 - **Routing**: Wouter for lightweight client-side routing.
-- **Forms**: React Hook Form with Zod validation.
+- **Forms**: React Hook Form with Zod validation, multi-step form components with auto-save functionality.
 - **Build Tool**: Vite.
-- **UI/UX**: Emphasizes credibility for SMBs with a professional design system, including a comprehensive design system overhaul with design tokens for colors (blue, emerald), typography (Inter font), spacing, and animations. It includes enhanced dark mode support, accessibility features (AA compliance, focus indicators), and a 4-step calculator flow with visual progress indicators and clear validation.
+- **UI/UX**: Emphasizes credibility for SMBs with a professional design system, including a comprehensive design system overhaul with design tokens for colors (blue, emerald), typography (Inter font), spacing, and animations. It includes enhanced dark mode support, accessibility features (AA compliance, focus indicators), and a 4-step calculator flow with visual progress indicators and clear validation. Now includes comprehensive multi-step intake forms with section navigation, auto-save (2-second debouncing), and mobile-responsive design.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js REST API server.
