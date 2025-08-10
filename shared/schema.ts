@@ -528,6 +528,26 @@ export const softwareExpenseSchema = z.object({
   endDate: z.string().optional(),
 });
 
+// Supporting information validation schema
+export const supportingInfoSchema = z.object({
+  hasPreviousClaims: z.boolean(),
+  previousClaimsYears: z.array(z.number()).optional(),
+  previousClaimsAmount: z.number().optional(),
+  grossReceipts: z.number().min(0, 'Gross receipts must be positive'),
+  isQSB: z.boolean().optional(),
+  payrollTaxElection: z.enum(['federal', 'state', 'both', 'neither']).optional(),
+  documentationAvailable: z.array(z.string()).optional(),
+  additionalNotes: z.string().optional(),
+  reviewSummary: z.object({
+    companyInfoComplete: z.boolean(),
+    rdActivitiesComplete: z.boolean(),
+    expenseBreakdownComplete: z.boolean(),
+    supportingInfoComplete: z.boolean(),
+    totalQualifiedExpenses: z.number().optional(),
+    estimatedCredit: z.number().optional(),
+  }).optional(),
+});
+
 export const rdActivitiesSchema = z.object({
   projects: z.array(rdProjectSchema).min(1, "At least one R&D project is required"),
   overallObjectives: z.string().min(50, "Overall R&D objectives must be at least 50 characters"),

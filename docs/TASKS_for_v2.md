@@ -30,7 +30,7 @@ _Source: rd-saas-complete-guide.v2.md_
 | 2.1.1 | Multi-Step Form Component | [x] | [📋](./acceptance/2.1.1.md) |
 | 2.1.2 | Company Information Section | [x] | [📋](./acceptance/2.1.2.md) |
 | 2.1.3 | R&D Activities Section | [x] | [📋](./acceptance/2.1.3.md) |
-| 2.1.4 | Expense Breakdown Section | [ ] | [📋](./acceptance/2.1.4.md) |
+| 2.1.4 | Expense Breakdown Section | [x] | [📋](./acceptance/2.1.4.md) |
 | 2.1.5 | Supporting Information Section | [ ] | [📋](./acceptance/2.1.5.md) |
 | 2.1.6 | Form Submission & Validation | [ ] | [📋](./acceptance/2.1.6.md) |
 | 2.2.1 | Implement Auto-Save Logic | [ ] | [📋](./acceptance/2.2.1.md) |
