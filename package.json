@@ -53,6 +53,7 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/memoizee": "^0.4.12",
+    "@types/sendgrid": "^2.0.31",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "airtable": "^0.12.2",

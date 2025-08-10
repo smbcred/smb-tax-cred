@@ -462,20 +462,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const event = stripe.webhooks.constructEvent(req.body, sig as string, endpointSecret);
       
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const metadata = session.metadata || {};
+        const { leadId, tierName, estimatedCredit, customerName } = metadata;
+        
+        if (session.customer_details?.email) {
+          // Import services
+          const { UserCreationService } = await import('./services/userCreation.js');
+          const { EmailService } = await import('./services/email.js');
+          const { assignPricingTier } = await import('../shared/config/pricing.js');
+          
+          // Extract name from customerName or session
+          const names = customerName ? customerName.split(' ') : [];
+          const firstName = names[0] || session.customer_details.name?.split(' ')[0];
+          const lastName = names.slice(1).join(' ') || session.customer_details.name?.split(' ').slice(1).join(' ');
+          
+          // Create or get user account
+          const userResult = await UserCreationService.createOrGetUserFromCheckout({
+            email: session.customer_details.email,
+            leadId,
+            firstName,
+            lastName,
+            stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
+          });
+          
+          // Link lead to user if leadId provided
+          if (leadId) {
+            await UserCreationService.linkLeadToUser(userResult.user.id, leadId);
+          }
+          
+          // Get pricing information
+          const estimatedCreditNum = parseFloat(estimatedCredit || '0');
+          const pricingTier = assignPricingTier(estimatedCreditNum);
+          
+          // Send welcome email
+          if (userResult.isNewUser) {
+            await EmailService.sendWelcomeEmail({
+              email: session.customer_details.email,
+              firstName,
+              orderNumber: session.id.slice(-8).toUpperCase(),
+              estimatedCredit: estimatedCreditNum,
+              tierName: tierName || pricingTier.name,
+              dashboardUrl: `${process.env.CLIENT_URL || 'http://localhost:5000'}/dashboard?token=${userResult.token}`,
+            });
+          }
+          
+          // Send order confirmation email
+          await EmailService.sendOrderConfirmationEmail({
+            email: session.customer_details.email,
+            firstName,
+            orderNumber: session.id.slice(-8).toUpperCase(),
+            amount: (session.amount_total || 0) / 100, // Convert from cents
+            tierName: tierName || pricingTier.name,
+            estimatedCredit: estimatedCreditNum,
+            nextSteps: [
+              'Your information is being reviewed by our tax specialists',
+              'IRS-compliant documentation will be prepared within 48 hours',
+              'You\'ll receive download links via email',
+              'File your amended return with the provided documentation',
+            ],
+          });
+          
+          console.log(`Checkout completed for ${session.customer_details.email}, user ${userResult.user.id} (${userResult.isNewUser ? 'new' : 'existing'})`);
+        }
+      }
+      
       if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const { userId, calculationId } = paymentIntent.metadata;
         
-        // Update payment status
-        const payments = await storage.getPaymentsByUserId(userId);
-        const payment = payments.find(p => p.stripePaymentIntentId === paymentIntent.id);
-        
-        if (payment) {
-          await storage.updatePayment(payment.id, { status: "completed" });
+        // Update payment status for existing payment intent flow
+        if (userId) {
+          const payments = await storage.getPaymentsByUserId(userId);
+          const payment = payments.find(p => p.stripePaymentIntentId === paymentIntent.id);
           
-          // Here you would trigger the document generation process
-          // For now, we'll just log it
-          console.log(`Payment completed for user ${userId}, calculation ${calculationId}`);
+          if (payment) {
+            await storage.updatePayment(payment.id, { status: "completed" });
+            console.log(`Payment completed for user ${userId}, calculation ${calculationId}`);
+          }
         }
       }
       
