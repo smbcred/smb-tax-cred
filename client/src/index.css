@@ -14,74 +14,60 @@
 }
 
 :root {
-  --background: hsl(210, 20%, 98%);
-  --foreground: hsl(210, 25%, 7.8431%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(210, 25%, 7.8431%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(210, 25%, 7.8431%);
-  --primary: hsl(220, 91%, 41%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(159, 78%, 42%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --muted: hsl(210, 40%, 94%);
-  --muted-foreground: hsl(210, 15%, 50%);
-  --accent: hsl(217, 91%, 60%);
-  --accent-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --ring: hsl(220, 91%, 41%);
-  --chart-1: hsl(220, 91%, 41%);
-  --chart-2: hsl(159, 78%, 42%);
-  --chart-3: hsl(42, 93%, 56%);
-  --chart-4: hsl(147, 78%, 42%);
-  --chart-5: hsl(341, 75%, 51%);
+  /* Map to new design system tokens */
+  --background: var(--color-cloud);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-paper);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-blue);
+  --primary-foreground: var(--color-paper);
+  --secondary: var(--color-emerald);
+  --secondary-foreground: var(--color-paper);
+  --muted: var(--color-cloud);
+  --muted-foreground: var(--color-ash);
+  --accent: var(--color-blue-light);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--color-paper);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-blue);
   
-  /* R&D Tax Credit specific colors */
-  --rd-primary-50: hsl(214, 100%, 97%);
-  --rd-primary-100: hsl(214, 95%, 93%);
-  --rd-primary-200: hsl(213, 97%, 87%);
-  --rd-primary-500: hsl(220, 91%, 41%);
-  --rd-primary-600: hsl(220, 91%, 37%);
-  --rd-primary-700: hsl(220, 91%, 33%);
-  --rd-secondary-100: hsl(159, 78%, 92%);
-  --rd-secondary-200: hsl(159, 78%, 85%);
-  --rd-secondary-500: hsl(159, 78%, 42%);
-  --rd-secondary-600: hsl(159, 78%, 38%);
-  --rd-primary-700: hsl(220, 91%, 33%);
-  --rd-secondary-50: hsl(158, 64%, 96%);
-  --rd-secondary-500: hsl(159, 78%, 42%);
-  --rd-secondary-600: hsl(159, 78%, 38%);
-  --rd-success: hsl(159, 78%, 38%);
-  --rd-warning: hsl(42, 93%, 44%);
-  --rd-error: hsl(0, 84%, 60%);
+  /* Chart colors using design tokens */
+  --chart-1: var(--color-blue);
+  --chart-2: var(--color-emerald);
+  --chart-3: var(--color-warn);
+  --chart-4: var(--color-emerald);
+  --chart-5: var(--color-error);
   
-  --font-inter: 'Inter', system-ui, sans-serif;
-  --radius: 0.75rem;
+  /* Layout from design system */
+  --font-inter: var(--font-sans);
+  --radius: var(--radius-md);
 }
 
 .dark {
-  --background: hsl(222, 84%, 5%);
-  --foreground: hsl(210, 40%, 98%);
-  --card: hsl(222, 84%, 5%);
-  --card-foreground: hsl(210, 40%, 98%);
-  --popover: hsl(222, 84%, 5%);
-  --popover-foreground: hsl(210, 40%, 98%);
-  --primary: hsl(217, 91%, 60%);
-  --primary-foreground: hsl(222, 84%, 5%);
-  --secondary: hsl(159, 78%, 42%);
-  --secondary-foreground: hsl(222, 84%, 5%);
-  --muted: hsl(217, 32%, 17%);
-  --muted-foreground: hsl(215, 20%, 65%);
-  --accent: hsl(217, 91%, 60%);
-  --accent-foreground: hsl(222, 84%, 5%);
-  --destructive: hsl(0, 63%, 31%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --border: hsl(217, 32%, 17%);
-  --input: hsl(217, 32%, 17%);
-  --ring: hsl(217, 91%, 60%);
+  /* Dark mode using design system tokens */
+  --background: var(--color-graphite);
+  --foreground: var(--color-cloud);
+  --card: var(--color-graphite);
+  --card-foreground: var(--color-cloud);
+  --popover: var(--color-graphite);
+  --popover-foreground: var(--color-cloud);
+  --primary: var(--color-blue-light);
+  --primary-foreground: var(--color-graphite);
+  --secondary: var(--color-emerald);
+  --secondary-foreground: var(--color-graphite);
+  --muted: var(--color-slate);
+  --muted-foreground: var(--color-ash);
+  --accent: var(--color-blue-light);
+  --accent-foreground: var(--color-graphite);
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--color-cloud);
+  --border: var(--color-slate);
+  --input: var(--color-slate);
+  --ring: var(--color-blue-light);
 }
 
 @layer base {
@@ -96,58 +82,119 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-inter);
-    font-weight: 600;
-    line-height: 1.2;
+    font-family: var(--font-sans);
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tight);
+  }
+  
+  h1 {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-bold);
+  }
+  
+  h2 {
+    font-size: var(--fs-h2);
+  }
+  
+  h3 {
+    font-size: var(--fs-h3);
+  }
+  
+  h4 {
+    font-size: var(--fs-h4);
+  }
+  
+  h5 {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+  }
+  
+  h6 {
+    font-size: var(--fs-small);
+    font-weight: var(--fw-bold);
+  }
+  
+  p {
+    line-height: var(--lh-normal);
+  }
+  
+  .text-display {
+    font-size: var(--fs-display);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-tight);
+  }
+  
+  .text-small {
+    font-size: var(--fs-small);
+  }
+  
+  .text-micro {
+    font-size: var(--fs-micro);
   }
 }
 
 @layer components {
-  /* R&D Tax Credit color utilities */
-  .bg-rd-primary-50 { background-color: hsl(214, 100%, 97%); }
-  .bg-rd-primary-100 { background-color: hsl(214, 95%, 93%); }
-  .bg-rd-primary-200 { background-color: hsl(213, 97%, 87%); }
-  .bg-rd-primary-500 { background-color: hsl(220, 91%, 41%); }
-  .bg-rd-primary-600 { background-color: hsl(220, 91%, 37%); }
-  .bg-rd-primary-700 { background-color: hsl(220, 91%, 33%); }
+  /* Simplified color utilities using design tokens */
+  /* Primary color utilities */
+  .bg-primary-light { background-color: var(--color-blue-light); }
+  .bg-primary { background-color: var(--color-blue); }
+  .bg-primary-dark { background-color: var(--color-blue-dark); }
   
-  .text-rd-primary-500 { color: hsl(220, 91%, 41%); }
-  .text-rd-primary-600 { color: hsl(220, 91%, 37%); }
-  .text-rd-primary-700 { color: hsl(220, 91%, 33%); }
+  .text-primary { color: var(--color-blue); }
+  .text-primary-dark { color: var(--color-blue-dark); }
   
-  .bg-rd-secondary-50 { background-color: hsl(158, 64%, 96%); }
-  .bg-rd-secondary-100 { background-color: hsl(159, 78%, 92%); }
-  .bg-rd-secondary-200 { background-color: hsl(159, 78%, 85%); }
-  .bg-rd-secondary-300 { background-color: hsl(159, 78%, 75%); }
-  .bg-rd-secondary-500 { background-color: hsl(159, 78%, 42%); }
-  .bg-rd-secondary-600 { background-color: hsl(159, 78%, 38%); }
+  /* Secondary color utilities */
+  .bg-secondary-light { background-color: var(--color-emerald-light); }
+  .bg-secondary { background-color: var(--color-emerald); }
+  .bg-secondary-dark { background-color: var(--color-emerald-dark); }
   
-  .text-rd-secondary-500 { color: hsl(159, 78%, 42%); }
-  .text-rd-secondary-600 { color: hsl(159, 78%, 38%); }
+  .text-secondary { color: var(--color-emerald); }
+  .text-secondary-dark { color: var(--color-emerald-dark); }
   
-  .border-rd-primary-200 { border-color: hsl(213, 97%, 87%); }
-  .border-rd-primary-300 { border-color: hsl(213, 97%, 80%); }
-  .border-rd-primary-500 { border-color: hsl(220, 91%, 41%); }
-  .border-rd-secondary-200 { border-color: hsl(159, 78%, 85%); }
-  .hover\:border-rd-primary-300:hover { border-color: hsl(213, 97%, 80%); }
+  /* Border utilities */
+  .border-primary { border-color: var(--color-blue); }
+  .border-secondary { border-color: var(--color-emerald); }
   
-  .focus\:ring-rd-primary-500:focus { 
-    --tw-ring-color: hsl(220, 91%, 41%); 
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  /* Focus utilities */
+  .focus\:ring-primary:focus { 
+    --tw-ring-color: var(--color-blue);
+    box-shadow: 0 0 0 3px var(--color-blue-light);
   }
-  .focus\:border-rd-primary-500:focus { border-color: hsl(220, 91%, 41%); }
-  .hover\:bg-rd-primary-50:hover { background-color: hsl(214, 100%, 97%); }
+  .focus\:border-primary:focus { border-color: var(--color-blue); }
+  .hover\:bg-primary-light:hover { background-color: var(--color-blue-light); }
 
   .btn-primary {
-    @apply bg-rd-primary-500 hover:bg-rd-primary-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm;
+    @apply text-white font-semibold transition-colors;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    background-color: var(--color-blue);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-primary:hover {
+    background-color: var(--color-blue-dark);
   }
   
   .btn-secondary {
-    @apply bg-rd-secondary-500 hover:bg-rd-secondary-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm;
+    @apply text-white font-semibold transition-colors;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    background-color: var(--color-emerald);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-emerald-dark);
   }
   
   .btn-outline {
-    @apply border-2 border-rd-primary-500 text-rd-primary-500 hover:bg-rd-primary-50 font-semibold px-6 py-3 rounded-lg transition-colors;
+    @apply border-2 font-semibold transition-colors;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    border-color: var(--color-blue);
+    color: var(--color-blue);
+  }
+  .btn-outline:hover {
+    background-color: var(--color-blue-light);
   }
   
   .card-hover {
@@ -183,15 +230,30 @@
   }
   
   .form-input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+    @apply w-full border focus:ring-2 transition-colors;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border-color: var(--color-border);
+  }
+  .form-input:focus {
+    --tw-ring-color: var(--color-blue);
+    border-color: var(--color-blue);
   }
   
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block;
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-small);
+    font-weight: var(--fw-medium);
+    color: var(--color-slate);
   }
   
   .trust-signal {
-    @apply text-center p-4 bg-white rounded-lg shadow-sm border border-gray-200;
+    @apply text-center bg-white border;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border);
   }
   
   .trust-signal-value {
@@ -199,43 +261,61 @@
   }
   
   .trust-signal-primary {
-    @apply text-rd-primary-500;
+    color: var(--color-blue);
   }
   
   .trust-signal-secondary {
-    @apply text-rd-secondary-500;
+    color: var(--color-emerald);
   }
   
   .trust-signal-accent {
-    @apply text-rd-accent;
+    color: var(--color-blue-light);
   }
   
   .modal-backdrop {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4;
+    @apply fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center;
+    padding: var(--space-4);
   }
   
   .modal-content {
-    @apply bg-white rounded-xl max-w-md w-full p-8 relative shadow-2xl;
+    @apply bg-white max-w-md w-full relative;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
   }
   
   .progress-step {
-    @apply flex items-center space-x-3 p-3 rounded-lg border transition-colors;
+    @apply flex items-center border transition-colors;
+    padding: var(--space-3);
+    gap: var(--space-3);
+    border-radius: var(--radius-md);
   }
   
   .progress-step-complete {
-    @apply bg-rd-secondary-50 border-rd-secondary-200;
+    background-color: var(--color-emerald-light);
+    border-color: var(--color-emerald);
   }
   
   .progress-step-current {
-    @apply bg-rd-primary-50 border-rd-primary-200 border-2;
+    background-color: var(--color-blue-light);
+    border: 2px solid var(--color-blue);
   }
   
   .progress-step-pending {
-    @apply bg-cloud border-ash/20 opacity-60;
+    @apply opacity-60;
+    background-color: var(--color-cloud);
+    border-color: var(--color-ash);
   }
   
   .dashboard-card {
-    @apply bg-white p-6 rounded-xl shadow-sm border border-ash/20 hover:shadow-md transition-shadow;
+    @apply bg-white border transition-shadow;
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border);
+  }
+  .dashboard-card:hover {
+    box-shadow: var(--shadow-md);
   }
   
   .feature-icon {
@@ -243,11 +323,13 @@
   }
   
   .feature-icon-primary {
-    @apply bg-rd-primary-100 text-rd-primary-500;
+    background-color: var(--color-blue-light);
+    color: var(--color-blue);
   }
   
   .feature-icon-secondary {
-    @apply bg-rd-secondary-100 text-rd-secondary-500;
+    background-color: var(--color-emerald-light);
+    color: var(--color-emerald);
   }
   
   .feature-icon-accent {
