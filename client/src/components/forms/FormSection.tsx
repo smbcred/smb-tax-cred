@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CompanyInfoSection from './sections/CompanyInfoSection';
 import RDActivitiesSection from './sections/RDActivitiesSection';
+import ExpenseBreakdownSection from './sections/ExpenseBreakdownSection';
 
 interface FormSectionProps {
   sectionId: string;
@@ -43,7 +44,8 @@ export default function FormSection({
         return;
         break;
       case 'expense-breakdown':
-        isValid = !!(data.totalWages || data.contractorCosts || data.supplies || data.cloudSoftware);
+        // Validation handled by ExpenseBreakdownSection component
+        return;
         break;
       case 'supporting-info':
         isValid = !!(data.documentation || data.additionalInfo);
@@ -72,100 +74,11 @@ export default function FormSection({
   );
 
   const renderExpenseBreakdownSection = () => (
-    <div className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Labor Costs</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="totalWages">Total R&D Wages</Label>
-              <Input
-                id="totalWages"
-                type="number"
-                value={data.totalWages || ''}
-                onChange={(e) => handleInputChange('totalWages', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contractorCosts">Contractor Costs</Label>
-              <Input
-                id="contractorCosts"
-                type="number"
-                value={data.contractorCosts || ''}
-                onChange={(e) => handleInputChange('contractorCosts', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Supply & Technology Costs</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="supplies">Supplies & Materials</Label>
-              <Input
-                id="supplies"
-                type="number"
-                value={data.supplies || ''}
-                onChange={(e) => handleInputChange('supplies', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cloudSoftware">Cloud & Software</Label>
-              <Input
-                id="cloudSoftware"
-                type="number"
-                value={data.cloudSoftware || ''}
-                onChange={(e) => handleInputChange('cloudSoftware', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">R&D Allocation</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="rdAllocation">Percentage of time/costs devoted to R&D activities</Label>
-            <Select
-              value={data.rdAllocation?.toString() || '100'}
-              onValueChange={(value) => handleInputChange('rdAllocation', parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select R&D allocation" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="100">100% - Fully dedicated to R&D</SelectItem>
-                <SelectItem value="75">75% - Mostly R&D work</SelectItem>
-                <SelectItem value="50">50% - Half R&D, half other activities</SelectItem>
-                <SelectItem value="25">25% - Some R&D work</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <ExpenseBreakdownSection 
+      data={data} 
+      onDataChange={onDataChange} 
+      onValidationChange={onValidationChange}
+    />
   );
 
   const renderSupportingInfoSection = () => (

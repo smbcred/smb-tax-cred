@@ -481,6 +481,53 @@ export const rdProjectSchema = z.object({
   path: ["endDate"],
 });
 
+// Employee expense validation schema
+export const employeeExpenseSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Employee name is required'),
+  role: z.string().min(1, 'Role is required'),
+  annualSalary: z.number().min(0, 'Salary must be positive'),
+  rdTimePercentage: z.number().min(0, 'R&D time must be at least 0%').max(100, 'R&D time cannot exceed 100%'),
+  benefitsRate: z.number().min(0, 'Benefits rate must be positive').max(100, 'Benefits rate cannot exceed 100%'),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
+// Contractor expense validation schema
+export const contractorExpenseSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Contractor name is required'),
+  type: z.string().min(1, 'Contractor type is required'),
+  totalCost: z.number().min(0, 'Total cost must be positive'),
+  rdTimePercentage: z.number().min(0, 'R&D time must be at least 0%').max(100, 'R&D time cannot exceed 100%'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
+// Supply expense validation schema
+export const supplyExpenseSchema = z.object({
+  id: z.string(),
+  description: z.string().min(1, 'Description is required'),
+  category: z.string().min(1, 'Category is required'),
+  totalCost: z.number().min(0, 'Total cost must be positive'),
+  rdAllocation: z.number().min(0, 'R&D allocation must be at least 0%').max(100, 'R&D allocation cannot exceed 100%'),
+  vendor: z.string().optional(),
+  purchaseDate: z.string().optional(),
+});
+
+// Software expense validation schema
+export const softwareExpenseSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Software name is required'),
+  category: z.string().min(1, 'Category is required'),
+  monthlyCost: z.number().min(0, 'Monthly cost must be positive'),
+  rdAllocation: z.number().min(0, 'R&D allocation must be at least 0%').max(100, 'R&D allocation cannot exceed 100%'),
+  vendor: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
 export const rdActivitiesSchema = z.object({
   projects: z.array(rdProjectSchema).min(1, "At least one R&D project is required"),
   overallObjectives: z.string().min(50, "Overall R&D objectives must be at least 50 characters"),
