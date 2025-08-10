@@ -1865,6 +1865,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return Math.min(100, Math.round(keywordScore + templateBonus));
   }
 
+  // Compliance memo endpoints
+  app.post("/api/compliance/memo/generate", authenticateToken, async (req: any, res) => {
+    try {
+      const { complianceMemoRequestSchema } = await import("@shared/schema");
+      const validatedRequest = complianceMemoRequestSchema.parse(req.body);
+
+      const { getComplianceMemoService } = await import("./services/complianceMemo");
+      const complianceService = getComplianceMemoService();
+
+      console.log('Compliance memo generation request:', {
+        userId: req.user.id,
+        companyName: validatedRequest.companyContext.companyName,
+        projectName: validatedRequest.projectContext.projectName,
+        taxYear: validatedRequest.companyContext.taxYear,
+        options: validatedRequest.memoOptions,
+      });
+
+      const complianceMemo = complianceService.generateComplianceMemo(validatedRequest);
+
+      res.json({
+        success: true,
+        memo: complianceMemo,
+        generatedAt: new Date().toISOString(),
+      });
+
+    } catch (error: any) {
+      console.error("Compliance memo generation error:", error);
+      
+      // Handle validation errors
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate compliance memo"
+      });
+    }
+  });
+
+  app.post("/api/compliance/memo/preview", authenticateToken, async (req: any, res) => {
+    try {
+      const { complianceMemoRequestSchema } = await import("@shared/schema");
+      const validatedRequest = complianceMemoRequestSchema.parse(req.body);
+
+      const { getComplianceMemoService } = await import("./services/complianceMemo");
+      const complianceService = getComplianceMemoService();
+
+      console.log('Compliance memo preview request:', {
+        userId: req.user.id,
+        companyName: validatedRequest.companyContext.companyName,
+        projectName: validatedRequest.projectContext.projectName,
+      });
+
+      // Generate a preview with basic analysis
+      const complianceMemo = complianceService.generateComplianceMemo(validatedRequest);
+      
+      // Return summary information for preview
+      const preview = {
+        overallCompliance: complianceMemo.overallCompliance,
+        riskAssessment: {
+          overallRisk: complianceMemo.riskAssessment.overallRisk,
+          riskFactorCount: complianceMemo.riskAssessment.riskFactors.length,
+          highRiskFactors: complianceMemo.riskAssessment.riskFactors.filter(f => f.risk === 'high').length,
+        },
+        fourPartTestAnalysis: {
+          overallScore: complianceMemo.fourPartTestAnalysis.overallScore,
+          sectionScores: {
+            technologicalInformation: complianceMemo.fourPartTestAnalysis.technologicalInformation.score,
+            businessComponent: complianceMemo.fourPartTestAnalysis.businessComponent.score,
+            uncertainty: complianceMemo.fourPartTestAnalysis.uncertainty.score,
+            experimentation: complianceMemo.fourPartTestAnalysis.experimentation.score,
+          },
+        },
+        qreJustification: {
+          totalQRE: complianceMemo.qreJustification.totalQRE,
+          contractorLimit: complianceMemo.qreJustification.contractorExpenses.sixtyfivePercentLimit,
+          overallRisk: calculateQREOverallRisk(complianceMemo.qreJustification),
+        },
+        recommendationCount: complianceMemo.recommendations.length,
+        documentationRequirementCount: complianceMemo.documentationRequirements.length,
+      };
+
+      res.json({
+        success: true,
+        preview,
+        generatedAt: new Date().toISOString(),
+      });
+
+    } catch (error: any) {
+      console.error("Compliance memo preview error:", error);
+      
+      // Handle validation errors
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate compliance memo preview"
+      });
+    }
+  });
+
+  // Helper function for QRE risk calculation
+  function calculateQREOverallRisk(qreJustification: any): 'low' | 'medium' | 'high' {
+    const risks = [
+      qreJustification.wageExpenses.riskLevel,
+      qreJustification.contractorExpenses.riskLevel,
+      qreJustification.supplyExpenses.riskLevel,
+    ];
+    
+    if (risks.includes('high')) return 'high';
+    if (risks.filter(r => r === 'medium').length >= 2) return 'medium';
+    return 'low';
+  }
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {

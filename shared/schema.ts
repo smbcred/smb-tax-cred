@@ -672,6 +672,124 @@ export type NarrativeTemplate = z.infer<typeof narrativeTemplateSchema>;
 export type GeneratedNarrative = z.infer<typeof generatedNarrativeSchema>;
 export type RdActivity = z.infer<typeof rdActivitySchema>;
 
+// Compliance memo schemas
+export const riskFactorSchema = z.object({
+  factor: z.string(),
+  risk: z.enum(['low', 'medium', 'high']),
+  description: z.string(),
+  mitigation: z.string(),
+});
+
+export const riskAssessmentSchema = z.object({
+  overallRisk: z.enum(['low', 'medium', 'high']),
+  riskFactors: z.array(riskFactorSchema),
+  recommendations: z.array(z.string()),
+  documentationGaps: z.array(z.string()),
+});
+
+export const testSectionSchema = z.object({
+  score: z.number().min(0).max(100),
+  evidence: z.array(z.string()),
+  gaps: z.array(z.string()),
+  recommendations: z.array(z.string()),
+});
+
+export const fourPartTestAnalysisSchema = z.object({
+  technologicalInformation: testSectionSchema,
+  businessComponent: testSectionSchema,
+  uncertainty: testSectionSchema,
+  experimentation: testSectionSchema,
+  overallScore: z.number().min(0).max(100),
+});
+
+export const qreJustificationSchema = z.object({
+  wageExpenses: z.object({
+    amount: z.number(),
+    justification: z.string(),
+    riskLevel: z.enum(['low', 'medium', 'high']),
+    supportingDocuments: z.array(z.string()),
+  }),
+  contractorExpenses: z.object({
+    amount: z.number(),
+    justification: z.string(),
+    riskLevel: z.enum(['low', 'medium', 'high']),
+    supportingDocuments: z.array(z.string()),
+    sixtyfivePercentLimit: z.boolean(),
+  }),
+  supplyExpenses: z.object({
+    amount: z.number(),
+    justification: z.string(),
+    riskLevel: z.enum(['low', 'medium', 'high']),
+    supportingDocuments: z.array(z.string()),
+  }),
+  totalQRE: z.number(),
+  complianceNotes: z.array(z.string()),
+});
+
+export const complianceMemoRequestSchema = z.object({
+  companyContext: z.object({
+    companyName: z.string().min(1, "Company name is required"),
+    taxYear: z.number().min(2000).max(new Date().getFullYear() + 1),
+    industry: z.string().min(1, "Industry is required"),
+    businessType: z.enum(['corporation', 'llc', 'partnership', 'sole_proprietorship']),
+  }),
+  projectContext: z.object({
+    projectName: z.string().min(1, "Project name is required"),
+    projectDescription: z.string().min(50, "Project description must be at least 50 characters"),
+    rdActivities: z.array(rdActivitySchema),
+    technicalChallenges: z.array(z.string().min(10, "Technical challenge must be at least 10 characters")),
+    uncertainties: z.array(z.string().min(10, "Uncertainty must be at least 10 characters")),
+    innovations: z.array(z.string().min(10, "Innovation must be at least 10 characters")),
+    businessPurpose: z.string().min(20, "Business purpose must be at least 20 characters"),
+  }),
+  expenseContext: z.object({
+    totalExpenses: z.number().min(0, "Total expenses must be non-negative"),
+    wageExpenses: z.number().min(0, "Wage expenses must be non-negative"),
+    contractorExpenses: z.number().min(0, "Contractor expenses must be non-negative"),
+    supplyExpenses: z.number().min(0, "Supply expenses must be non-negative"),
+    expenseBreakdown: z.array(z.object({
+      category: z.string(),
+      amount: z.number(),
+      description: z.string(),
+    })).optional(),
+  }),
+  memoOptions: z.object({
+    includeRiskAssessment: z.boolean().default(true),
+    includeFourPartTest: z.boolean().default(true),
+    includeQREAnalysis: z.boolean().default(true),
+    includeRecommendations: z.boolean().default(true),
+    detailLevel: z.enum(['summary', 'standard', 'comprehensive']).default('standard'),
+  }),
+});
+
+export const complianceMemoSchema = z.object({
+  id: z.string(),
+  companyName: z.string(),
+  projectName: z.string(),
+  taxYear: z.number(),
+  generatedAt: z.string(),
+  memoContent: z.string(),
+  riskAssessment: riskAssessmentSchema,
+  fourPartTestAnalysis: fourPartTestAnalysisSchema,
+  qreJustification: qreJustificationSchema,
+  overallCompliance: z.object({
+    score: z.number().min(0).max(100),
+    level: z.enum(['low', 'medium', 'high']),
+    summary: z.string(),
+  }),
+  recommendations: z.array(z.string()),
+  documentationRequirements: z.array(z.string()),
+  disclaimers: z.array(z.string()),
+});
+
+export type RiskFactor = z.infer<typeof riskFactorSchema>;
+export type RiskAssessment = z.infer<typeof riskAssessmentSchema>;
+export type TestSection = z.infer<typeof testSectionSchema>;
+export type FourPartTestAnalysis = z.infer<typeof fourPartTestAnalysisSchema>;
+export type QREJustification = z.infer<typeof qreJustificationSchema>;
+export type ComplianceMemoRequest = z.infer<typeof complianceMemoRequestSchema>;
+export type ComplianceMemo = z.infer<typeof complianceMemoSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;
