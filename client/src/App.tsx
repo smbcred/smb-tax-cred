@@ -1,3 +1,23 @@
+// Add these imports at the top of App.tsx
+import './styles/global-styles.css';
+import { ThemeProvider } from './providers/ThemeProvider';
+import { BrowserRouter } from 'react-router-dom';
+// ... your other imports
+
+function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        {/* Your existing Routes and other components */}
+        <Routes>
+          {/* Your existing routes */}
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
+
+export default App;
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
