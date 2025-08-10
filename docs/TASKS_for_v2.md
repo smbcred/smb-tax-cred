@@ -34,8 +34,8 @@ _Source: rd-saas-complete-guide.v2.md_
 | 2.1.5 | Supporting Information Section | [x] | [📋](./acceptance/2.1.5.md) |
 | 2.1.6 | Form Submission & Validation | [x] | [📋](./acceptance/2.1.6.md) |
 | 2.2.1 | Implement Auto-Save Logic | [x] | [📋](./acceptance/2.2.1.md) |
-| 2.2.2 | Create Save API Endpoints | [ ] | [📋](./acceptance/2.2.2.md) |
-| 2.3.1 | Airtable Service Setup | [ ] | [📋](./acceptance/2.3.1.md) |
+| 2.2.2 | Create Save API Endpoints | [x] | [📋](./acceptance/2.2.2.md) |
+| 2.3.1 | Airtable Service Setup | [x] | [📋](./acceptance/2.3.1.md) |
 | 2.3.2 | Customer Record Sync | [ ] | [📋](./acceptance/2.3.2.md) |
 | 2.3.3 | Document URL Management | [ ] | [📋](./acceptance/2.3.3.md) |
 | 2.4.1 | Webhook Endpoint Creation | [ ] | [📋](./acceptance/2.4.1.md) |

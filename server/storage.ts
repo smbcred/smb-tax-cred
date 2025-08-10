@@ -79,6 +79,10 @@ export interface IStorage {
   getLeadByEmail(email: string): Promise<Lead | undefined>;
   createLead(lead: InsertLead): Promise<Lead>;
   updateLead(id: string, updates: Partial<Lead>): Promise<Lead>;
+
+  // Airtable sync operations
+  syncToAirtable(intakeFormId: string): Promise<string>;
+  updateAirtableSync(intakeFormId: string, recordId: string, status: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -343,6 +347,52 @@ export class DatabaseStorage implements IStorage {
       .where(eq(leads.id, id))
       .returning();
     return lead;
+  }
+
+  // Airtable sync operations
+  async syncToAirtable(intakeFormId: string): Promise<string> {
+    const form = await this.getIntakeForm(intakeFormId);
+    if (!form) {
+      throw new Error(`Intake form not found: ${intakeFormId}`);
+    }
+
+    try {
+      const { getAirtableService } = await import("./services/airtable");
+      const airtableService = getAirtableService();
+      const recordId = await airtableService.createCustomerRecord(form);
+      
+      // Update the intake form with Airtable sync info
+      await this.updateIntakeForm(intakeFormId, {
+        airtableRecordId: recordId,
+        airtableSyncStatus: 'synced',
+        airtableSyncedAt: new Date(),
+      });
+
+      return recordId;
+    } catch (error: any) {
+      // Update sync status to failed
+      await this.updateIntakeForm(intakeFormId, {
+        airtableSyncStatus: 'failed',
+        airtableSyncError: error.message,
+      });
+      throw error;
+    }
+  }
+
+  async updateAirtableSync(intakeFormId: string, recordId: string, status: string): Promise<void> {
+    const updates: Partial<IntakeForm> = {
+      airtableRecordId: recordId,
+      airtableSyncStatus: status,
+      airtableSyncedAt: new Date(),
+    };
+
+    if (status === 'failed') {
+      updates.airtableSyncError = 'Sync operation failed';
+    } else {
+      updates.airtableSyncError = null;
+    }
+
+    await this.updateIntakeForm(intakeFormId, updates);
   }
 }
 

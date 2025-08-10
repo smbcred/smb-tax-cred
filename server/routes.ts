@@ -55,7 +55,6 @@ const autoSaveRateLimit = rateLimit({
   message: "Too many auto-save attempts, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: any) => req.user?.id || req.ip, // Rate limit by user ID
 });
 
 // Helper to get client IP address
