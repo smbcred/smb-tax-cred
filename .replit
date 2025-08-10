@@ -1,39 +1,92 @@
-modules = ["nodejs-20", "web", "postgresql-16"]
+# Replit configuration for SMBTaxCredits.com
+# AI-forward R&D tax credit platform for SMBs
+
 run = "npm run dev"
-hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+entrypoint = "backend/src/app.ts"
+hidden = [".build", ".config", "node_modules"]
+modules = ["nodejs-18:v3-20230608-f4cd419"]
 
 [nix]
-channel = "stable-24_05"
-
-[deployment]
-deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+channel = "stable-23_05"
 
 [env]
+NODE_ENV = "development"
 PORT = "5000"
+CLIENT_PORT = "3000"
 
-[workflows]
-runButton = "Project"
+[packager]
+language = "nodejs"
 
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
+[packager.features]
+packageSearch = true
+guessImports = true
+enabledForHosting = true
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start application"
+[languages]
+[languages.javascript]
+pattern = "**/*.{js,jsx,mjs}"
 
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
+[languages.typescript]
+pattern = "**/*.{ts,tsx}"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
+[debugger]
+support = true
 
-[[ports]]
-localPort = 5000
-externalPort = 80
+[debugger.interactive]
+transport = "localhost:0"
+startCommand = ["dap-node"]
+
+[debugger.interactive.initializeMessage]
+command = "initialize"
+type = "request"
+
+[debugger.interactive.initializeMessage.arguments]
+clientId = "replit"
+clientName = "replit.com"
+columnsStartAt1 = true
+linesStartAt1 = true
+locale = "en-us"
+pathFormat = "path"
+supportsInvalidatedEvent = true
+supportsProgressReporting = true
+supportsRunInTerminalRequest = true
+supportsVariablePaging = true
+supportsVariableType = true
+
+[debugger.interactive.launchMessage]
+command = "launch"
+type = "request"
+
+[debugger.interactive.launchMessage.arguments]
+console = "externalTerminal"
+cwd = "."
+pauseForSourceMap = false
+program = "./backend/src/app.ts"
+request = "launch"
+sourceMaps = true
+stopOnEntry = false
+type = "node"
+
+[deployment]
+run = ["sh", "-c", "npm start"]
+deploymentTarget = "cloudrun"
+
+[ai]
+model = "claude-3"
+description = """
+R&D Tax Credit SaaS platform for SMBs documenting AI experimentation.
+Focus: Converting test-and-learn work with ChatGPT, Claude, custom GPTs, 
+and automations into IRS-compliant documentation.
+"""
+
+instructions = """
+This is an AI-forward platform helping small businesses claim R&D tax credits.
+Key points:
+- Federal credits only (10-16% of project costs)
+- Focus on AI/automation experiments (prompt tuning, chatbots, workflows)
+- Flat-fee pricing ($500-$2,000)
+- Plain language for SMB owners (Grade 7-9 reading level)
+- Emphasize test-and-learn cycles and documentation
+- Examples: prompt libraries, custom GPTs, LLM routing, data cleanup
+- Always search project knowledge base before responding
+"""
