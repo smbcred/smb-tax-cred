@@ -138,16 +138,16 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
               
               {/* Teaser Amount */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div className="mb-6 p-4 bg-primary-light rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">Estimated Federal Innovation Credit</p>
-                <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                <p className="text-3xl font-bold text-primary">
                   {formatCurrency(Math.round(federalCredit / 1000) * 1000)}+
                 </p>
               </div>
 
               <button
                 onClick={onGetStarted}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center group"
+                className="w-full btn-primary flex items-center justify-center group"
               >
                 See My Full Results
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -177,7 +177,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <CountUpAnimation
                 end={federalCredit}
                 duration={2000}
-                className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
+                className="text-5xl md:text-6xl font-bold text-primary"
                 prefix="$"
               />
               
@@ -205,7 +205,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8"
+            className="bg-secondary-light border border-secondary rounded-xl p-6 mb-8"
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
@@ -342,7 +342,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1 }}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6 mb-8"
+              className="bg-primary text-white rounded-xl p-6 mb-8 card-shadow-lg"
             >
               <h3 className="text-lg font-semibold mb-2">Your Service Package</h3>
               <div className="flex justify-between items-start mb-4">
@@ -407,7 +407,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             >
               <button
                 onClick={onGetStarted}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-8 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                className="btn-primary btn-lg transform hover:scale-105 shadow-lg"
               >
                 Start My Documentation
               </button>

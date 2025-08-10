@@ -201,7 +201,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+              <div className="relative bg-primary text-white p-6 rounded-t-2xl">
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 p-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
@@ -247,8 +247,8 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               {/* Form */}
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="form-group">
+                  <label htmlFor="email" className="form-label form-label-required">
                     Work Email
                   </label>
                   <input
@@ -260,23 +260,17 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                     onChange={(e) => handleFieldChange('email', e.target.value)}
                     onBlur={() => handleFieldBlur('email')}
                     placeholder="you@company.com"
-                    className={`
-                      w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                      ${touchedFields.has('email') && fieldErrors.email 
-                        ? 'border-red-300' 
-                        : 'border-gray-300'
-                      }
-                    `}
+                    className={`form-input ${touchedFields.has('email') && fieldErrors.email ? 'form-input-error' : ''}`}
                   />
                   {touchedFields.has('email') && fieldErrors.email && (
-                    <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                    <p className="form-helper form-helper-error">{fieldErrors.email}</p>
                   )}
                 </div>
 
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="form-group">
+                    <label htmlFor="firstName" className="form-label form-label-required">
                       First Name
                     </label>
                     <input
@@ -287,21 +281,15 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                       onChange={(e) => handleFieldChange('firstName', e.target.value)}
                       onBlur={() => handleFieldBlur('firstName')}
                       placeholder="John"
-                      className={`
-                        w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                        ${touchedFields.has('firstName') && fieldErrors.firstName 
-                          ? 'border-red-300' 
-                          : 'border-gray-300'
-                        }
-                      `}
+                      className={`form-input ${touchedFields.has('firstName') && fieldErrors.firstName ? 'form-input-error' : ''}`}
                     />
                     {touchedFields.has('firstName') && fieldErrors.firstName && (
-                      <p className="mt-1 text-sm text-red-600">{fieldErrors.firstName}</p>
+                      <p className="form-helper form-helper-error">{fieldErrors.firstName}</p>
                     )}
                   </div>
 
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="form-group">
+                    <label htmlFor="lastName" className="form-label form-label-required">
                       Last Name
                     </label>
                     <input
@@ -312,23 +300,17 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                       onChange={(e) => handleFieldChange('lastName', e.target.value)}
                       onBlur={() => handleFieldBlur('lastName')}
                       placeholder="Doe"
-                      className={`
-                        w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                        ${touchedFields.has('lastName') && fieldErrors.lastName 
-                          ? 'border-red-300' 
-                          : 'border-gray-300'
-                        }
-                      `}
+                      className={`form-input ${touchedFields.has('lastName') && fieldErrors.lastName ? 'form-input-error' : ''}`}
                     />
                     {touchedFields.has('lastName') && fieldErrors.lastName && (
-                      <p className="mt-1 text-sm text-red-600">{fieldErrors.lastName}</p>
+                      <p className="form-helper form-helper-error">{fieldErrors.lastName}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Company Name */}
-                <div>
-                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="form-group">
+                  <label htmlFor="companyName" className="form-label form-label-required">
                     Company Name
                   </label>
                   <input
@@ -339,22 +321,16 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                     onChange={(e) => handleFieldChange('companyName', e.target.value)}
                     onBlur={() => handleFieldBlur('companyName')}
                     placeholder="Acme Inc."
-                    className={`
-                      w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                      ${touchedFields.has('companyName') && fieldErrors.companyName 
-                        ? 'border-red-300' 
-                        : 'border-gray-300'
-                      }
-                    `}
+                    className={`form-input ${touchedFields.has('companyName') && fieldErrors.companyName ? 'form-input-error' : ''}`}
                   />
                   {touchedFields.has('companyName') && fieldErrors.companyName && (
-                    <p className="mt-1 text-sm text-red-600">{fieldErrors.companyName}</p>
+                    <p className="form-helper form-helper-error">{fieldErrors.companyName}</p>
                   )}
                 </div>
 
                 {/* Phone (Optional) */}
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="form-group">
+                  <label htmlFor="phone" className="form-label">
                     Phone Number <span className="text-gray-500">(Optional - for faster service)</span>
                   </label>
                   <input
@@ -365,16 +341,10 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                     onChange={(e) => handleFieldChange('phone', e.target.value)}
                     onBlur={() => handleFieldBlur('phone')}
                     placeholder="(555) 123-4567"
-                    className={`
-                      w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                      ${touchedFields.has('phone') && fieldErrors.phone 
-                        ? 'border-red-300' 
-                        : 'border-gray-300'
-                      }
-                    `}
+                    className={`form-input ${touchedFields.has('phone') && fieldErrors.phone ? 'form-input-error' : ''}`}
                   />
                   {touchedFields.has('phone') && fieldErrors.phone && (
-                    <p className="mt-1 text-sm text-red-600">{fieldErrors.phone}</p>
+                    <p className="form-helper form-helper-error">{fieldErrors.phone}</p>
                   )}
                 </div>
 
@@ -390,7 +360,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
