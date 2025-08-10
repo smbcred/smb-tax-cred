@@ -190,13 +190,15 @@ All four must be met:
 ```
 
 ### Pricing Tiers (Based on Federal Credit)
-- Tier 1: $0-4,999 → $500
-- Tier 2: $5,000-9,999 → $700
-- Tier 3: $10,000-19,999 → $900
-- Tier 4: $20,000-39,999 → $1,200
-- Tier 5: $40,000-74,999 → $1,500
-- Tier 6: $75,000-149,999 → $1,800
-- Tier 7: $150,000+ → $2,000
+•	Tier 0 (Micro): <$5,000 credit → $399
+•	Tier 1: $5,000–$9,999 → $500
+•	Tier 2: $10,000–$19,999 → $750
+•	Tier 3: $20,000–$34,999 → $1,000
+•	Tier 4: $35,000–$49,999 → $1,250
+•	Tier 5: $50,000–$99,999 → $1,500
+•	Tier 6: $100,000–$199,999 → $2,000
+•	Tier 7 (Ceiling): $200,000+ → $2,500
+Add-on: Additional years (same client, same session): $399 per extra year (flat, regardless of credit size), only after paying full price for the first year.
 
 ## ✍️ Marketing & Copywriting
 

@@ -16,27 +16,27 @@ export interface PricingTier {
 // Pricing tiers based on federal credit amount
 export const pricingTiers: PricingTier[] = [
   {
-    tier: 1,
+    tier: 0,
     minCredit: 0,
     maxCredit: 5000,
-    price: 500,
-    description: "Credits up to $4,999",
+    price: 399,
+    description: "Credits under $5,000",
     features: [
       "Federal R&D Credit Forms",
-      "Technical Narrative (4-8 pages)",
+      "Technical Narrative (2-5 pages)",
       "Section 174 Deduction",
       "Compliance Memo",
       "90-day Document Access"
     ]
   },
   {
-    tier: 2,
+    tier: 1,
     minCredit: 5000,
     maxCredit: 10000,
-    price: 700,
+    price: 500,
     description: "Credits $5,000-$9,999",
     features: [
-      "Everything in Tier 1",
+      "Everything in Micro tier",
       "Enhanced narrative detail",
       "Priority support",
       "Multi-year guidance",
@@ -44,13 +44,13 @@ export const pricingTiers: PricingTier[] = [
     ]
   },
   {
-    tier: 3,
+    tier: 2,
     minCredit: 10000,
     maxCredit: 20000,
-    price: 900,
+    price: 750,
     description: "Credits $10,000-$19,999",
     features: [
-      "Everything in Tier 2",
+      "Everything in Tier 1",
       "Multi-project support",
       "Expedited processing",
       "Executive summary",
@@ -58,52 +58,66 @@ export const pricingTiers: PricingTier[] = [
     ]
   },
   {
-    tier: 4,
+    tier: 3,
     minCredit: 20000,
-    maxCredit: 40000,
-    price: 1200,
-    description: "Credits $20,000-$39,999",
+    maxCredit: 35000,
+    price: 1000,
+    description: "Credits $20,000-$34,999",
     features: [
-      "Everything in Tier 3",
+      "Everything in Tier 2",
       "Complex project structures",
       "Department-level breakdowns",
       "Custom narratives"
     ]
   },
   {
-    tier: 5,
-    minCredit: 40000,
-    maxCredit: 75000,
-    price: 1500,
-    description: "Credits $40,000-$74,999",
+    tier: 4,
+    minCredit: 35000,
+    maxCredit: 50000,
+    price: 1250,
+    description: "Credits $35,000-$49,999",
     features: [
-      "Everything in Tier 4",
+      "Everything in Tier 3",
       "Dedicated support specialist",
       "Advanced documentation"
     ]
   },
   {
-    tier: 6,
-    minCredit: 75000,
-    maxCredit: 150000,
-    price: 1800,
-    description: "Credits $75,000-$149,999",
+    tier: 5,
+    minCredit: 50000,
+    maxCredit: 100000,
+    price: 1500,
+    description: "Credits $50,000-$99,999",
     features: [
-      "Everything in Tier 5",
+      "Everything in Tier 4",
       "Rush processing available",
       "White-glove service"
     ]
   },
   {
-    tier: 7,
-    minCredit: 150000,
-    maxCredit: 999999999,
+    tier: 6,
+    minCredit: 100000,
+    maxCredit: 200000,
     price: 2000,
-    description: "Credits $150,000+",
+    description: "Credits $100,000-$199,999",
     features: [
+      "Everything in Tier 5",
       "Enterprise features",
       "Custom solutions",
       "Dedicated account manager"
+    ]
+  },
+  {
+    tier: 7,
+    minCredit: 200000,
+    maxCredit: 999999999,
+    price: 2500,
+    description: "Credits $200,000+",
+    features: [
+      "Everything in Tier 6",
+      "White-glove service",
+      "Full audit defense",
+      "Unlimited consulting"
     ]
   }
 ];

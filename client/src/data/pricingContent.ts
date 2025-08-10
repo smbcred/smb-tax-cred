@@ -10,10 +10,10 @@ export const pricingContent = {
   
   tiers: [
     {
-      tier: "Starter",
-      creditRange: "$0 - $4,999",
-      price: "$500",
-      example: "$3K credit = 6x ROI",
+      tier: "Micro",
+      creditRange: "Under $5,000",
+      price: "$399",
+      example: "$3K credit = 7.5x ROI",
       features: [
         "Federal credit documentation",
         "AI experimentation narrative",
@@ -25,12 +25,12 @@ export const pricingContent = {
       bestFor: "Perfect for: Solopreneurs and consultants testing AI tools"
     },
     {
-      tier: "Growth",
+      tier: "Starter",
       creditRange: "$5,000 - $9,999",
-      price: "$700",
-      example: "$7K credit = 10x ROI",
+      price: "$500",
+      example: "$7K credit = 14x ROI",
       features: [
-        "Everything in Starter",
+        "Everything in Micro",
         "Multiple AI projects",
         "Priority processing",
         "Email support"
@@ -39,12 +39,12 @@ export const pricingContent = {
       bestFor: "Perfect for: Small teams experimenting with AI"
     },
     {
-      tier: "Professional",
+      tier: "Growth",
       creditRange: "$10,000 - $19,999",
-      price: "$900",
-      example: "$15K credit = 16x ROI",
+      price: "$750",
+      example: "$15K credit = 20x ROI",
       features: [
-        "Everything in Growth",
+        "Everything in Starter",
         "Unlimited AI projects",
         "Complex implementations",
         "Phone support"
@@ -53,12 +53,12 @@ export const pricingContent = {
       bestFor: "Perfect for: Growing agencies using AI extensively"
     },
     {
-      tier: "Scale",
-      creditRange: "$20,000 - $39,999",
-      price: "$1,200",
-      example: "$30K credit = 25x ROI",
+      tier: "Professional",
+      creditRange: "$20,000 - $34,999",
+      price: "$1,000",
+      example: "$27K credit = 27x ROI",
       features: [
-        "Everything in Professional",
+        "Everything in Growth",
         "Multi-year documentation",
         "Dedicated assistance",
         "Expedited processing"
@@ -67,12 +67,12 @@ export const pricingContent = {
       bestFor: "Perfect for: Established businesses with AI initiatives"
     },
     {
-      tier: "Advanced",
-      creditRange: "$40,000 - $74,999",
-      price: "$1,500",
-      example: "$60K credit = 40x ROI",
+      tier: "Scale",
+      creditRange: "$35,000 - $49,999",
+      price: "$1,250",
+      example: "$42K credit = 33x ROI",
       features: [
-        "Everything in Scale",
+        "Everything in Professional",
         "Custom documentation",
         "White-glove service",
         "Audit preparation support"
@@ -81,12 +81,12 @@ export const pricingContent = {
       bestFor: "Perfect for: Companies with major AI transformations"
     },
     {
-      tier: "Premium",
-      creditRange: "$75,000 - $149,999",
-      price: "$1,800",
-      example: "$100K credit = 55x ROI",
+      tier: "Advanced",
+      creditRange: "$50,000 - $99,999",
+      price: "$1,500",
+      example: "$75K credit = 50x ROI",
       features: [
-        "Everything in Advanced",
+        "Everything in Scale",
         "Priority handling",
         "Executive summary",
         "Quarterly reviews"
@@ -95,24 +95,38 @@ export const pricingContent = {
       bestFor: "Perfect for: Large-scale AI implementations"
     },
     {
-      tier: "Enterprise",
-      creditRange: "$150,000+",
+      tier: "Premium",
+      creditRange: "$100,000 - $199,999",
       price: "$2,000",
-      example: "$200K credit = 100x ROI",
+      example: "$150K credit = 75x ROI",
       features: [
-        "Everything in Premium",
+        "Everything in Advanced",
         "Dedicated account manager",
         "Custom reporting",
         "Full audit defense prep"
       ],
       highlighted: false,
       bestFor: "Perfect for: Enterprise AI transformations"
+    },
+    {
+      tier: "Enterprise",
+      creditRange: "$200,000+",
+      price: "$2,500",
+      example: "$250K credit = 100x ROI",
+      features: [
+        "Everything in Premium",
+        "White-glove service",
+        "Audit defense included",
+        "Unlimited support"
+      ],
+      highlighted: false,
+      bestFor: "Perfect for: Fortune 500 AI transformations"
     }
   ],
   
   additionalYear: {
-    price: "$297",
-    description: "Multiple years? Add $297 per year",
+    price: "$399",
+    description: "Multiple years? Add $399 per year",
     note: "Claim credits for 2022, 2023, and 2024 AI experiments"
   },
   
@@ -120,8 +134,8 @@ export const pricingContent = {
     title: "Save Thousands vs Traditional Consultants",
     competitor: "Consultants charge 20% on $30K credit",
     competitorPrice: "$6,000",
-    ourPrice: "$1,200",
-    savings: "You save $4,800"
+    ourPrice: "$1,000",
+    savings: "You save $5,000"
   },
 
   guarantee: "If your final credit is lower than estimated, we automatically refund the difference in pricing tiers."
