@@ -15,6 +15,7 @@ import {
   leadCaptureSchema,
   calculatorExpensesSchema,
   companyInfoSchema,
+  intakeFormSubmissionSchema,
   type CalculatorExpenses,
 } from "@shared/schema";
 
@@ -484,6 +485,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedForm);
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Failed to update intake form" });
+    }
+  });
+
+  // Submit intake form endpoint
+  app.post("/api/intake-forms/:id/submit", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: formId } = req.params;
+      const submissionData = req.body;
+      
+      // Verify the intake form belongs to the authenticated user
+      const form = await storage.getIntakeForm(formId);
+      if (!form || form.userId !== req.user.id) {
+        return res.status(404).json({ message: "Intake form not found" });
+      }
+      
+      // Validate submission data against schema
+      const { intakeFormSubmissionSchema } = await import("@shared/schema");
+      const validatedData = intakeFormSubmissionSchema.parse(submissionData);
+      
+      // Submit the form
+      const submittedForm = await storage.submitIntakeForm(formId, validatedData);
+      
+      res.json({ 
+        success: true, 
+        message: "Intake form submitted successfully",
+        intakeForm: submittedForm 
+      });
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      res.status(400).json({ 
+        message: error.message || "Failed to submit intake form",
+        errors: error.errors || null
+      });
     }
   });
 

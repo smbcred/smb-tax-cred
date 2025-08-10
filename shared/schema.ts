@@ -523,29 +523,31 @@ export const softwareExpenseSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   monthlyCost: z.number().min(0, 'Monthly cost must be positive'),
   rdAllocation: z.number().min(0, 'R&D allocation must be at least 0%').max(100, 'R&D allocation cannot exceed 100%'),
+  description: z.string().optional(),
   vendor: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
 });
 
 // Supporting information validation schema
 export const supportingInfoSchema = z.object({
   hasPreviousClaims: z.boolean(),
-  previousClaimsYears: z.array(z.number()).optional(),
-  previousClaimsAmount: z.number().optional(),
+  previousClaimYears: z.array(z.string()).optional(),
+  previousClaimAmounts: z.record(z.string(), z.number().min(0)).optional(),
   grossReceipts: z.number().min(0, 'Gross receipts must be positive'),
-  isQSB: z.boolean().optional(),
-  payrollTaxElection: z.enum(['federal', 'state', 'both', 'neither']).optional(),
-  documentationAvailable: z.array(z.string()).optional(),
+  isQualifiedSmallBusiness: z.boolean(),
+  payrollTaxElection: z.enum(['none', 'fica', 'futa']).optional(),
+  documentationTypes: z.array(z.string()),
   additionalNotes: z.string().optional(),
-  reviewSummary: z.object({
-    companyInfoComplete: z.boolean(),
-    rdActivitiesComplete: z.boolean(),
-    expenseBreakdownComplete: z.boolean(),
-    supportingInfoComplete: z.boolean(),
-    totalQualifiedExpenses: z.number().optional(),
-    estimatedCredit: z.number().optional(),
-  }).optional(),
+});
+
+// Complete intake form submission schema
+export const intakeFormSubmissionSchema = z.object({
+  companyInfo: companyInfoSchema,
+  rdProjects: z.array(rdProjectSchema).min(1, 'At least one R&D project is required'),
+  employeeExpenses: z.array(employeeExpenseSchema),
+  contractorExpenses: z.array(contractorExpenseSchema),
+  supplyExpenses: z.array(supplyExpenseSchema),
+  softwareExpenses: z.array(softwareExpenseSchema),
+  supportingInfo: supportingInfoSchema,
 });
 
 export const rdActivitiesSchema = z.object({

@@ -26,6 +26,21 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
     },
   });
 
+  // Form submission mutation
+  const submitMutation = useMutation({
+    mutationFn: async (submissionData: any) => {
+      return apiRequest('POST', `/api/intake-forms/${intakeFormId}/submit`, submissionData);
+    },
+    onSuccess: (response) => {
+      alert('Form submitted successfully!');
+      console.log('Submission successful:', response);
+    },
+    onError: (error: any) => {
+      alert(`Submission failed: ${error.message}`);
+      console.error('Submission error:', error);
+    },
+  });
+
   // Form progress management
   const {
     progress,
@@ -72,6 +87,29 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
         goToNextSection();
       }
     }
+  };
+
+  const handleSubmit = () => {
+    // Validate all sections are completed
+    const allSectionsValid = progress.sections.every(section => section.isCompleted);
+    
+    if (!allSectionsValid) {
+      alert('Please complete all sections before submitting.');
+      return;
+    }
+
+    // Prepare submission data from form data
+    const submissionData = {
+      companyInfo: formData.companyInfo || {},
+      rdProjects: formData.rdActivities?.projects || [],
+      employeeExpenses: formData.expenseBreakdown?.employeeExpenses || [],
+      contractorExpenses: formData.expenseBreakdown?.contractorExpenses || [],
+      supplyExpenses: formData.expenseBreakdown?.supplyExpenses || [],
+      softwareExpenses: formData.expenseBreakdown?.softwareExpenses || [],
+      supportingInfo: formData.supportingInfo || {},
+    };
+
+    submitMutation.mutate(submissionData);
   };
 
   const handlePrevious = () => {
@@ -227,14 +265,11 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
                 <div className="flex space-x-3">
                   {progress.sections.findIndex(s => s.id === progress.currentSection) === progress.sections.length - 1 ? (
                     <Button
-                      onClick={() => {
-                        // Handle form submission
-                        console.log('Submit form', formData);
-                      }}
-                      disabled={!currentSection?.isValid}
+                      onClick={handleSubmit}
+                      disabled={!currentSection?.isValid || submitMutation.isPending}
                       className="bg-emerald-600 hover:bg-emerald-700"
                     >
-                      Submit Form
+                      {submitMutation.isPending ? 'Submitting...' : 'Submit Form'}
                     </Button>
                   ) : (
                     <Button

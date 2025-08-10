@@ -64,6 +64,7 @@ export interface IStorage {
   getIntakeFormByCompanyId(companyId: string): Promise<IntakeForm | undefined>;
   createIntakeForm(intakeForm: InsertIntakeForm): Promise<IntakeForm>;
   updateIntakeForm(id: string, updates: Partial<IntakeForm>): Promise<IntakeForm>;
+  submitIntakeForm(id: string, submissionData: any): Promise<IntakeForm>;
 
   // Document operations
   getDocument(id: string): Promise<Document | undefined>;
@@ -220,6 +221,20 @@ export class DatabaseStorage implements IStorage {
     const [intakeForm] = await db
       .update(intakeForms)
       .set({ ...updates, updatedAt: new Date() })
+      .where(eq(intakeForms.id, id))
+      .returning();
+    return intakeForm;
+  }
+
+  async submitIntakeForm(id: string, submissionData: any): Promise<IntakeForm> {
+    const [intakeForm] = await db
+      .update(intakeForms)
+      .set({ 
+        formData: submissionData,
+        status: 'submitted',
+        submittedAt: new Date(),
+        updatedAt: new Date(),
+      })
       .where(eq(intakeForms.id, id))
       .returning();
     return intakeForm;
