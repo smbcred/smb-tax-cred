@@ -4,7 +4,11 @@ _This file tracks current blockers preventing task completion_
 
 ## Active Blockers
 
-*No active blockers.*
+### Task 3.2.2: PDF Generation Integration - DOCUMENTED 2025-08-10 23:38
+- **Issue**: Missing DOCUMINT_API_KEY environment variable for full PDF generation functionality
+- **Impact**: Service operates with placeholder PDF responses instead of actual Documint API integration
+- **Workaround**: Complete PDF generation service implemented with graceful fallback to placeholder functionality
+- **Required**: User must provide DOCUMINT_API_KEY to enable full Documint API integration for production PDF generation
 
 ## Resolved Blockers
 

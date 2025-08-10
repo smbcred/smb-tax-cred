@@ -451,18 +451,38 @@ export class DocumentOrchestrator extends EventEmitter {
     this.emit('jobProgress', { jobId: job.id, progress: job.progress });
 
     try {
-      // For now, we'll create a placeholder PDF URL since PDF generation service isn't implemented yet
-      // This will be replaced with actual PDF generation in task 3.2.2
-      const pdfUrl = `/api/documents/${job.id}/download.pdf`;
+      const { getDocumintService } = await import('./documint');
+      const documintService = getDocumintService();
+
+      // Prepare Form 6765 data from job context
+      const form6765Data = this.mapJobToForm6765Data(job, result);
+
+      const pdfRequest = {
+        templateId: 'form-6765-rd-credit',
+        data: form6765Data,
+        options: {
+          format: 'pdf' as const,
+          quality: 'high' as const,
+          includeAttachments: true,
+          watermark: false,
+        },
+      };
+
+      const pdfResult = await documintService.generatePDF(pdfRequest);
       
       job.services.pdfGeneration.status = 'completed';
-      job.services.pdfGeneration.result = { pdfUrl };
-      result.pdfUrl = pdfUrl;
+      job.services.pdfGeneration.result = pdfResult;
+      result.pdfUrl = pdfResult.downloadUrl;
 
       job.progress.completedSteps.push('pdfGeneration');
       job.progress.percentage = Math.round((job.progress.completedSteps.length / job.progress.totalSteps) * 100);
       
-      console.log('PDF generation completed for job:', job.id);
+      console.log('PDF generation completed for job:', {
+        jobId: job.id,
+        pdfId: pdfResult.id,
+        status: pdfResult.status,
+        downloadUrl: pdfResult.downloadUrl,
+      });
 
     } catch (error: any) {
       job.services.pdfGeneration.status = 'failed';
@@ -471,6 +491,50 @@ export class DocumentOrchestrator extends EventEmitter {
       await this.handleJobError(job, 'pdfGeneration', error.message);
       throw error;
     }
+  }
+
+  private mapJobToForm6765Data(job: DocumentJob, result: DocumentGenerationResult): any {
+    const request = job.request;
+    
+    // Calculate contractor expenses with 65% limit
+    const contractorExpenses = Math.min(
+      request.expenseContext.contractorExpenses,
+      request.expenseContext.wageExpenses * 0.65
+    );
+
+    return {
+      companyName: request.companyContext.companyName,
+      taxYear: request.companyContext.taxYear,
+      businessType: request.companyContext.businessType,
+      currentYearExpenses: {
+        wages: request.expenseContext.wageExpenses,
+        contractors: contractorExpenses,
+        supplies: request.expenseContext.supplyExpenses,
+        total: request.expenseContext.totalExpenses,
+      },
+      rdActivities: request.projectContext.rdActivities.map((activity: any) => ({
+        activity: activity.activity,
+        description: activity.description,
+        hours: activity.timeSpent || 0,
+        wages: Math.round((activity.timeSpent || 0) * 50), // Estimate $50/hour
+        category: activity.category,
+      })),
+      technicalChallenges: request.projectContext.technicalChallenges,
+      uncertainties: request.projectContext.uncertainties,
+      innovations: request.projectContext.innovations,
+      businessPurpose: request.projectContext.businessPurpose,
+      calculations: {
+        totalQualifiedExpenses: request.expenseContext.totalExpenses,
+        ascPercentage: 0.14, // Default 14% for most businesses
+        baseAmount: request.expenseContext.totalExpenses * 0.5, // Simplified base calculation
+        creditAmount: Math.round(request.expenseContext.totalExpenses * 0.1), // 10% credit estimate
+        riskLevel: result.complianceMemo?.overallCompliance?.riskLevel || 'medium',
+      },
+      attachments: {
+        narrativeContent: result.narrative?.content,
+        complianceMemo: JSON.stringify(result.complianceMemo),
+      },
+    };
   }
 
   private async handleJobError(job: DocumentJob, service: string, error: string): Promise<void> {

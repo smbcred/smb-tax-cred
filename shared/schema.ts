@@ -894,6 +894,90 @@ export type DocumentJob = z.infer<typeof documentJobSchema>;
 export type DocumentGenerationRequest = z.infer<typeof documentGenerationRequestSchema>;
 export type DocumentGenerationResult = z.infer<typeof documentGenerationResultSchema>;
 
+// PDF generation schemas
+export const form6765DataSchema = z.object({
+  companyName: z.string().min(1, "Company name is required"),
+  ein: z.string().optional(),
+  taxYear: z.number().min(2000).max(new Date().getFullYear() + 1),
+  businessType: z.enum(['corporation', 'llc', 'partnership', 'sole_proprietorship']),
+  address: z.object({
+    street: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+  }).optional(),
+  currentYearExpenses: z.object({
+    wages: z.number().min(0),
+    contractors: z.number().min(0),
+    supplies: z.number().min(0),
+    total: z.number().min(0),
+  }),
+  priorYearData: z.array(z.object({
+    year: z.number(),
+    expenses: z.number().min(0),
+  })).optional(),
+  rdActivities: z.array(z.object({
+    activity: z.string(),
+    description: z.string(),
+    hours: z.number().min(0),
+    wages: z.number().min(0),
+    category: z.enum(['experimentation', 'testing', 'analysis', 'development', 'evaluation']),
+  })),
+  technicalChallenges: z.array(z.string()),
+  uncertainties: z.array(z.string()),
+  innovations: z.array(z.string()),
+  businessPurpose: z.string(),
+  calculations: z.object({
+    totalQualifiedExpenses: z.number(),
+    averageGrossReceipts: z.number().optional(),
+    ascPercentage: z.number(),
+    baseAmount: z.number(),
+    creditAmount: z.number(),
+    riskLevel: z.enum(['low', 'medium', 'high']),
+  }),
+  attachments: z.object({
+    narrativeContent: z.string().optional(),
+    complianceMemo: z.string().optional(),
+    supportingDocuments: z.array(z.string()).optional(),
+  }).optional(),
+});
+
+export const pdfGenerationRequestSchema = z.object({
+  templateId: z.string(),
+  data: form6765DataSchema,
+  options: z.object({
+    format: z.enum(['pdf', 'docx']).default('pdf'),
+    quality: z.enum(['draft', 'standard', 'high']).default('standard'),
+    includeAttachments: z.boolean().default(true),
+    watermark: z.boolean().default(false),
+  }).optional(),
+});
+
+export const pdfGenerationResponseSchema = z.object({
+  id: z.string(),
+  status: z.enum(['pending', 'processing', 'completed', 'failed']),
+  downloadUrl: z.string().optional(),
+  previewUrl: z.string().optional(),
+  metadata: z.object({
+    pages: z.number().optional(),
+    size: z.number().optional(),
+    format: z.string().optional(),
+    generatedAt: z.string().optional(),
+  }).optional(),
+  errors: z.array(z.string()).optional(),
+});
+
+export const pdfQualityVerificationSchema = z.object({
+  isValid: z.boolean(),
+  issues: z.array(z.string()),
+  score: z.number().min(0).max(100),
+});
+
+export type Form6765Data = z.infer<typeof form6765DataSchema>;
+export type PDFGenerationRequest = z.infer<typeof pdfGenerationRequestSchema>;
+export type PDFGenerationResponse = z.infer<typeof pdfGenerationResponseSchema>;
+export type PDFQualityVerification = z.infer<typeof pdfQualityVerificationSchema>;
+
 // Form progress types
 export type FormSection = z.infer<typeof formSectionSchema>;
 export type FormProgress = z.infer<typeof formProgressSchema>;

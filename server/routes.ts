@@ -2215,6 +2215,170 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDF generation endpoints
+  app.post("/api/pdf/generate", authenticateToken, async (req: any, res) => {
+    try {
+      const { pdfGenerationRequestSchema } = await import("@shared/schema");
+      const validatedRequest = pdfGenerationRequestSchema.parse(req.body);
+
+      const { getDocumintService } = await import("./services/documint");
+      const documintService = getDocumintService();
+
+      console.log('PDF generation request:', {
+        userId: req.user.id,
+        templateId: validatedRequest.templateId,
+        companyName: validatedRequest.data.companyName,
+        taxYear: validatedRequest.data.taxYear,
+      });
+
+      const result = await documintService.generatePDF(validatedRequest);
+
+      res.json({
+        success: true,
+        pdf: result,
+        message: 'PDF generation started',
+      });
+
+    } catch (error: any) {
+      console.error("PDF generation request error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate PDF"
+      });
+    }
+  });
+
+  app.get("/api/pdf/status/:pdfId", authenticateToken, async (req: any, res) => {
+    try {
+      const { pdfId } = req.params;
+
+      const { getDocumintService } = await import("./services/documint");
+      const documintService = getDocumintService();
+
+      const status = await documintService.checkPDFStatus(pdfId);
+
+      res.json({
+        success: true,
+        pdf: status,
+      });
+
+    } catch (error: any) {
+      console.error("PDF status check error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to check PDF status"
+      });
+    }
+  });
+
+  app.get("/api/pdf/template/:templateId", authenticateToken, async (req: any, res) => {
+    try {
+      const { templateId } = req.params;
+
+      const { getDocumintService } = await import("./services/documint");
+      const documintService = getDocumintService();
+
+      const template = await documintService.getTemplate(templateId);
+
+      res.json({
+        success: true,
+        template,
+      });
+
+    } catch (error: any) {
+      console.error("Template fetch error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to fetch template"
+      });
+    }
+  });
+
+  app.post("/api/pdf/batch", authenticateToken, async (req: any, res) => {
+    try {
+      const { pdfGenerationRequestSchema } = await import("@shared/schema");
+      const { requests } = req.body;
+
+      if (!Array.isArray(requests)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Requests must be an array',
+        });
+      }
+
+      // Validate each request
+      const validatedRequests = requests.map((request: any) => 
+        pdfGenerationRequestSchema.parse(request)
+      );
+
+      const { getDocumintService } = await import("./services/documint");
+      const documintService = getDocumintService();
+
+      console.log('Batch PDF generation request:', {
+        userId: req.user.id,
+        requestCount: validatedRequests.length,
+      });
+
+      const results = await documintService.generateBatchPDFs(validatedRequests);
+
+      res.json({
+        success: true,
+        results,
+        total: results.length,
+        completed: results.filter(r => r.status === 'completed').length,
+        failed: results.filter(r => r.status === 'failed').length,
+      });
+
+    } catch (error: any) {
+      console.error("Batch PDF generation error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to generate batch PDFs"
+      });
+    }
+  });
+
+  app.get("/api/pdf/verify/:pdfId", authenticateToken, async (req: any, res) => {
+    try {
+      const { pdfId } = req.params;
+
+      const { getDocumintService } = await import("./services/documint");
+      const documintService = getDocumintService();
+
+      const verification = await documintService.verifyPDFQuality(pdfId);
+
+      res.json({
+        success: true,
+        verification,
+      });
+
+    } catch (error: any) {
+      console.error("PDF verification error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to verify PDF quality"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {
