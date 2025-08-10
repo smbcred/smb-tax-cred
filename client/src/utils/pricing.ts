@@ -18,9 +18,9 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 1,
     minCredit: 0,
-    maxCredit: 10000,
+    maxCredit: 5000,
     price: 500,
-    description: "Credits < $10K",
+    description: "Credits up to $4,999",
     features: [
       "Federal R&D Credit Forms",
       "Technical Narrative (4-8 pages)",
@@ -31,10 +31,10 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 2,
-    minCredit: 10000,
-    maxCredit: 20000,
-    price: 750,
-    description: "Credits $10K-$20K",
+    minCredit: 5000,
+    maxCredit: 10000,
+    price: 700,
+    description: "Credits $5,000-$9,999",
     features: [
       "Everything in Tier 1",
       "Enhanced narrative detail",
@@ -45,10 +45,10 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 3,
-    minCredit: 20000,
-    maxCredit: 30000,
-    price: 1000,
-    description: "Credits $20K-$30K",
+    minCredit: 10000,
+    maxCredit: 20000,
+    price: 900,
+    description: "Credits $10,000-$19,999",
     features: [
       "Everything in Tier 2",
       "Multi-project support",
@@ -59,10 +59,10 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 4,
-    minCredit: 30000,
+    minCredit: 20000,
     maxCredit: 40000,
-    price: 1250,
-    description: "Credits $30K-$40K",
+    price: 1200,
+    description: "Credits $20,000-$39,999",
     features: [
       "Everything in Tier 3",
       "Complex project structures",
@@ -73,9 +73,9 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 5,
     minCredit: 40000,
-    maxCredit: 50000,
+    maxCredit: 75000,
     price: 1500,
-    description: "Credits $40K-$50K",
+    description: "Credits $40,000-$74,999",
     features: [
       "Everything in Tier 4",
       "Dedicated support specialist",
@@ -84,10 +84,10 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 6,
-    minCredit: 50000,
-    maxCredit: 60000,
-    price: 1750,
-    description: "Credits $50K-$60K",
+    minCredit: 75000,
+    maxCredit: 150000,
+    price: 1800,
+    description: "Credits $75,000-$149,999",
     features: [
       "Everything in Tier 5",
       "Rush processing available",
@@ -96,10 +96,10 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     tier: 7,
-    minCredit: 60000,
+    minCredit: 150000,
     maxCredit: 999999999,
     price: 2000,
-    description: "Credits > $60K",
+    description: "Credits $150,000+",
     features: [
       "Enterprise features",
       "Custom solutions",

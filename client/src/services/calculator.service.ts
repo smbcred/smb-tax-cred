@@ -132,7 +132,7 @@ export const pricingTiers: PricingTier[] = [
     tier: 1,
     name: "Starter",
     price: 500,
-    creditRange: "Up to $10,000",
+    creditRange: "$0 - $4,999",
     features: [
       "Credit calculation",
       "Form 6765 generation", 
@@ -143,8 +143,8 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 2,
     name: "Growth",
-    price: 750,
-    creditRange: "$10,001 - $20,000",
+    price: 700,
+    creditRange: "$5,000 - $9,999",
     features: [
       "Everything in Starter",
       "Detailed narratives",
@@ -155,8 +155,8 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 3,
     name: "Professional",
-    price: 1000,
-    creditRange: "$20,001 - $30,000",
+    price: 900,
+    creditRange: "$10,000 - $19,999",
     popular: true,
     features: [
       "Everything in Growth",
@@ -168,8 +168,8 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 4,
     name: "Scale",
-    price: 1250,
-    creditRange: "$30,001 - $40,000",
+    price: 1200,
+    creditRange: "$20,000 - $39,999",
     features: [
       "Everything in Professional",
       "Advanced analytics",
@@ -181,7 +181,7 @@ export const pricingTiers: PricingTier[] = [
     tier: 5,
     name: "Advanced",
     price: 1500,
-    creditRange: "$40,001 - $50,000",
+    creditRange: "$40,000 - $74,999",
     features: [
       "Everything in Scale",
       "Custom consulting",
@@ -192,8 +192,8 @@ export const pricingTiers: PricingTier[] = [
   {
     tier: 6,
     name: "Premium",
-    price: 1750,
-    creditRange: "$50,001 - $60,000",
+    price: 1800,
+    creditRange: "$75,000 - $149,999",
     features: [
       "Everything in Advanced",
       "White-glove service",
@@ -205,7 +205,7 @@ export const pricingTiers: PricingTier[] = [
     tier: 7,
     name: "Enterprise",
     price: 2000,
-    creditRange: "$60,000+",
+    creditRange: "$150,000+",
     features: [
       "Everything in Premium",
       "Unlimited consulting",
@@ -248,13 +248,13 @@ export const calculateRDTaxCredit = (expenses: CalculatorExpenses): CalculationR
  * Uses standardized 7-tier structure matching calculator engine
  */
 export const getPricingTier = (creditAmount: number): PricingTier => {
-  if (creditAmount <= 10000) return pricingTiers[0];  // Tier 1: Starter
-  if (creditAmount <= 20000) return pricingTiers[1];  // Tier 2: Growth
-  if (creditAmount <= 30000) return pricingTiers[2];  // Tier 3: Professional
-  if (creditAmount <= 40000) return pricingTiers[3];  // Tier 4: Scale
-  if (creditAmount <= 50000) return pricingTiers[4];  // Tier 5: Advanced
-  if (creditAmount <= 60000) return pricingTiers[5];  // Tier 6: Premium
-  return pricingTiers[6];  // Tier 7: Enterprise
+  if (creditAmount < 5000) return pricingTiers[0];     // Tier 1: Starter ($0-4,999)
+  if (creditAmount < 10000) return pricingTiers[1];    // Tier 2: Growth ($5,000-9,999)
+  if (creditAmount < 20000) return pricingTiers[2];    // Tier 3: Professional ($10,000-19,999)
+  if (creditAmount < 40000) return pricingTiers[3];    // Tier 4: Scale ($20,000-39,999)
+  if (creditAmount < 75000) return pricingTiers[4];    // Tier 5: Advanced ($40,000-74,999)
+  if (creditAmount < 150000) return pricingTiers[5];   // Tier 6: Premium ($75,000-149,999)
+  return pricingTiers[6];  // Tier 7: Enterprise ($150,000+)
 };
 
 /**
