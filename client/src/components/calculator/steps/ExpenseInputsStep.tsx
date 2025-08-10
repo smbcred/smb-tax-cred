@@ -96,11 +96,11 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
       clearTimeout(updateTimeouts.current[field]);
     }
     
-    // Set up debounced update to parent
+    // Set up debounced update to parent - IMMEDIATE for better UX
     updateTimeouts.current[field] = setTimeout(() => {
       const numValue = parseInt(value.replace(/[^0-9]/g, '') || '0');
       onUpdate({ [field]: numValue });
-    }, 750); // Longer delay to prevent interference
+    }, 100); // Much shorter delay to prevent race conditions
   };
 
   const handleNonStringChange = (field: string, value: boolean | number) => {

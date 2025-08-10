@@ -320,7 +320,10 @@ export const InteractiveCalculator: React.FC = () => {
               <ExpenseInputsStep
                 expenses={state.expenses}
                 onUpdate={(updates) => {
-                  dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
+                  // Batch updates to prevent multiple re-renders
+                  requestAnimationFrame(() => {
+                    dispatch({ type: 'UPDATE_EXPENSES', payload: updates });
+                  });
                 }}
                 businessType={state.businessType}
               />
