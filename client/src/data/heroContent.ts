@@ -5,17 +5,17 @@
  */
 
 export const HeroContent = {
-  headline: "Your AI development qualifies for R&D tax credits",
-  subheadline: "Turn ChatGPT prompts, custom GPTs, and AI automation into federal tax savings—with IRS-compliant documentation.",
-  primaryCTA: "Calculate your AI credit",
+  headline: "Your AI experiments may qualify for R&D tax credits",
+  subheadline: "For businesses USING AI tools, not building them. Turn tests into tax savings with IRS-compliant documentation.",
+  primaryCTA: "Calculate your potential credit",
   secondaryCTA: "See how it works",
   
   // Social proof strip items
   trustSignals: [
     "Built for businesses using AI tools",
-    "ChatGPT & Claude usage qualifies",
-    "Section G ready",
-    "IRS-compliant AI documentation"
+    "ChatGPT & Claude usage may qualify",
+    "Based on your AI experiments",
+    "Documentation service only"
   ],
 
   // Additional trust metrics

@@ -291,6 +291,11 @@ export const ExpenseInputsStep: React.FC<ExpenseInputsStepProps> = ({
                 <p className="text-xs text-gray-500 mt-1">
                   External developers, engineers, technical consultants
                 </p>
+                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-xs text-yellow-800">
+                    <strong>⚠️ IRS Limit:</strong> Only 65% of contractor costs qualify for R&D credit per IRC Section 41
+                  </p>
+                </div>
               </div>
             </div>
             <div>

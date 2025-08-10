@@ -327,6 +327,97 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Important Compliance Information Section */}
+      <section className="py-12 sm:py-16 bg-amber-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
+              Important Information for Tax Year {new Date().getFullYear()}
+            </h2>
+            
+            {/* Section 174 Warning */}
+            <div className="mb-6 p-6 bg-white border-2 border-amber-300 rounded-lg shadow-md">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">Section 174 Capitalization Requirement</h3>
+                  <p className="text-gray-700 mb-3">
+                    <strong>For tax years 2022-2025,</strong> R&D expenses must be capitalized and amortized over 5 years 
+                    (domestic) or 15 years (foreign) instead of immediate expensing. This significantly impacts cash flow 
+                    even with the R&D credit.
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Consult your tax professional about how this impacts your specific situation.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Startup Payroll Offset */}
+            <div className="mb-6 p-6 bg-white border-2 border-green-300 rounded-lg shadow-md">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🚀</span>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">Startup Payroll Tax Offset</h3>
+                  <p className="text-gray-700 mb-3">
+                    Qualifying startups (less than 5 years old with under $5M in gross receipts) may use up to 
+                    <strong> $500,000</strong> of R&D credits to offset payroll taxes instead of income tax.
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    This provides immediate cash flow benefits even for pre-revenue companies.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* IRS Four-Part Test */}
+            <div className="mb-6 p-6 bg-white border-2 border-blue-300 rounded-lg shadow-md">
+              <h3 className="font-bold text-lg text-gray-900 mb-4">IRS Four-Part Test for R&D Credits</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold">1.</span>
+                  <div>
+                    <strong className="text-gray-900">Technological in Nature</strong>
+                    <p className="text-sm text-gray-600">Relies on computer science or engineering</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold">2.</span>
+                  <div>
+                    <strong className="text-gray-900">Elimination of Uncertainty</strong>
+                    <p className="text-sm text-gray-600">Addresses technical challenges</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold">3.</span>
+                  <div>
+                    <strong className="text-gray-900">Process of Experimentation</strong>
+                    <p className="text-sm text-gray-600">Involves testing and iteration</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold">4.</span>
+                  <div>
+                    <strong className="text-gray-900">Business Component</strong>
+                    <p className="text-sm text-gray-600">Creates new or improved functionality</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Required Disclaimer */}
+            <div className="p-6 bg-gray-100 border border-gray-300 rounded-lg">
+              <p className="text-sm text-gray-700 text-center">
+                <strong>Important Disclaimer:</strong> This tool provides estimates based on current federal tax law. 
+                Actual credits depend on your specific circumstances and IRS examination. SMBTaxCredits.com provides 
+                documentation services only and does not offer tax advice. Always consult a qualified tax professional 
+                before claiming credits.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA Section - Responsive Conversion optimization point */}
       <section className="py-12 sm:py-16 bg-gradient-to-r from-green-600 to-blue-600">
         <div className="container mx-auto px-4">

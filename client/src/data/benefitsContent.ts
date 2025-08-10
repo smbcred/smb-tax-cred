@@ -15,8 +15,8 @@ export const benefitsContent = [
   {
     iconName: "FaDollarSign",
     title: "Simple Flat Fee",
-    description: "Know your cost upfront—$500 to $1,500 based on credit size. Traditional consultants take 15-30% of your credit. We save you thousands.",
-    highlight: "$500-1,500 flat"
+    description: "Know your cost upfront—$500 to $2,000 based on potential credit size. Traditional consultants take 15-30% of your credit. We save you thousands.",
+    highlight: "$500-2,000 flat"
   },
   {
     iconName: "FaClock",
