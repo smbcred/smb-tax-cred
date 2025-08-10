@@ -201,7 +201,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="relative bg-primary text-white p-6 rounded-t-2xl">
+              <div className="relative bg-gradient-to-br from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl">
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 p-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
@@ -215,12 +215,20 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                     <Sparkles className="h-8 w-8" />
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">
-                    Your ${formatCurrency(federalCredit)} Credit is Ready!
+                  <h2 className="text-xl font-semibold mb-3">
+                    Your ${formatCurrency(federalCredit).replace('$', '')} Credit is Ready!
                   </h2>
                   
-                  <p className="text-blue-100">
-                    Get your complete R&D tax credit analysis
+                  {/* Prominent Credit Amount Display */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-3">
+                    <p className="text-sm text-blue-100 mb-1">Your Federal R&D Tax Credit</p>
+                    <p className="text-4xl font-bold">
+                      ${formatCurrency(federalCredit).replace('$', '')}
+                    </p>
+                  </div>
+                  
+                  <p className="text-sm text-blue-100">
+                    Get your complete analysis & documentation guide
                   </p>
                 </div>
               </div>
@@ -238,10 +246,13 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               </div>
 
               {/* Success Story */}
-              <div className="mx-6 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800">
-                  <strong>💡 Success Story:</strong> A marketing agency like yours discovered $15,000 in credits from their custom GPT development work - get your full breakdown now!
-                </p>
+              <div className="mx-6 mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-emerald-800">
+                    <strong>Success Story:</strong> A marketing agency like yours discovered $15,000 in credits from their custom GPT development work - get your full breakdown now!
+                  </p>
+                </div>
               </div>
 
               {/* Form */}

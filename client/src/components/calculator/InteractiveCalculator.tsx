@@ -327,46 +327,71 @@ export const InteractiveCalculator: React.FC = () => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <ResultsDisplayStep
-                results={state.results}
-                isBlurred={!emailCaptured}
-                onCTAClick={() => setShowLeadCapture(true)}
-              />
+              {!emailCaptured ? (
+                // Show teaser view before email capture
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                    <Sparkles className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Your Results Are Ready!
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Click below to see your exact federal tax credit amount
+                  </p>
+                  <button
+                    onClick={() => setShowLeadCapture(true)}
+                    className="btn-primary"
+                  >
+                    See My Full Results
+                  </button>
+                </div>
+              ) : (
+                // Show full results after email capture
+                <ResultsDisplayStep
+                  results={state.results}
+                  isBlurred={false}
+                  onCTAClick={() => setShowLeadCapture(true)}
+                />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6 sm:mt-8">
-        <button
-          onClick={handlePrev}
-          disabled={state.currentStep === 1}
-          className={`
-            px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all
-            ${state.currentStep === 1 
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }
-          `}
-        >
-          Back
-        </button>
+      {/* Hide navigation on step 4 before email capture */}
+      {!(state.currentStep === 4 && !emailCaptured) && (
+        <div className="flex justify-between mt-6 sm:mt-8">
+          <button
+            onClick={handlePrev}
+            disabled={state.currentStep === 1}
+            className={`
+              px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all
+              ${state.currentStep === 1 
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }
+            `}
+          >
+            Back
+          </button>
 
-        <button
-          onClick={handleNext}
-          disabled={!canProceed()}
-          className={`
-            px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-all
-            ${canProceed()
-              ? 'bg-green-600 text-white hover:bg-green-700 transform hover:scale-105'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }
-          `}
-        >
-          {state.currentStep === 4 ? 'See Full Results' : 'Next'}
-        </button>
-      </div>
+          <button
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className={`
+              px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-all
+              ${canProceed()
+                ? 'bg-green-600 text-white hover:bg-green-700 transform hover:scale-105'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }
+            `}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Error display */}
       {stepErrors[state.currentStep] && stepErrors[state.currentStep].length > 0 && (
