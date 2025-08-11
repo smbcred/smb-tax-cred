@@ -36,6 +36,7 @@ const LoadingStatesDemo = lazy(() => import("@/pages/LoadingStatesDemo"));
 const MobileDemo = lazy(() => import("@/pages/MobileDemo"));
 const Help = lazy(() => import("@/pages/Help"));
 const Support = lazy(() => import("@/pages/Support"));
+const Admin = lazy(() => import("@/pages/Admin"));
 
 // Performance-optimized loading skeleton
 function LoadingSkeleton() {
@@ -153,6 +154,11 @@ function Router() {
             <Route path="/documents">
               <ProtectedRoute>
                 <DocumentsPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin">
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             </Route>
             <Route path="/how-it-works" component={HowItWorks} />

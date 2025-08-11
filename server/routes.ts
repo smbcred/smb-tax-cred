@@ -62,6 +62,24 @@ import {
 } from "./middleware/encryption";
 import checkoutRoutes from "./routes/checkout.js";
 import { adminRouter } from "./routes/admin";
+
+// Define authentication middleware directly
+function isAuthenticated(req: any, res: any, next: any) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access token required' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+}
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -4177,6 +4195,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register admin routes (protected by admin authentication)
   app.use("/api/admin", adminRouter);
+  
+  // Document signed URL endpoint (for admin quick actions)
+  app.get('/api/docs/:id/url', isAuthenticated, async (req, res) => {
+    try {
+      const documentId = req.params.id;
+      
+      // Check if document exists and user has access
+      const [document] = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.id, documentId))
+        .limit(1);
+
+      if (!document) {
+        return res.status(404).json({ error: 'Document not found' });
+      }
+
+      // For admin users or document owners
+      const userId = req.user?.id;
+      const isAdmin = req.user?.isAdmin;
+      
+      if (!isAdmin && document.userId !== userId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Generate a signed URL with 15 minute expiration
+      const signedUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/api/documents/${document.id}/download?token=${Date.now()}`;
+      
+      res.json({
+        signedUrl,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        fileName: document.fileName || `${document.documentType}.pdf`
+      });
+    } catch (error) {
+      console.error('Error generating signed URL:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
