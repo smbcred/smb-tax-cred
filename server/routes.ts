@@ -225,7 +225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes with rate limiting and brute force protection
-  app.post("/api/auth/register", authRateLimit, bruteForceProtection(), userRegistrationValidation, async (req, res) => {
+  app.post("/api/auth/register", authRateLimit, bruteForceProtection(), userRegistrationValidation, async (req: any, res: any) => {
     try {
       const { email, password } = req.body;
       
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", authRateLimit, bruteForceProtection(), userLoginValidation, async (req, res) => {
+  app.post("/api/auth/login", authRateLimit, bruteForceProtection(), userLoginValidation, async (req: any, res: any) => {
     try {
       const { email, password } = req.body;
       
@@ -1251,13 +1251,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         intakeFormId: form.id,
         airtableRecordId: form.airtableRecordId,
         companyInfo: {
-          name: company?.name || 'Unknown Company',
-          ein: company?.ein,
-          industry: company?.industry,
-          address: company?.address,
+          name: company?.legalName || 'Unknown Company',
+          ein: company?.ein || undefined,
+          industry: company?.industry || undefined,
+          address: company?.address || undefined,
         },
-        rdActivities: form.formData?.rdActivities || [],
-        expenses: form.formData?.expenses || {
+        rdActivities: (form.formData as any)?.rdActivities || [],
+        expenses: (form.formData as any)?.expenses || {
           wages: 0,
           contractors: 0,
           supplies: 0,
@@ -1274,7 +1274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create workflow trigger record
       const trigger = await storage.createWorkflowTrigger({
         intakeFormId: form.id,
-        airtableRecordId: form.airtableRecordId,
+        airtableRecordId: form.airtableRecordId || undefined,
         triggerPayload,
         workflowName: 'document_generation',
         timeoutAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minute timeout

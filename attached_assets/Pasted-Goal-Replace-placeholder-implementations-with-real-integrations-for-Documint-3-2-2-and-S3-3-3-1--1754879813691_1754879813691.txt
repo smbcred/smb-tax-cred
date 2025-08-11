@@ -1,0 +1,41 @@
+Goal: Replace placeholder implementations with real integrations for Documint (3.2.2) and S3 (3.3.1) using secrets now in Replit. Bring both tasks to fully accepted per /docs/acceptance/3.2.2.md and /docs/acceptance/3.3.1.md.
+
+Read first
+	•	/docs/BLOCKERS.md, /docs/PROGRESS.md, /docs/TASKS_for_v2.md
+	•	/docs/acceptance/3.2.2.md, /docs/acceptance/3.3.1.md
+	•	Current orchestrator: server/src/services/documents/* (or wherever the stubs live)
+
+Env required (fail fast in prod)
+	•	DOCUMINT_API_KEY
+	•	AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
+	•	AWS_S3_BUCKET
+	•	(Optional) DOCUMINT_API_URL default to official base
+
+Implement
+	1.	Env schema & config
+	•	Add a Zod (or similar) env validator in server startup. In production, crash if any of the above are missing; in dev allow stubs.
+	•	Update .env.example and /docs/rd-saas-complete-guide.v2.md “Dependencies to Track”.
+	2.	Documint client (3.2.2)
+	•	Create server/src/services/documint.ts:
+	•	Exports generateForm6765(payload): Promise<{pdfBuffer|url}>.
+	•	Uses DOCUMINT_API_KEY in Authorization header, retries with backoff on 5xx/timeouts, and returns structured errors.
+	•	Add mapping from our calculation/intake fields to the template fields.
+	•	Update the Document Orchestrator to call Documint instead of the placeholder.
+	•	Unit tests with nock: success 200 returns a buffer; 401/403/500 handled.
+	3.	S3 storage (3.3.1)
+	•	Create server/src/services/storage/s3.ts using @aws-sdk/client-s3 + @aws-sdk/s3-request-presigner.
+	•	uploadPdf({buffer, key, contentType:'application/pdf', sse:'AES256'})
+	•	getSignedUrl(key, expires=3600)
+	•	Key convention: customers/{customerId}/{taxYear}/{docType}-{timestamp}.pdf
+	•	Set Cache-Control: private, max-age=0 and server-side encryption.
+	•	Replace placeholder storage calls in the orchestrator with S3.
+	•	Tests using AWS SDK v3 mocks.
+	4.	Wire Make callback
+	•	Ensure the scenario’s final step POSTs to /api/webhooks/make with doc URLs from S3.
+	•	Verify our route saves URLs and marks job complete.
+	5.	Security & logging
+	•	Mask secrets in logs; never log full headers.
+	•	Add basic size limits and MIME guard for uploads.
+
+Verify (acceptance)
+	•	Run:
