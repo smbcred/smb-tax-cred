@@ -54,7 +54,7 @@ Preferred communication style: Simple, everyday language.
 - **Document Orchestrator**: Integrated service that coordinates Claude AI, Documint PDF generation, and S3 storage for complete document workflows.
 
 ### Communication Services
-- **SendGrid**: Email delivery for notifications and document delivery.
+- **SendGrid**: Complete email delivery service with dynamic templates for welcome emails, document notifications, payment confirmations, and intake reminders. Includes development smoke test endpoint and comprehensive unit test coverage.
 - **Airtable**: Workflow management and lead tracking.
 - **Make.com**: Automation orchestration for business process workflows.
 

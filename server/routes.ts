@@ -265,6 +265,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
     });
+
+    // Dev-only SendGrid email smoke test route (no authentication required)
+    app.post("/api/dev/email-smoke", async (req: any, res) => {
+      try {
+        const { to } = req.body;
+        
+        if (!to || typeof to !== 'string' || !to.includes('@')) {
+          return res.status(400).json({
+            success: false,
+            error: 'Valid email address required in request body: { "to": "email@example.com" }'
+          });
+        }
+
+        console.log('SendGrid smoke test - sending welcome email to:', to);
+
+        // Import SendGrid service
+        const { sendWelcomeEmail } = await import('./services/email/sendgrid');
+        
+        const success = await sendWelcomeEmail(to, {
+          name: 'Test User',
+          companyName: 'SMBTaxCredits'
+        });
+
+        if (success) {
+          res.json({
+            success: true,
+            message: `Welcome email sent successfully to ${to}`,
+            templateUsed: 'SENDGRID_TEMPLATE_WELCOME',
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          res.status(500).json({
+            success: false,
+            error: 'Failed to send email - check SendGrid configuration'
+          });
+        }
+
+      } catch (error: any) {
+        console.error('SendGrid smoke test error:', error);
+        res.status(500).json({
+          success: false,
+          error: error.message || 'Email service error',
+          details: error.response?.body || null
+        });
+      }
+    });
   }
 
   // Apply monitoring middleware
@@ -3728,6 +3774,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+
 
   // Document generation with S3 storage endpoints
   app.post("/api/docs/generate", authenticateToken, async (req: any, res) => {
