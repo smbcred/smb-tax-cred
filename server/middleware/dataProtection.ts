@@ -456,8 +456,81 @@ export class PrivacyCompliance {
 
 // Middleware to apply data protection
 export function applyDataProtection() {
-  return [
-    dataSanitization(),
-    dataAccessControl(),
-  ];
+  return (req: Request, res: Response, next: NextFunction) => {
+    // Skip authentication for public routes
+    const publicRoutes = [
+      '/',
+      '/login', 
+      '/register',
+      '/checkout',
+      '/how-it-works',
+      '/pricing',
+      '/faq',
+      '/sample-documents',
+      '/rd-credit-guide',
+      '/qualifying-activities',
+      '/blog',
+      '/industries',
+      '/demo',
+      '/api/leads',
+      '/api/calculation',
+      '/api/calculator',
+      '/api/csrf-token'
+    ];
+
+    // Check if route is public
+    const isPublicRoute = publicRoutes.some(route => 
+      req.path === route || 
+      req.path.startsWith(route + '/') ||
+      req.path.startsWith('/api/auth/') // Auth routes are handled separately
+    );
+
+    // In development, allow all Vite assets and source files
+    const isDevelopmentAsset = process.env.NODE_ENV === 'development' && (
+      req.path.startsWith('/@vite') ||
+      req.path.startsWith('/@react-refresh') ||
+      req.path.startsWith('/@fs/') ||
+      req.path.startsWith('/src/') ||
+      req.path.startsWith('/node_modules/') ||
+      req.path.startsWith('/assets/') ||
+      req.path.startsWith('/__vite') ||
+      /\.(tsx?|jsx?|css|scss|sass|less|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|ico|json|map)(\?.*)?$/.test(req.path)
+    );
+    
+    // Apply data sanitization to all routes
+    dataSanitization()(req, res, (err?: any) => {
+      if (err) return next(err);
+      
+      if (isPublicRoute || isDevelopmentAsset) {
+        // For public routes and dev assets, just log access without authentication
+        const dataTypes = PIIDetector.detectPII(JSON.stringify(req.body || {}));
+        AccessLogger.logDataAccess(
+          req,
+          req.method.toLowerCase(),
+          req.path,
+          dataTypes,
+          true,
+          isDevelopmentAsset ? 'Development asset access' : 'Public route access'
+        );
+        return next();
+      }
+      
+      // Apply data access control to protected routes only
+      dataAccessControl()(req, res, (err?: any) => {
+        if (err) return next(err);
+        
+        // Log all data access attempts for protected routes
+        const dataTypes = PIIDetector.detectPII(JSON.stringify(req.body || {}));
+        AccessLogger.logDataAccess(
+          req,
+          req.method.toLowerCase(),
+          req.path,
+          dataTypes,
+          true
+        );
+        
+        next();
+      });
+    });
+  };
 }

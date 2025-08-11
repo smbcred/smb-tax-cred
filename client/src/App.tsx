@@ -32,6 +32,7 @@ const Login = lazy(() => import("@/pages/auth/Login"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const IntakeFormPage = lazy(() => import("@/pages/IntakeFormPage"));
 const LoadingStatesDemo = lazy(() => import("@/pages/LoadingStatesDemo"));
+const MobileDemo = lazy(() => import("@/pages/MobileDemo"));
 
 // Performance-optimized loading skeleton
 function LoadingSkeleton() {
@@ -77,6 +78,16 @@ function Router() {
   // Initialize performance optimizations
   useEffect(() => {
     initPerformanceOptimizations();
+    
+    // Initialize mobile optimizations
+    import("@/utils/mobileOptimizations").then(({ initMobileOptimizations }) => {
+      initMobileOptimizations({
+        enableVirtualKeyboardFix: true,
+        enableTouchOptimizations: true,
+        enablePerformanceOptimizations: true,
+        enableA11yEnhancements: true
+      });
+    });
   }, []);
 
   if (isLoading) {
@@ -149,6 +160,7 @@ function Router() {
           </>
         )}
         <Route path="/demo/loading-states" component={LoadingStatesDemo} />
+        <Route path="/demo/mobile" component={MobileDemo} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

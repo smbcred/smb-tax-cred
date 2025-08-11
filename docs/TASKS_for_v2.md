@@ -55,8 +55,8 @@ _Source: rd-saas-complete-guide.v2.md_
 | 4.2.2 | Backend Optimization | [x] | [📋](./acceptance/4.2.2.md) |
 | 4.3.1 | Security Audit Implementation | [x] | [📋](./acceptance/4.3.1.md) |
 | 4.3.2 | Data Protection | [x] | [📋](./acceptance/4.3.2.md) |
-| 4.4.1 | Loading States & Feedback | [ ] | [📋](./acceptance/4.4.1.md) |
-| 4.4.2 | Mobile Optimization | [ ] | [📋](./acceptance/4.4.2.md) |
+| 4.4.1 | Loading States & Feedback | [x] | [📋](./acceptance/4.4.1.md) |
+| 4.4.2 | Mobile Optimization | [x] | [📋](./acceptance/4.4.2.md) |
 | 4.5.1 | Analytics Implementation | [ ] | [📋](./acceptance/4.5.1.md) |
 | 4.5.2 | Application Monitoring | [ ] | [📋](./acceptance/4.5.2.md) |
 | 5.1.1 | Comprehensive Testing Suite | [ ] | [📋](./acceptance/5.1.1.md) |

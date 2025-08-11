@@ -1,0 +1,295 @@
+/* Mobile Optimization Styles */
+
+/* Touch target sizing - minimum 44px for accessibility */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+  }
+
+  /* Ensure form inputs are large enough on mobile */
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+
+  /* Better spacing for mobile interfaces */
+  .mobile-spacing {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  /* Mobile-friendly navigation */
+  .mobile-nav {
+    padding: 12px 16px;
+    min-height: 56px;
+  }
+
+  .mobile-nav button,
+  .mobile-nav a {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Responsive breakpoints with mobile-first approach */
+@media (max-width: 640px) {
+  /* Stack layouts vertically on small screens */
+  .mobile-stack {
+    flex-direction: column !important;
+    gap: 16px;
+  }
+
+  /* Full-width mobile elements */
+  .mobile-full {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Mobile typography scaling */
+  .mobile-heading {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  .mobile-text {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    line-height: 1.5;
+  }
+
+  /* Mobile-optimized cards */
+  .mobile-card {
+    margin: 0 -16px;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  /* Mobile form improvements */
+  .mobile-form {
+    gap: 20px;
+  }
+
+  .mobile-form .form-group {
+    margin-bottom: 20px;
+  }
+
+  .mobile-form label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Mobile calculator optimizations */
+  .mobile-calculator {
+    padding: 16px;
+  }
+
+  .mobile-calculator input {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .mobile-calculator .calc-button {
+    min-height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* Mobile modal improvements */
+  .mobile-modal {
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .mobile-modal-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .mobile-modal-content {
+    padding: 16px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  /* Mobile table improvements */
+  .mobile-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .mobile-table thead {
+    display: none;
+  }
+
+  .mobile-table tbody,
+  .mobile-table tr,
+  .mobile-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .mobile-table tr {
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 16px;
+  }
+
+  .mobile-table td {
+    border: none;
+    padding: 4px 0;
+    position: relative;
+    padding-left: 40%;
+  }
+
+  .mobile-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 35%;
+    padding-right: 8px;
+    white-space: nowrap;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .tablet-sidebar {
+    width: 280px;
+  }
+
+  .tablet-main {
+    margin-left: 280px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .retina-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 896px) and (orientation: landscape) {
+  .landscape-hide {
+    display: none;
+  }
+
+  .landscape-compact {
+    padding: 8px 16px;
+    min-height: 40px;
+  }
+
+  .landscape-nav {
+    height: 48px;
+  }
+}
+
+/* Print styles for mobile */
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-full-width {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Ensure text is readable when printed */
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: black !important;
+    background: white !important;
+  }
+}
+
+/* Dark mode mobile optimizations */
+@media (prefers-color-scheme: dark) and (max-width: 640px) {
+  .mobile-dark-optimized {
+    background: hsl(var(--background));
+    border-color: hsl(var(--border));
+  }
+
+  /* Reduce white text on OLED screens */
+  .mobile-dark-text {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-animation {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .mobile-transform {
+    transform: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mobile-high-contrast {
+    border: 2px solid;
+    background: buttonface;
+    color: buttontext;
+  }
+
+  .mobile-high-contrast:focus {
+    outline: 3px solid highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* Utility classes for mobile development */
+.touch-none { touch-action: none; }
+.touch-pan-x { touch-action: pan-x; }
+.touch-pan-y { touch-action: pan-y; }
+.touch-manipulation { touch-action: manipulation; }
+
+.mobile-hidden { display: none; }
+@media (max-width: 640px) {
+  .mobile-hidden { display: none !important; }
+  .mobile-block { display: block !important; }
+  .mobile-flex { display: flex !important; }
+  .mobile-grid { display: grid !important; }
+}
+
+.tablet-hidden { display: block; }
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-hidden { display: none !important; }
+  .tablet-block { display: block !important; }
+  .tablet-flex { display: flex !important; }
+  .tablet-grid { display: grid !important; }
+}
