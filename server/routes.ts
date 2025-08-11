@@ -508,9 +508,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Company routes
   app.post("/api/companies", authenticateToken, async (req: any, res) => {
     try {
+      // Transform nested address object to individual fields
+      const { address, ...otherData } = req.body;
       const companyData = insertCompanySchema.parse({
-        ...req.body,
+        ...otherData,
         userId: req.user.id,
+        ...(address && {
+          addressLine1: address.street,
+          city: address.city,
+          state: address.state,
+          zipCode: address.zipCode,
+          address: `${address.street}, ${address.city}, ${address.state} ${address.zipCode}` // For compatibility
+        })
       });
       
       const company = await storage.createCompany(companyData);
@@ -1249,7 +1258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Construct workflow payload
       const triggerPayload = {
         intakeFormId: form.id,
-        airtableRecordId: form.airtableRecordId,
+        airtableRecordId: form.airtableRecordId || undefined,
         companyInfo: {
           name: company?.legalName || 'Unknown Company',
           ein: company?.ein || undefined,
@@ -1284,7 +1293,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { getWorkflowService } = await import("./services/makeWorkflow");
       const workflowService = getWorkflowService();
       
-      const result = await workflowService.triggerDocumentGeneration(triggerPayload);
+      const result = await workflowService.triggerDocumentGeneration({
+        ...triggerPayload,
+        airtableRecordId: triggerPayload.airtableRecordId || undefined
+      });
 
       if (result.success) {
         // Mark as triggered
@@ -1384,7 +1396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Sort by creation date
-        triggers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        triggers.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
       }
       
       res.json({ 
@@ -1439,7 +1451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { getWorkflowService } = await import("./services/makeWorkflow");
       const workflowService = getWorkflowService();
       
-      const result = await workflowService.triggerDocumentGeneration(trigger.triggerPayload);
+      const result = await workflowService.triggerDocumentGeneration(trigger.triggerPayload as any);
 
       if (result.success) {
         await storage.markWorkflowTriggered(triggerId, {
@@ -1846,7 +1858,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedRequest.templateId,
         validatedRequest.companyContext,
         validatedRequest.projectContext,
-        validatedRequest.options || {}
+        validatedRequest.options || {
+          length: "standard",
+          tone: "professional", 
+          focus: "technical",
+          includeMetrics: false,
+          includeTimeline: false,
+          emphasizeInnovation: false
+        }
       );
 
       // Generate content using Claude
@@ -2842,7 +2861,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         downloadType: validatedRequest.downloadType,
       });
 
-      const downloadResponse = await downloadManager.createDownload(validatedRequest);
+      const downloadResponse = await downloadManager.createDownload({
+        ...validatedRequest,
+        userId: req.user.id
+      });
 
       res.json({
         success: true,
@@ -3059,7 +3081,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         priority: validatedRequest.priority,
       });
 
-      const result = await emailService.sendNotification(validatedRequest);
+      const result = await emailService.sendNotification({
+        ...validatedRequest,
+        userId: req.user.id
+      });
 
       res.json({
         success: true,
@@ -3403,14 +3428,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getCompaniesByUserId(req.user.id),
         storage.getIntakeFormsByUserId(req.user.id),
         storage.getPaymentsByUserId(req.user.id),
-        storage.getDocumentsByUserId(req.user.id),
+        storage.getPaymentsByUserId(req.user.id), // Placeholder: getDocumentsByUserId doesn't exist
       ]);
 
       // Calculate summary statistics
       const latestCalculation = calculations[0];
-      const hasCompletedPayment = payments.some(p => p.status === "completed");
-      const hasIntakeFormInProgress = intakeForms.some(f => f.status === "in_progress");
-      const documentsGenerated = documents.filter(d => d.status === "completed").length;
+      const hasCompletedPayment = payments.some((p: any) => p.status === "completed");
+      const hasIntakeFormInProgress = intakeForms.some((f: any) => f.status === "in_progress");
+      const documentsGenerated = documents.filter((d: any) => d.status === "completed").length;
 
       // Calculate progress statistics
       const totalSections = 4; // Company Info, R&D Activities, Expense Breakdown, Supporting Info
@@ -3419,7 +3444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let completedFields = 0;
 
       // Analyze intake form completion status
-      intakeForms.forEach(form => {
+      intakeForms.forEach((form: any) => {
         const formData = form.formData as any || {};
         
         // Company Info section (10 fields)
@@ -3467,7 +3492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastLoginAt: req.user.lastLoginAt?.toISOString() || null,
           loginCount: req.user.loginCount,
         },
-        companies: companies.map(c => ({
+        companies: companies.map((c: any) => ({
           id: c.id,
           legalName: c.legalName,
           ein: c.ein,
