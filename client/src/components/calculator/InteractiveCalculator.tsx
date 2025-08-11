@@ -25,6 +25,7 @@ import {
 import { calculateRDTaxCredit, businessTypes } from "@/services/calculator.service";
 import type { CalculatorExpenses, CalculationResult } from "@shared/schema";
 import { formatCurrency } from "@/utils/calculations";
+import { CalculatorEvents } from "@/utils/analyticsEvents";
 
 // CTA Button with development mode gating
 interface CTAButtonProps {
@@ -97,6 +98,7 @@ export function InteractiveCalculator() {
   
   const [step, setStep] = useState(1);
   const [showResults, setShowResults] = useState(false);
+  const [calculatorStartTime] = useState(Date.now());
 
   const updateState = (updates: Partial<CalculatorState>) => {
     setState(prev => ({ ...prev, ...updates }));
@@ -113,6 +115,36 @@ export function InteractiveCalculator() {
   };
 
   const handleCalculate = () => {
+    const results = calculateResults();
+    const timeSpent = Date.now() - calculatorStartTime;
+    
+    // Track calculator completion analytics
+    CalculatorEvents.completed(
+      {
+        federalCredit: results.federalCredit,
+        totalQRE: results.totalQRE,
+        pricingTier: results.pricingTier,
+        businessType: state.businessType
+      },
+      timeSpent
+    );
+    
+    // Development debug logging
+    if (import.meta.env.DEV) {
+      console.log('[ANALYTICS DEBUG] calc.completed:', {
+        federalCredit: results.federalCredit,
+        totalQRE: results.totalQRE,
+        timeSpent: `${(timeSpent / 1000).toFixed(1)}s`,
+        businessType: state.businessType,
+        expenses: {
+          wages: state.wages,
+          contractors: state.contractors,
+          supplies: state.supplies,
+          cloud: state.cloud
+        }
+      });
+    }
+    
     setShowResults(true);
   };
 
@@ -138,15 +170,15 @@ export function InteractiveCalculator() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-        <Card className="overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-green-500 to-blue-600 text-white">
+        <Card className="overflow-hidden shadow-xl border-0">
+          <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-600 text-white dark:from-emerald-600 dark:to-blue-700">
             <CardTitle className="flex items-center gap-2 text-2xl">
               <TrendingUp className="h-6 w-6" />
               Your R&D Tax Credit Estimate
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <CardContent className="p-6 sm:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               {/* Results Summary */}
               <div className="space-y-6">
                 <div className="text-center">
@@ -188,7 +220,7 @@ export function InteractiveCalculator() {
 
               {/* Service Tier */}
               <div className="space-y-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
                   <h3 className="font-semibold text-lg mb-4">Recommended Service Tier</h3>
                   <div className="text-center">
                     <Badge variant="outline" className="text-lg px-3 py-1 mb-2">
@@ -258,8 +290,8 @@ export function InteractiveCalculator() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto px-4">
-      <Card>
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="shadow-lg border-0 bg-white dark:bg-gray-950">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-6 w-6 text-blue-600" />
@@ -283,6 +315,19 @@ export function InteractiveCalculator() {
                       data-testid={`business-type-${type.id}`}
                       onClick={() => {
                         updateState({ businessType: type.id });
+                        
+                        // Track calculator start analytics
+                        CalculatorEvents.start('calculator_widget');
+                        
+                        // Development debug logging
+                        if (import.meta.env.DEV) {
+                          console.log('[ANALYTICS DEBUG] calc.started:', {
+                            businessType: type.id,
+                            source: 'calculator_widget',
+                            timestamp: new Date().toISOString()
+                          });
+                        }
+                        
                         setStep(2);
                       }}
                       className={`p-4 border rounded-lg text-left hover:border-blue-500 transition-colors ${
@@ -307,7 +352,7 @@ export function InteractiveCalculator() {
             >
               <div>
                 <h3 className="text-lg font-semibold mb-4">Enter your annual R&D expenses</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="wages" className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
