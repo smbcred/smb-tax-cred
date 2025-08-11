@@ -6,6 +6,27 @@ import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import crypto from "crypto";
 import { storage } from "./storage";
+
+// Import performance optimization middleware
+import { 
+  cacheMiddleware, 
+  invalidateCache, 
+  etagMiddleware, 
+  compressionMiddleware,
+  queryCache 
+} from "./middleware/caching";
+import { 
+  apiRateLimit, 
+  authRateLimit as authRL, 
+  strictRateLimit, 
+  userRateLimit 
+} from "./middleware/rateLimit";
+import { 
+  OptimizedQueryBuilder, 
+  PaginationOptimizer, 
+  QueryPerformanceMonitor,
+  ConnectionPoolOptimizer 
+} from "./services/queryOptimizer";
 import checkoutRoutes from "./routes/checkout.js";
 import {
   insertUserSchema,
