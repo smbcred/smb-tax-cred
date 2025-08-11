@@ -196,6 +196,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register analytics routes
   const { default: analyticsRoutes } = await import('./routes/analytics.js');
   app.use("/api/analytics", analyticsRoutes);
+
+  // Register monitoring routes
+  const { default: monitoringRoutes } = await import('./routes/monitoring.js');
+  app.use("/api/monitoring", monitoringRoutes);
+
+  // Apply monitoring middleware
+  const { applyMonitoring } = await import('./middleware/monitoring.js');
+  app.use(applyMonitoring());
   
   // CSRF token endpoints
   app.get("/api/csrf-token", csrfTokenEndpoint());
