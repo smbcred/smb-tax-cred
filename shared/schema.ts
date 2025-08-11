@@ -342,6 +342,84 @@ export const leads = pgTable("leads", {
   statusIdx: index("idx_leads_status").on(table.status),
 }));
 
+// User feedback and testing data
+export const userFeedback = pgTable("user_feedback", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  sessionId: varchar("session_id", { length: 255 }), // Anonymous session tracking
+  type: varchar("type", { length: 50 }).notNull(), // 'survey', 'widget', 'interview', 'bug_report'
+  category: varchar("category", { length: 50 }).notNull(), // 'ux', 'content', 'technical', 'business'
+  severity: varchar("severity", { length: 20 }).notNull().default("medium"), // 'critical', 'high', 'medium', 'low'
+  page: varchar("page", { length: 255 }), // Page where feedback was given
+  feature: varchar("feature", { length: 100 }), // Specific feature being tested
+  rating: integer("rating"), // 1-10 satisfaction rating
+  npsScore: integer("nps_score"), // 0-10 Net Promoter Score
+  title: varchar("title", { length: 255 }),
+  description: text("description"),
+  tags: jsonb("tags").default(sql`'[]'::jsonb`),
+  metadata: jsonb("metadata").$type<{
+    userAgent?: string;
+    viewport?: { width: number; height: number };
+    task?: string;
+    timeSpent?: number;
+    completionStatus?: 'completed' | 'abandoned' | 'error';
+    testingPhase?: 'moderated' | 'unmoderated' | 'ab_test';
+    userPersona?: 'business_owner' | 'accountant' | 'startup_founder';
+    referenceId?: string;
+  }>(),
+  status: varchar("status", { length: 20 }).notNull().default("new"), // 'new', 'reviewed', 'in_progress', 'resolved', 'closed'
+  priority: varchar("priority", { length: 20 }).notNull().default("medium"), // 'critical', 'high', 'medium', 'low'
+  assignedTo: varchar("assigned_to", { length: 255 }),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+}, (table) => ({
+  userIdIdx: index("idx_user_feedback_user_id").on(table.userId),
+  sessionIdIdx: index("idx_user_feedback_session_id").on(table.sessionId),
+  typeIdx: index("idx_user_feedback_type").on(table.type),
+  categoryIdx: index("idx_user_feedback_category").on(table.category),
+  severityIdx: index("idx_user_feedback_severity").on(table.severity),
+  statusIdx: index("idx_user_feedback_status").on(table.status),
+  priorityIdx: index("idx_user_feedback_priority").on(table.priority),
+}));
+
+// Testing sessions and participant tracking
+export const testingSessions = pgTable("testing_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  participantId: varchar("participant_id", { length: 255 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'moderated', 'unmoderated', 'ab_test'
+  phase: varchar("phase", { length: 50 }).notNull(), // 'recruitment', 'scheduled', 'completed', 'analyzed'
+  persona: varchar("persona", { length: 50 }).notNull(), // 'business_owner', 'accountant', 'startup_founder'
+  scenarios: jsonb("scenarios").default(sql`'[]'::jsonb`),
+  startTime: timestamp("start_time"),
+  endTime: timestamp("end_time"),
+  duration: integer("duration"), // in seconds
+  completionRate: integer("completion_rate"), // percentage
+  satisfactionScore: integer("satisfaction_score"), // 1-10
+  npsScore: integer("nps_score"), // 0-10
+  recordingUrl: varchar("recording_url", { length: 500 }),
+  notes: text("notes"),
+  facilitator: varchar("facilitator", { length: 255 }),
+  incentivePaid: boolean("incentive_paid").default(false),
+  metadata: jsonb("metadata").$type<{
+    recruitmentChannel?: string;
+    company?: string;
+    industry?: string;
+    companySize?: string;
+    aiToolUsage?: string[];
+    technicalSetup?: string;
+    issues?: string[];
+    keyInsights?: string[];
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+}, (table) => ({
+  participantIdIdx: index("idx_testing_sessions_participant_id").on(table.participantId),
+  typeIdx: index("idx_testing_sessions_type").on(table.type),
+  phaseIdx: index("idx_testing_sessions_phase").on(table.phase),
+  personaIdx: index("idx_testing_sessions_persona").on(table.persona),
+}));
+
 // Insert schemas
 export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
   id: true,
@@ -420,6 +498,22 @@ export const insertDocumentSchema = createInsertSchema(documents).omit({
   fileName: true,
   status: true,
   expirationDate: true,
+});
+
+export const insertUserFeedbackSchema = createInsertSchema(userFeedback).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  status: true,
+  priority: true,
+  resolvedAt: true,
+});
+
+export const insertTestingSessionSchema = createInsertSchema(testingSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  incentivePaid: true,
 });
 
 export const insertLeadSchema = createInsertSchema(leads).omit({

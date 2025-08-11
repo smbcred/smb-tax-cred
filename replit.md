@@ -64,3 +64,9 @@ Preferred communication style: Simple, everyday language.
 - **Radix UI**: Accessible, unstyled component primitives.
 - **Shadcn/ui**: Pre-built component library.
 - **Font Awesome**: Icon system.
+
+### User Acceptance Testing
+- **Framework**: Comprehensive UAT system with test scenarios, recruitment plan, and feedback collection.
+- **Components**: UserFeedbackWidget with multiple trigger modes (float, inline, button) and rating systems.
+- **API**: RESTful feedback endpoints with validation, analytics, and testing session tracking.
+- **Database**: User feedback and testing session tables with comprehensive metadata and participant tracking.
