@@ -8,14 +8,37 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './client/src/test/setup.ts',
+    setupFiles: './client/src/__tests__/setup.ts',
     coverage: {
-      reporter: ['text', 'json', 'html'],
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
       exclude: [
         'node_modules/',
-        'client/src/test/',
+        'dist/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/coverage/**',
+        '**/__tests__/**',
+        '**/*.test.*',
+        '**/*.spec.*',
+        'client/src/test/'
       ],
+      thresholds: {
+        global: {
+          branches: 70,
+          functions: 70,
+          lines: 70,
+          statements: 70
+        }
+      }
     },
+    testTimeout: 10000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true
+      }
+    }
   },
   resolve: {
     alias: {
@@ -27,6 +50,7 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './client/src/hooks'),
       '@pages': path.resolve(__dirname, './client/src/pages'),
       '@shared': path.resolve(__dirname, './shared'),
+      '@server': path.resolve(__dirname, './server'),
     },
   },
 });
