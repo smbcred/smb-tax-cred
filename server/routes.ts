@@ -213,6 +213,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { default: supportRoutes } = await import('./routes/support.js');
   app.use("/api/support", supportRoutes);
 
+  // Dev-only S3 smoke test route (no authentication required)
+  if (process.env.NODE_ENV !== 'production') {
+    app.post("/api/dev/s3-smoke", async (req, res) => {
+      try {
+        const { createS3Service } = await import('./services/storage/s3');
+        
+        // Create a tiny PDF buffer for testing
+        const tinyPdfBuffer = Buffer.from(
+          '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000010 00000 n \n0000000079 00000 n \n0000000136 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n213\n%%EOF'
+        );
+        
+        const s3Service = createS3Service();
+        const testKey = s3Service.docKey({
+          customerId: 'smoke-test',
+          taxYear: new Date().getFullYear(),
+          docType: 'test-doc'
+        });
+        
+        // Upload the test PDF
+        await s3Service.uploadPdf({
+          buffer: tinyPdfBuffer,
+          key: testKey,
+          metadata: {
+            testType: 'smoke-test',
+            createdBy: 'dev-route'
+          }
+        });
+        
+        // Generate a 5-minute presigned URL
+        const url = await s3Service.getPdfUrl(testKey, 300);
+        
+        res.json({
+          success: true,
+          key: testKey,
+          url: url,
+          size: tinyPdfBuffer.length,
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (error: any) {
+        console.error('S3 smoke test failed:', error);
+        res.status(500).json({
+          success: false,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+  }
+
   // Apply monitoring middleware
   const { applyMonitoring } = await import('./middleware/monitoring.js');
   app.use(applyMonitoring());
@@ -3635,6 +3685,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch intake form" });
     }
   });
+
+
 
   const httpServer = createServer(app);
   return httpServer;

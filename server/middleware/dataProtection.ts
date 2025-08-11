@@ -476,6 +476,7 @@ export function applyDataProtection() {
       '/support',
       '/api/leads',
       '/api/calculation',
+      '/api/dev/s3-smoke',
       '/api/calculator',
       '/api/csrf-token',
       '/api/help',
