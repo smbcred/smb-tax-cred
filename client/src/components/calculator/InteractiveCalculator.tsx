@@ -32,7 +32,7 @@ import { ExpenseInputsStepNew as ExpenseInputsStep } from './steps/ExpenseInputs
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { ProgressIndicator } from './ProgressIndicator';
 import { LeadCaptureModal } from '@/components/leadCapture/LeadCaptureModal';
-import { RDTaxCalculator } from '@/services/calculation/calculator.engine';
+import { RDTaxCalculator, EnhancedRDTaxCalculator } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
 interface CalculatorState {
@@ -150,8 +150,8 @@ export const InteractiveCalculator: React.FC = () => {
       setIsCalculating(true);
       
       try {
-        // Use the new ASC method calculator
-        const calculationResult = RDTaxCalculator.calculate({
+        // Use the enhanced calculator with QSB analysis and legislative benefits
+        const calculationResult = EnhancedRDTaxCalculator.calculate({
           // Company info
           businessType: state.businessType || 'Software',
           industryCode: '541511', // Default software industry
@@ -185,19 +185,39 @@ export const InteractiveCalculator: React.FC = () => {
           qualifyingActivities: state.qualifyingActivities
         });
         
+        // Enhanced results with QSB and legislative benefits
         const results = {
+          // Basic results for backward compatibility
           totalQRE: calculationResult.qreBreakdown.total,
           federalCredit: calculationResult.federalCredit,
           stateCredit: 0, // No state credits for now
-          totalBenefit: calculationResult.federalCredit,
+          totalBenefit: calculationResult.qsbAnalysis.payrollOffsetAvailable ? 
+            calculationResult.qsbAnalysis.quarterlyBenefit * 4 : calculationResult.federalCredit,
           pricingTier: calculationResult.pricingTier.price,
           tierInfo: calculationResult.pricingTier,
-          roi: calculationResult.roi.roiMultiple,
+          roi: parseFloat(calculationResult.roi.roiMultiple.replace('x', '')),
           breakdown: {
             wages: calculationResult.qreBreakdown.wages,
             contractors: calculationResult.qreBreakdown.contractors,
             supplies: calculationResult.qreBreakdown.supplies,
             cloud: calculationResult.qreBreakdown.cloudAndSoftware
+          },
+          
+          // Enhanced features - NEW!
+          qsbAnalysis: calculationResult.qsbAnalysis,
+          legislativeContext: calculationResult.legislativeContext,
+          industryInsights: calculationResult.industryInsights,
+          payrollOffset: calculationResult.qsbAnalysis.payrollOffsetAvailable ? {
+            quarterlyBenefit: calculationResult.qsbAnalysis.quarterlyBenefit,
+            annualBenefit: calculationResult.qsbAnalysis.quarterlyBenefit * 4,
+            maxLifetime: calculationResult.qsbAnalysis.maxPayrollOffset,
+            remainingCapacity: calculationResult.qsbAnalysis.lifetimeRemaining
+          } : null,
+          enhancedFeatures: {
+            hasQSBBenefits: calculationResult.qsbAnalysis.isEligible,
+            hasPayrollOffset: calculationResult.qsbAnalysis.payrollOffsetAvailable,
+            legislativeAlerts: calculationResult.legislativeContext.alerts.length > 0,
+            confidence: calculationResult.confidence
           }
         };
         

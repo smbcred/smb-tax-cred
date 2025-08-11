@@ -94,8 +94,23 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     );
   }
 
-  const { federalCredit, totalQRE, tierInfo, roi, breakdown } = result;
+  const { 
+    federalCredit, 
+    totalQRE, 
+    tierInfo, 
+    roi, 
+    breakdown,
+    // Enhanced features
+    qsbAnalysis,
+    payrollOffset,
+    legislativeContext,
+    industryInsights,
+    enhancedFeatures
+  } = result;
+  
   const hasSignificantCredit = federalCredit >= 5000;
+  const hasQSBBenefits = enhancedFeatures?.hasQSBBenefits;
+  const hasPayrollOffset = enhancedFeatures?.hasPayrollOffset;
 
   const getExampleActivity = () => {
     const activities = [
@@ -248,6 +263,128 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </div>
           </motion.div>
+
+          {/* QSB Payroll Tax Offset Benefits - NEW ENHANCED FEATURE */}
+          {hasPayrollOffset && payrollOffset && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8"
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <Shield className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    🚀 Qualified Small Business (QSB) Benefits
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      You Qualify!
+                    </span>
+                  </h3>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Your startup qualifies for immediate payroll tax offset benefits. This means cash back every quarter instead of waiting until tax time.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg p-4">
+                  <p className="text-sm text-gray-600 mb-1">Quarterly Cash Back</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {formatCurrency(payrollOffset.quarterlyBenefit)}
+                  </p>
+                  <p className="text-xs text-gray-500">Every 3 months</p>
+                </div>
+                <div className="bg-white rounded-lg p-4">
+                  <p className="text-sm text-gray-600 mb-1">Annual Total</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {formatCurrency(payrollOffset.annualBenefit)}
+                  </p>
+                  <p className="text-xs text-gray-500">vs. waiting for tax refund</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <div className="flex items-center gap-2 text-blue-800 text-sm">
+                  <Clock className="h-4 w-4" />
+                  <span className="font-medium">Fast Track Cash Flow:</span>
+                </div>
+                <p className="text-blue-700 text-sm mt-1">
+                  Get cash back in 30-45 days instead of waiting 12+ months for traditional tax refunds. Perfect for funding growth.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Legislative Benefits Alert */}
+          {legislativeContext?.alerts && legislativeContext.alerts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+            >
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-3">Legislative Updates & Benefits</h3>
+                  <div className="space-y-3">
+                    {legislativeContext.alerts.slice(0, 2).map((alert, index) => (
+                      <div key={index} className="bg-white rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <span className={`inline-block w-2 h-2 rounded-full mt-2 ${
+                            alert.type === 'benefit' ? 'bg-green-500' : 
+                            alert.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
+                          }`}></span>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{alert.message}</p>
+                            <p className="text-xs text-gray-600 mt-1">{alert.impact}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Industry Insights */}
+          {industryInsights && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0 }}
+              className="bg-purple-50 border border-purple-200 rounded-xl p-6 mb-8"
+            >
+              <div className="flex items-start gap-3">
+                <Award className="h-6 w-6 text-purple-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-3">Industry Peer Insights</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg p-4">
+                      <p className="text-sm text-gray-600 mb-1">Average in Your Industry</p>
+                      <p className="text-lg font-bold text-purple-600">{industryInsights.averageCredit}</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <p className="text-sm text-gray-600 mb-1">Success Story</p>
+                      <p className="text-xs text-gray-700">{industryInsights.successStory}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-900 mb-2">Common Activities in Your Industry:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {industryInsights.commonActivities?.slice(0, 3).map((activity, index) => (
+                        <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
+                          {activity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* QRE Breakdown */}
           {breakdown && (
