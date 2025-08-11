@@ -1,34 +1,35 @@
-# SMBTaxCredits.com - R&D Tax Credit Calculation Guide
+# SMBTaxCredits.com - R&D Tax Credit Calculation Guide (2025 Updated)
 
 ## Overview
-This guide ensures accurate calculation of federal R&D tax credits, including recent law changes and compliance requirements.
+This guide ensures accurate calculation of federal R&D tax credits, including all recent law changes through the 2025 "One Big Beautiful Bill Act" and compliance requirements.
 
 ## Table of Contents
 1. [Current Law Overview](#current-law-overview)
 2. [Calculation Methods](#calculation-methods)
-3. [Recent Law Changes](#recent-law-changes)
-4. [Qualified Research Expenses (QREs)](#qualified-research-expenses-qres)
-5. [Special Considerations](#special-considerations)
-6. [Calculation Examples](#calculation-examples)
-7. [Validation Rules](#validation-rules)
-8. [Compliance Warnings](#compliance-warnings)
+3. [Qualified Small Business (QSB) Benefits](#qsb-benefits)
+4. [Recent Law Changes (2022-2025)](#recent-law-changes)
+5. [Qualified Research Expenses (QREs)](#qualified-research-expenses-qres)
+6. [Section 280C Election](#section-280c-election)
+7. [Calculation Examples](#calculation-examples)
+8. [Compliance Requirements](#compliance-requirements)
 
 ---
 
 ## Current Law Overview
 
 ### IRC Section 41 - Research Credit
-The federal R&D tax credit is governed by Internal Revenue Code Section 41. Key points:
+The federal R&D tax credit is permanent (made so by PATH Act 2015) and provides:
 
 - **Regular Credit**: 20% of QREs exceeding a base amount
 - **Alternative Simplified Credit (ASC)**: 14% of QREs exceeding 50% of 3-year average
-- **Startup Credit**: Up to $500,000 against payroll taxes (increased from $250,000)
+- **Startup Payroll Tax Credit**: Up to **$500,000** against payroll taxes (doubled from $250,000 by IRA 2022)
+- **Full R&D Deduction**: Restored for 2025+ (reversing 2022-2024 amortization)
 
 ### Four-Part Test (All Must Be Met)
-1. **Technological in Nature**: Relies on hard sciences
+1. **Technological in Nature**: Relies on hard sciences (engineering, computer science, biological sciences, physical sciences)
 2. **Elimination of Uncertainty**: Technical uncertainty about capability, method, or design
-3. **Process of Experimentation**: Systematic trial and error
-4. **Business Component**: New or improved functionality, performance, reliability, or quality
+3. **Process of Experimentation**: Systematic trial and error, modeling, simulation, or testing
+4. **Qualified Purpose**: New or improved functionality, performance, reliability, or quality
 
 ---
 
@@ -36,486 +37,275 @@ The federal R&D tax credit is governed by Internal Revenue Code Section 41. Key 
 
 ### Method 1: Regular Research Credit (RRC)
 ```typescript
-// Regular Research Credit Calculation
-export const calculateRegularCredit = (
-  currentYearQREs: number,
-  baseAmount: number,
-  historicalData?: HistoricalQREs
-): CreditCalculation => {
-  // Base amount is greater of:
-  // 1. Fixed base percentage × average annual gross receipts (last 4 years)
-  // 2. 50% of current year QREs
-  
-  const minimumBase = currentYearQREs * 0.5;
-  const effectiveBase = Math.max(baseAmount, minimumBase);
-  
-  // Credit is 20% of excess QREs
-  const excessQREs = Math.max(0, currentYearQREs - effectiveBase);
-  const creditAmount = excessQREs * 0.20;
-  
-  return {
-    method: 'regular',
-    currentYearQREs,
-    baseAmount: effectiveBase,
-    excessQREs,
-    creditRate: 0.20,
-    creditAmount,
-  };
+// Regular Credit: 20% of excess over base
+// Most SMBs get ~10% effective rate due to 50% minimum base
+const calculateRegularCredit = (currentQRE: number, historicalData: any) => {
+  // For startups: 3% fixed base for first 5 years
+  // For others: Complex historical calculation
+  const minimumBase = currentQRE * 0.5; // 50% floor
+  const computedBase = calculateHistoricalBase(historicalData);
+  const effectiveBase = Math.max(computedBase, minimumBase);
+  const excess = Math.max(0, currentQRE - effectiveBase);
+  return excess * 0.20;
 };
 ```
 
-### Method 2: Alternative Simplified Credit (ASC)
+### Method 2: Alternative Simplified Credit (ASC) - Recommended for SMBs
 ```typescript
-// ASC Calculation - Most SMBs use this method
-export const calculateASC = (
-  currentYearQREs: number,
-  priorThreeYearsQREs: number[]
-): CreditCalculation => {
-  // Special rules for different scenarios
-  if (priorThreeYearsQREs.length === 0) {
-    // No prior QREs: 6% of current year
-    return {
-      method: 'asc_no_prior',
-      currentYearQREs,
-      baseAmount: 0,
-      creditRate: 0.06,
-      creditAmount: currentYearQREs * 0.06,
-    };
+// ASC: More straightforward calculation
+const calculateASC = (currentQRE: number, priorThreeYears: number[]) => {
+  // First-time filers (no prior QREs)
+  if (!priorThreeYears.length || priorThreeYears.every(y => y === 0)) {
+    return currentQRE * 0.06; // 6% for first-timers
   }
   
-  // Calculate 3-year average
-  const validPriorYears = priorThreeYearsQREs.filter(qre => qre > 0);
-  const averagePriorQREs = validPriorYears.length > 0
-    ? validPriorYears.reduce((sum, qre) => sum + qre, 0) / validPriorYears.length
-    : 0;
-  
-  // Base is 50% of average
-  const baseAmount = averagePriorQREs * 0.5;
-  
-  // Credit is 14% of excess
-  const excessQREs = Math.max(0, currentYearQREs - baseAmount);
-  const creditAmount = excessQREs * 0.14;
-  
-  return {
-    method: 'asc',
-    currentYearQREs,
-    priorYearsAverage: averagePriorQREs,
-    baseAmount,
-    excessQREs,
-    creditRate: 0.14,
-    creditAmount,
-  };
-};
-```
-
-### Method 3: Startup/Small Business Credit
-```typescript
-// Payroll tax offset for qualified small businesses
-export const calculateStartupCredit = (
-  regularCredit: number,
-  businessInfo: BusinessInfo
-): StartupCreditResult => {
-  // Eligibility requirements
-  const eligible = 
-    businessInfo.grossReceipts < 5_000_000 && // Less than $5M current year
-    businessInfo.yearsSinceFirstReceipts < 5 && // No receipts before 5 years ago
-    !businessInfo.isSuccessorCompany; // Not a successor
-  
-  if (!eligible) {
-    return {
-      eligible: false,
-      reason: 'Does not meet QSB requirements',
-      creditAmount: 0,
-    };
-  }
-  
-  // Cap at $500,000 (increased from $250,000 as of 2023)
-  const maxCredit = 500_000;
-  const allowedCredit = Math.min(regularCredit, maxCredit);
-  
-  return {
-    eligible: true,
-    creditAmount: allowedCredit,
-    appliedAgainst: 'payroll_tax',
-    form: 'Form 8974',
-  };
+  // Repeat filers
+  const avgPrior = priorThreeYears.reduce((a,b) => a+b, 0) / priorThreeYears.length;
+  const base = avgPrior * 0.5; // 50% of average
+  const excess = Math.max(0, currentQRE - base);
+  return excess * 0.14; // 14% of excess
 };
 ```
 
 ---
 
-## Recent Law Changes
+## Qualified Small Business (QSB) Benefits
 
-### Tax Cuts and Jobs Act (TCJA) - 2017
-- Eliminated AMT limitation for C-corps
-- Expanded payroll tax offset to $250,000
+### Payroll Tax Offset - Major Startup Benefit! 🚀
 
-### Consolidated Appropriations Act - 2021
-- Made R&D credit refundable for 2020 (COVID relief)
+**Eligibility Requirements:**
+- Gross receipts < $5 million in credit year
+- No gross receipts before 5 tax years ago  
+- Not a tax-exempt organization
+- Must elect on timely filed original return (no amendments!)
 
-### SECURE Act 2.0 - 2022
-- Increased payroll tax offset to $500,000
-- Expanded to all businesses (not just startups)
+**Benefits (Enhanced by IRA 2022):**
+- Apply up to **$500,000** of R&D credits against payroll taxes annually (was $250k pre-2023)
+- First $250k offsets Social Security tax (6.2% employer portion)
+- Next $250k offsets Medicare tax (1.45% employer portion)
+- Provides immediate cash flow benefit (quarterly via Form 941)
+- Available for up to 5 tax years total (lifetime limit)
 
-### **IMPORTANT: Section 174 Capitalization (2022-2025)**
-```typescript
-// CRITICAL CHANGE: R&D expenses must be capitalized
-export const calculateSection174Impact = (
-  taxYear: number,
-  rdExpenses: number,
-  isDomestic: boolean
-): Section174Result => {
-  if (taxYear < 2022) {
-    // Pre-2022: Immediate deduction
-    return {
-      currentYearDeduction: rdExpenses,
-      amortizationRequired: false,
-    };
-  }
-  
-  // 2022-2025: Must capitalize and amortize
-  const amortizationPeriod = isDomestic ? 5 : 15;
-  const midYearConvention = 0.5; // Half-year in year 1
-  
-  const firstYearAmortization = (rdExpenses / amortizationPeriod) * midYearConvention;
-  const subsequentYearAmortization = rdExpenses / amortizationPeriod;
-  
-  return {
-    currentYearDeduction: firstYearAmortization,
-    amortizationRequired: true,
-    amortizationPeriod,
-    totalCapitalized: rdExpenses,
-    annualAmortization: subsequentYearAmortization,
-    warning: 'Section 174 requires capitalization of R&D expenses for 2022-2025',
-  };
-};
+**How It Works:**
+1. Calculate R&D credit on Form 6765
+2. Make Section D election for payroll tax offset
+3. File Form 8974 with quarterly Form 941
+4. Reduce payroll tax deposits immediately
+
+**Example:**
+```
+AI Startup with $400,000 R&D credit, no income tax liability:
+- Elects $400,000 payroll tax offset
+- Quarterly payroll tax: $30,000
+- Pays $0 payroll tax for 3+ quarters
+- Saves $400,000 in cash within 12-15 months
 ```
 
-### Proposed Changes (Monitor for Updates)
-- Various bills to repeal Section 174 capitalization
-- Proposals to increase credit rates
-- Enhanced startup provisions
+---
+
+## Recent Law Changes (2022-2025)
+
+### 2015: PATH Act
+- Made R&D credit permanent (was temporary for 30+ years)
+- Introduced $250,000 payroll tax offset for startups
+- Allowed credit to offset AMT for private companies
+
+### 2017: Tax Cuts and Jobs Act (TCJA)
+- Eliminated corporate AMT (expanded credit usability)
+- **Enacted Section 174 amortization starting 2022** (see below)
+
+### 2022-2024: Section 174 Amortization Period ⚠️
+- R&D expenses must be capitalized and amortized:
+  - Domestic R&D: 5 years
+  - Foreign R&D: 15 years
+- Created cash flow challenges for R&D-heavy businesses
+- Still could claim credit, but couldn't fully deduct expenses
+
+### 2022: Inflation Reduction Act (IRA)
+- **Doubled payroll tax offset cap from $250k to $500k** ✅
+- Expanded to allow Medicare tax offset (previously only Social Security)
+- Effective for tax years beginning after December 31, 2022
+
+### 2025: "One Big Beautiful Bill Act" (OBBBA) 🎉
+- **Restored 100% immediate deduction for domestic R&D** (reversing Section 174)
+- Foreign R&D still requires 15-year amortization
+- Retroactive relief options for 2022-2024 amortization
+- Enhanced Form 6765 with new Section G project documentation
 
 ---
 
 ## Qualified Research Expenses (QREs)
 
-### Includable Expenses
-```typescript
-export const calculateQREs = (expenses: ExpenseData): QRECalculation => {
-  const qres = {
-    // W-2 Wages - 100% if substantially engaged
-    wages: expenses.wages * expenses.rdAllocationPercentage,
-    
-    // Contract Labor - Limited to 65%
-    contractors: Math.min(
-      expenses.contractorCosts * expenses.rdAllocationPercentage,
-      expenses.contractorCosts * 0.65
-    ),
-    
-    // Supplies - 100% if used in R&D
-    supplies: expenses.supplies * expenses.rdAllocationPercentage,
-    
-    // Computer Costs - If used for R&D
-    cloudComputing: expenses.cloudCosts * expenses.rdAllocationPercentage,
-    software: expenses.softwareLicenses * expenses.rdAllocationPercentage,
-  };
-  
-  const totalQREs = Object.values(qres).reduce((sum, val) => sum + val, 0);
-  
-  return {
-    breakdown: qres,
-    total: totalQREs,
-    warnings: validateQREs(expenses),
-  };
-};
-```
+### Included Expenses ✅
+1. **W-2 Wages**: 
+   - Employees substantially engaged in R&D (engineers, developers, data scientists)
+   - Includes salary, bonuses, employer payroll taxes
+   - First-line supervisor wages if directly supervising R&D
 
-### Excluded Expenses
-```typescript
-const EXCLUDED_EXPENSES = [
-  'Land or building costs',
-  'General administrative costs',
-  'Marketing expenses',
-  'Post-production modifications',
-  'Foreign research',
-  'Funded research',
-  'Research after commercial production',
-];
-```
+2. **Contract Research (65% limit)**:
+   - Outside contractors performing R&D on your behalf
+   - Only 65% of costs qualify (per IRC Section 41)
+   - Must be US-based work
+
+3. **Supplies**:
+   - Materials used in R&D process
+   - Cloud computing for R&D (AWS, Azure, GCP)
+   - Software licenses for R&D activities
+   - Prototype materials
+   - Testing supplies
+
+4. **Computer Use**:
+   - Rental/lease of computers for R&D
+   - Cloud infrastructure costs
+   - Development environments
+
+### Excluded Expenses ❌
+- Land or buildings
+- General administrative costs
+- Marketing or sales activities
+- Foreign research (post-production modifications)
+- Funded research (customer pays and retains rights)
+- Research after commercial production begins
 
 ---
 
-## Special Considerations
+## Section 280C Election
 
-### AI/Software Development Activities
-```typescript
-export const validateAIActivities = (activities: AIActivity[]): ValidationResult => {
-  const qualifyingActivities = [];
-  const warnings = [];
-  
-  activities.forEach(activity => {
-    // Must show experimentation
-    if (!activity.iterations || activity.iterations < 2) {
-      warnings.push(`${activity.name}: Needs multiple iterations to show experimentation`);
-      return;
-    }
-    
-    // Must have technical uncertainty
-    if (!activity.technicalChallenge) {
-      warnings.push(`${activity.name}: Must identify technical uncertainty`);
-      return;
-    }
-    
-    // Must track improvements
-    if (!activity.metrics || !activity.improvements) {
-      warnings.push(`${activity.name}: Must document measurable improvements`);
-      return;
-    }
-    
-    qualifyingActivities.push(activity);
-  });
-  
-  return {
-    qualified: qualifyingActivities,
-    warnings,
-    qualificationRate: qualifyingActivities.length / activities.length,
-  };
-};
+### The Choice: Full Credit vs. Reduced Credit
+
+**Option 1: Full Credit**
+- Take 100% of calculated credit
+- Must reduce R&D deduction by credit amount
+- More complex accounting
+- May increase taxable income
+
+**Option 2: Reduced Credit (Recommended for SMBs)**
+- Take credit × (1 - 21%) = 79% of full credit
+- Keep full R&D deduction
+- Simpler accounting
+- Often similar net benefit
+
+**Example Comparison:**
 ```
+$100,000 QREs, 14% ASC rate = $14,000 potential credit
 
-### Industry-Specific Rules
-```typescript
-const INDUSTRY_MULTIPLIERS = {
-  // Manufacturing often has higher qualification rates
-  manufacturing: 1.0,
-  
-  // Software/tech typically qualifies well
-  software: 0.9,
-  
-  // Service industries need strong documentation
-  services: 0.7,
-  
-  // Retail has lower qualification rates
-  retail: 0.5,
-};
+Full Credit:
+- Credit: $14,000
+- Lost deduction: $14,000 × 21% = $2,940 tax increase  
+- Net benefit: $11,060
+
+Reduced Credit:
+- Credit: $14,000 × 79% = $11,060
+- Lost deduction: $0
+- Net benefit: $11,060
+
+Result: Same benefit, simpler with reduced credit!
 ```
 
 ---
 
 ## Calculation Examples
 
-### Example 1: Marketing Agency with AI Tools
-```typescript
-const agencyExample = {
-  // Input data
-  businessType: 'agency',
-  taxYear: 2024,
-  employees: {
-    total: 25,
-    technicalStaff: 8,
-  },
-  expenses: {
-    wages: 800_000, // Total W-2 wages
-    rdWages: 320_000, // 8 employees × $40k allocated to R&D
-    contractors: 50_000, // Freelance developers
-    software: 30_000, // AI tools, APIs
-    supplies: 5_000, // Testing infrastructure
-  },
-  activities: [
-    'Custom GPT development for client proposals',
-    'Prompt engineering for content generation',
-    'Chatbot development for customer service',
-  ],
-  
-  // Calculation
-  qres: {
-    wages: 320_000,
-    contractors: 32_500, // 50,000 × 0.65
-    software: 30_000,
-    supplies: 5_000,
-    total: 387_500,
-  },
-  
-  // ASC Method (14% with no prior years = 6%)
-  credit: 387_500 * 0.06, // $23,250
-  
-  // Service tier
-  serviceFee: 1_200, // Tier 4
-};
+### Example 1: First-Time Filer (Software Startup)
+```
+TechStartup Inc - 2025 Tax Year
+- 5 engineers × $120,000 salary = $600,000
+- 80% time on R&D = $480,000 wage QREs
+- $50,000 AWS costs for development
+- $30,000 contractor for specialized AI work
+- Total QREs: $480,000 + $50,000 + ($30,000 × 65%) = $549,500
+
+ASC Calculation (first-time):
+- Credit = $549,500 × 6% = $32,970
+
+QSB Payroll Offset:
+- Gross receipts: $1.2M ✓
+- First year of revenue ✓  
+- Can offset full $32,970 against Q1-Q2 payroll taxes
 ```
 
-### Example 2: E-commerce with Chatbot
-```typescript
-const ecommerceExample = {
-  businessType: 'ecommerce',
-  taxYear: 2024,
-  expenses: {
-    wages: 200_000, // 2 developers × $100k
-    contractors: 0,
-    software: 15_000, // Chatbot platform, APIs
-    cloudComputing: 10_000, // AWS for testing
-  },
-  
-  qres: {
-    wages: 200_000,
-    software: 15_000,
-    cloud: 10_000,
-    total: 225_000,
-  },
-  
-  // With 3 prior years averaging $150k QREs
-  priorAverage: 150_000,
-  baseAmount: 75_000, // 50% of average
-  excessQREs: 150_000, // 225k - 75k
-  credit: 150_000 * 0.14, // $21,000
-  
-  serviceFee: 1_200, // Tier 4
-};
+### Example 2: Repeat Filer (E-commerce Company)
+```
+ShopTech LLC - 2025 Tax Year
+Prior 3 years QREs: $200k, $250k, $300k (avg = $250k)
+Current year: $400,000 QREs
+
+ASC Calculation:
+- Base = $250,000 × 50% = $125,000
+- Excess = $400,000 - $125,000 = $275,000
+- Credit = $275,000 × 14% = $38,500
+
+Not QSB (>$5M revenue), uses against income tax
+```
+
+### Example 3: Maximum Payroll Offset
+```
+BioAI Corp - 2025 Tax Year  
+- 50 researchers × $150,000 = $7,500,000 wages
+- $2M in lab supplies and cloud compute
+- Total QREs: $9,500,000
+- Prior 3-year average: $5,000,000
+
+ASC Calculation:
+- Base = $5,000,000 × 50% = $2,500,000
+- Excess = $9,500,000 - $2,500,000 = $7,000,000
+- Credit = $7,000,000 × 14% = $980,000
+
+QSB Status:
+- Revenue: $4.8M ✓
+- Age: 3 years ✓
+- Elects maximum $500,000 payroll offset
+- Remaining $480,000 carries forward
 ```
 
 ---
 
-## Validation Rules
+## Compliance Requirements
 
-### Business Logic Validation
-```typescript
-export const validateCalculation = (input: CalculationInput): ValidationResult => {
-  const errors = [];
-  const warnings = [];
-  
-  // Check reasonableness
-  if (input.rdAllocation > 0.8) {
-    warnings.push('R&D allocation above 80% requires strong documentation');
-  }
-  
-  // Contractor limitation
-  if (input.contractors > input.wages) {
-    warnings.push('High contractor ratio may trigger additional scrutiny');
-  }
-  
-  // Startup eligibility
-  if (input.grossReceipts > 5_000_000 && input.requestingPayrollOffset) {
-    errors.push('Gross receipts exceed $5M - not eligible for payroll offset');
-  }
-  
-  // Section 174 warning
-  if (input.taxYear >= 2022) {
-    warnings.push('Remember: R&D expenses must be capitalized for tax years 2022-2025');
-  }
-  
-  // Credit reasonableness
-  const effectiveRate = input.calculatedCredit / input.totalQREs;
-  if (effectiveRate > 0.14) {
-    warnings.push('Effective credit rate seems high - please verify calculations');
-  }
-  
-  return { valid: errors.length === 0, errors, warnings };
-};
-```
+### Documentation Requirements (Enhanced 2025)
+1. **Project Documentation**:
+   - Technical objectives and uncertainties
+   - Experimentation process and iterations
+   - Results and learnings
+   - Timeline of activities
 
-### IRS Red Flags to Avoid
-```typescript
-const RED_FLAGS = {
-  // Allocation issues
-  'allocation_100': 'Claiming 100% of all wages as R&D',
-  'no_documentation': 'Lack of contemporaneous documentation',
-  'retroactive_claims': 'Claiming for years without real-time records',
-  
-  // Activity issues
-  'routine_development': 'Claiming routine website updates',
-  'no_uncertainty': 'No technical uncertainty documented',
-  'post_production': 'Changes after commercial release',
-  
-  // Calculation issues
-  'excessive_credit': 'Credit exceeds 20% of QREs',
-  'inconsistent_years': 'Wildly varying QREs year-to-year',
-};
-```
+2. **Financial Records**:
+   - Time tracking for R&D activities
+   - Wage records and allocation methods
+   - Invoices for supplies and contractors
+   - Allocation methodology documentation
+
+3. **Form 6765 Section G (NEW)**:
+   - List each business component
+   - Describe research activities
+   - Identify uncertainties addressed
+   - Required on all returns claiming credit
+
+### Filing Requirements
+- **Original Returns**: Include Form 6765 with timely filed return
+- **Amended Returns**: Must include detailed Section G documentation
+- **Payroll Election**: Must be made on original return (no amendments)
+- **Statute of Limitations**: Generally 3 years from filing
+
+### Best Practices
+1. **Contemporaneous Documentation**: Keep records as you go
+2. **Project Tracking**: Use project codes for expenses
+3. **Technical Narratives**: Document the "why" not just "what"
+4. **Annual Reviews**: Don't wait until tax time
+5. **Professional Guidance**: Complex calculations may need expert help
 
 ---
 
-## Compliance Warnings
+## Key Takeaways for SMBs
 
-### Required Disclaimers
-```typescript
-export const CALCULATION_DISCLAIMERS = {
-  general: 'This calculation is an estimate based on the information provided. Actual credits may vary based on IRS examination.',
-  
-  section174: 'IMPORTANT: For tax years 2022-2025, R&D expenses must be capitalized and amortized under Section 174. Consult your tax advisor about the impact on your tax liability.',
-  
-  documentation: 'The R&D credit requires contemporaneous documentation. Ensure you maintain proper records of all experimentation activities.',
-  
-  audit: 'R&D credits may be subject to IRS audit. Keep all supporting documentation for at least 7 years.',
-  
-  professional: 'This tool provides estimates only. Consult a qualified tax professional before claiming credits on your return.',
-};
-```
+1. **Use ASC Method**: Simpler and often better for growing companies
+2. **Check QSB Status**: $500k payroll offset is game-changing for startups
+3. **Consider Reduced Credit**: Simpler accounting, same net benefit
+4. **Document Everything**: New requirements make documentation critical
+5. **Act Timely**: Payroll election can't be made on amended returns
+6. **2025 is Better**: Full R&D deduction restored - celebrate!
 
-### Calculation Confidence Scoring
-```typescript
-export const calculateConfidenceScore = (data: CalculationData): ConfidenceScore => {
-  let score = 100;
-  const factors = [];
-  
-  // Reduce confidence for common issues
-  if (!data.priorYearData) {
-    score -= 10;
-    factors.push('No prior year data for comparison');
-  }
-  
-  if (data.rdAllocation > 0.75) {
-    score -= 15;
-    factors.push('Very high R&D allocation percentage');
-  }
-  
-  if (data.activities.length < 3) {
-    score -= 10;
-    factors.push('Limited number of R&D activities');
-  }
-  
-  if (!data.hasContemporaneousRecords) {
-    score -= 20;
-    factors.push('Lack of contemporaneous documentation');
-  }
-  
-  return {
-    score: Math.max(0, score),
-    rating: score > 80 ? 'High' : score > 60 ? 'Medium' : 'Low',
-    factors,
-    recommendation: score < 60 ? 'Consider additional documentation before filing' : 'Proceed with filing',
-  };
-};
-```
+---
 
-## Testing & Validation
-
-### Unit Tests for Calculations
-```typescript
-describe('R&D Credit Calculations', () => {
-  test('ASC with no prior years = 6%', () => {
-    const result = calculateASC(100_000, []);
-    expect(result.creditAmount).toBe(6_000);
-  });
-  
-  test('ASC with prior years = 14% of excess', () => {
-    const result = calculateASC(200_000, [100_000, 100_000, 100_000]);
-    expect(result.baseAmount).toBe(50_000); // 50% of 100k average
-    expect(result.creditAmount).toBe(21_000); // 14% of 150k excess
-  });
-  
-  test('Contractor costs limited to 65%', () => {
-    const qres = calculateQREs({
-      contractors: 100_000,
-      rdAllocationPercentage: 1.0,
-    });
-    expect(qres.breakdown.contractors).toBe(65_000);
-  });
-  
-  test('Section 174 capitalization required for 2022+', () => {
-    const result = calculateSection174Impact(2024, 100_000, true);
-    expect(result.amortizationRequired).toBe(true);
-    expect(result.currentYearDeduction).toBe(10_000); // Half-year convention
-  });
-});
-```
+*Last Updated: January 2025*
+*Note: This guide covers federal credits only. State credits vary significantly.*

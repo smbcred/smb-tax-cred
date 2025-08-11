@@ -1,9 +1,11 @@
-// scripts/sendgrid/seedTemplates.mjs
-// Usage: node scripts/sendgrid/seedTemplates.mjs
-import sg from '@sendgrid/client';
+import sgClient from '@sendgrid/client';
+import { MailService } from '@sendgrid/mail';
+
+const sg = sgClient;
+const sgMail = new MailService();
 
 if (!process.env.SENDGRID_API_KEY) {
-  console.error('Missing SENDGRID_API_KEY in env');
+  console.error('SENDGRID_API_KEY environment variable must be set');
   process.exit(1);
 }
 sg.setApiKey(process.env.SENDGRID_API_KEY);
@@ -20,38 +22,46 @@ const BRAND = {
   warning: '#F59E0B',
 };
 
-// Helper: upsert a dynamic template by name, then add a published version
-async function upsertTemplate({ name, subject, html }) {
-  // 1) List existing dynamic templates
-  const [resp, body] = await sg.request({
-    method: 'GET',
-    url: '/v3/templates?generations=dynamic',
-  });
-  const existing = (body?.result || []).find(t => t.name === name);
+// Utility function to create dynamic templates
+async function createTemplate(name, subject, htmlContent, textContent = null) {
+  const data = {
+    name: name,
+    generation: 'dynamic'
+  };
 
-  let templateId = existing?.id;
-  if (!templateId) {
-    // 2) Create the template
-    const [, created] = await sg.request({
-      method: 'POST',
+  try {
+    // Create the template
+    const [response] = await sg.request({
       url: '/v3/templates',
-      body: { name, generation: 'dynamic' },
+      method: 'POST',
+      body: data,
     });
-    templateId = created.id;
-  }
 
-  // 3) Add a new version (active=1 publishes it)
-  await sg.request({
-    method: 'POST',
-    url: `/v3/templates/${templateId}/versions`,
-    body: {
-      name: 'v1',
+    const templateId = response.body.id;
+
+    // Create the template version
+    const versionData = {
+      template_id: templateId,
       active: 1,
-      subject,
-      html_content: html,
-      plain_content: 'This email requires an HTML-capable client.',
-    },
-  });
+      name: name,
+      subject: subject,
+      html_content: htmlContent,
+      plain_content: textContent || `This is a plain text version of the ${name} email.`,
+      generate_plain_content: true,
+    };
+
+    await sg.request({
+      url: `/v3/templates/${templateId}/versions`,
+      method: 'POST',
+      body: versionData,
+    });
+
+    console.log(`✔ ${name}: ${templateId}`);
+    return templateId;
+  } catch (error) {
+    console.error(`✗ ${name}:`, error.response?.body || error.message);
+    throw error;
+  }
 
   return templateId;
 }
@@ -161,64 +171,69 @@ const welcome = {
   `),
 };
 
-// 2) Lead Credit Report (after lead capture)
-// NOTE: pass preformatted strings for amounts/rates in your data.
+// 2) Lead Credit Report
 const leadReport = {
   name: 'Lead Credit Report',
-  subject: 'Your estimated R&D credit: ${{credit.estimate}} for {{taxYear}}',
+  subject: '💰 Your R&D estimate: ${{estimatedCredit}} ({{businessType}})',
   html: wrap(`
-    <h1 style="margin:0 0 4px;color:#111827;">Your R&D Credit Estimate</h1>
-    <p style="margin:0 0 16px;color:#6B7280;">Tax Year {{taxYear}} • Method: {{method}}</p>
-
-    <div style="background:#F3F4F6;border-radius:10px;padding:16px;margin-bottom:16px;">
-      <p style="margin:0;color:#111827;font-size:18px;">
-        Estimated Credit: <strong>$` + `{{credit.estimate}}</strong>
-        <span style="color:#6B7280;font-size:14px;">(effective rate ~ {{credit.effectiveRatePct}}%)</span>
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="background:linear-gradient(135deg, ${BRAND.secondary} 0%, ${BRAND.secondaryLight} 100%);color:#fff;padding:16px;border-radius:50%;display:inline-block;margin-bottom:16px;width:60px;height:60px;line-height:60px;font-size:30px;">📊</div>
+      <h1 style="margin:0 0 8px;color:#111827;font-size:28px;font-weight:700;">
+        Your R&D Credit Estimate
+      </h1>
+      <p style="margin:0;color:${BRAND.neutral};font-size:16px;">
+        Hi {{name}}, here's your personalized analysis for {{businessType}}
       </p>
-      {{#if pricing.tierLabel}}
-      <p style="margin:6px 0 0;color:#374151;">
-        Service Fee: <strong>{{pricing.tierLabel}}</strong> — $` + `{{pricing.fee}}
+    </div>
+    
+    <div style="background:linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);padding:24px;border-radius:16px;margin-bottom:24px;border:3px solid ${BRAND.secondary};text-align:center;">
+      <h2 style="margin:0 0 12px;color:#065F46;font-size:32px;font-weight:800;">
+        ${{estimatedCredit}}
+      </h2>
+      <p style="margin:0 0 16px;color:#047857;font-size:18px;font-weight:600;">
+        Estimated Federal R&D Tax Credit
       </p>
-      {{/if}}
+      <div style="background:#fff;padding:16px;border-radius:8px;margin-top:16px;">
+        <table width="100%" cellspacing="0" cellpadding="8">
+          <tr>
+            <td style="color:#6B7280;font-size:14px;">Annual R&D Expenses:</td>
+            <td style="text-align:right;font-weight:600;color:#111827;">${{annualExpenses}}</td>
+          </tr>
+          <tr>
+            <td style="color:#6B7280;font-size:14px;">Confidence Level:</td>
+            <td style="text-align:right;font-weight:600;color:${BRAND.secondary};">{{confidence}}</td>
+          </tr>
+          <tr>
+            <td style="color:#6B7280;font-size:14px;">Business Category:</td>
+            <td style="text-align:right;font-weight:600;color:#111827;">{{businessType}}</td>
+          </tr>
+        </table>
+      </div>
     </div>
-
-    <h3 style="margin:16px 0 8px;color:#111827;">Qualified Research Expenses (QRE) — Draft</h3>
-    <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse;border:1px solid #E5E7EB;">
-      <tr style="background:#F9FAFB;">
-        <th align="left" style="border-bottom:1px solid #E5E7EB;">Category</th>
-        <th align="right" style="border-bottom:1px solid #E5E7EB;">Amount</th>
-      </tr>
-      {{#if qres.wages}}<tr><td>Wages (allocated)</td><td align="right">$` + `{{qres.wages}}</td></tr>{{/if}}
-      {{#if qres.contractors}}<tr><td>Contractors (65% eligible)</td><td align="right">$` + `{{qres.contractors}}</td></tr>{{/if}}
-      {{#if qres.supplies}}<tr><td>Supplies</td><td align="right">$` + `{{qres.supplies}}</td></tr>{{/if}}
-      {{#if qres.software}}<tr><td>Software Licenses</td><td align="right">$` + `{{qres.software}}</td></tr>{{/if}}
-      {{#if qres.cloud}}<tr><td>Cloud Computing</td><td align="right">$` + `{{qres.cloud}}</td></tr>{{/if}}
-    </table>
-
-    {{#if isQSB}}
-    <div style="background:#ECFDF5;border:1px solid #D1FAE5;border-radius:10px;padding:12px;margin:16px 0;">
-      <strong style="color:#065F46;">QSB Payroll Offset:</strong>
-      You may apply up to $` + `{{qsb.maxOffset}} of the credit against payroll taxes (Form 8974), subject to eligibility.
+    
+    <div style="background:linear-gradient(135deg, #FEF7E0 0%, #FEF3C7 100%);padding:20px;border-radius:12px;margin-bottom:24px;border-left:4px solid ${BRAND.warning};">
+      <h3 style="margin:0 0 12px;color:#92400E;font-size:18px;">⚡ Important: 2024 Tax Changes</h3>
+      <p style="margin:0;color:#92400E;font-size:14px;line-height:1.6;">
+        Starting in 2022, R&D expenses must be capitalized and amortized over 5 years under Section 174. 
+        Our documentation helps you navigate these changes and maximize your available credits.
+      </p>
     </div>
-    {{/if}}
-
-    <p style="margin:16px 0;color:#374151;">
-      Next, complete your intake so we can generate your IRS package (Form 6765 + narrative) and finalize numbers.
-    </p>
-
-    <p>
-      <a href="{{next.intakeUrl}}" style="display:inline-block;background:` + BRAND.secondary + `;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;margin-right:8px;">
-        Complete Intake
+    
+    <div style="text-align:center;margin:32px 0;">
+      <a href="{{dashboardUrl}}" class="button" style="display:inline-block;background:linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%);color:#fff;padding:16px 32px;border-radius:12px;text-decoration:none;font-size:18px;font-weight:600;box-shadow:0 4px 12px rgba(46,90,172,0.3);">
+        📋 View Detailed Breakdown
       </a>
-      <a href="{{next.dashboardUrl}}" style="display:inline-block;background:` + BRAND.primary + `;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;">
-        View Dashboard
-      </a>
-    </p>
-
-    <p style="margin:16px 0 0;color:#6B7280;font-size:13px;line-height:1.6;">
-      This estimate uses ASC by default. If there were no QREs in the prior three years, ASC is 6% of current-year QREs; otherwise it's 14% of the excess over 50% of the 3-year average.
-      Contractor costs are counted at 65% of the qualifying portion.
-    </p>
+    </div>
+    
+    <div style="background:#F8FAFC;padding:20px;border-radius:8px;border:1px solid #E2E8F0;">
+      <h4 style="margin:0 0 12px;color:#374151;font-size:16px;">🎯 Next Steps to Claim Your Credit:</h4>
+      <ul style="margin:0;padding-left:20px;color:#6B7280;line-height:1.7;">
+        <li>Complete your detailed business intake form</li>
+        <li>Upload supporting documentation (invoices, timesheets)</li>
+        <li>Review IRS-compliant documentation package</li>
+        <li>File with your tax return or amended return</li>
+      </ul>
+    </div>
   `),
 };
 
@@ -296,7 +311,7 @@ const receipt = {
               </tr>
               <tr>
                 <td style="font-weight:600;color:#374151;border-bottom:1px solid #F3F4F6;">Amount Paid:</td>
-                <td style="text-align:right;font-weight:700;font-size:18px;color:${BRAND.success};border-bottom:1px solid #F3F4F6;">$` + `{{amount}}</td>
+                <td style="text-align:right;font-weight:700;font-size:18px;color:${BRAND.success};border-bottom:1px solid #F3F4F6;">${{amount}}</td>
               </tr>
               <tr>
                 <td style="font-weight:600;color:#374151;border-bottom:1px solid #F3F4F6;">Payment Date:</td>
@@ -367,23 +382,28 @@ const reset = {
   `),
 };
 
+// ---- Create all templates ----
 async function main() {
-  const items = [welcome, leadReport, docsReady, receipt, reset];
-  const results = {};
-  for (const t of items) {
-    const id = await upsertTemplate(t);
-    results[t.name] = id;
-    console.log(`✔ ${t.name}: ${id}`);
+  try {
+    console.log('Creating polished SendGrid email templates...\n');
+
+    const welcomeId = await createTemplate(welcome.name, welcome.subject, welcome.html);
+    const leadReportId = await createTemplate(leadReport.name, leadReport.subject, leadReport.html);
+    const docsReadyId = await createTemplate(docsReady.name, docsReady.subject, docsReady.html);
+    const receiptId = await createTemplate(receipt.name, receipt.subject, receipt.html);
+    const resetId = await createTemplate(reset.name, reset.subject, reset.html);
+
+    console.log('\nAdd these to your secrets:');
+    console.log(`SENDGRID_TEMPLATE_WELCOME=${welcomeId}`);
+    console.log(`SENDGRID_TEMPLATE_LEAD_REPORT=${leadReportId}`);
+    console.log(`SENDGRID_TEMPLATE_DOCS_READY=${docsReadyId}`);
+    console.log(`SENDGRID_TEMPLATE_RECEIPT=${receiptId}`);
+    console.log(`SENDGRID_TEMPLATE_RESET=${resetId}`);
+
+  } catch (error) {
+    console.error('\nFailed to create templates:', error.message);
+    process.exit(1);
   }
-  console.log('\nAdd these to your secrets:');
-  console.log(`SENDGRID_TEMPLATE_WELCOME=${results['Welcome']}`);
-  console.log(`SENDGRID_TEMPLATE_LEAD_REPORT=${results['Lead Credit Report']}`);
-  console.log(`SENDGRID_TEMPLATE_DOCS_READY=${results['Docs Ready']}`);
-  console.log(`SENDGRID_TEMPLATE_RECEIPT=${results['Receipt']}`);
-  console.log(`SENDGRID_TEMPLATE_RESET=${results['Password Reset']}`);
 }
 
-main().catch(e => {
-  console.error('Seed failed:', e?.response?.body || e.message);
-  process.exit(1);
-});
+main();
