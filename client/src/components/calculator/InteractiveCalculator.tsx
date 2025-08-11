@@ -152,17 +152,37 @@ export const InteractiveCalculator: React.FC = () => {
       try {
         // Use the new ASC method calculator
         const calculationResult = RDTaxCalculator.calculate({
-          businessType: state.businessType || 'professional_services',
-          totalEmployees: state.expenses.totalEmployees,
+          // Company info
+          businessType: state.businessType || 'Software',
+          industryCode: '541511', // Default software industry
+          
+          // QSB eligibility (use reasonable defaults)
+          currentYearRevenue: 1200000, // Default $1.2M
+          yearOfFirstRevenue: new Date().getFullYear() - 2, // 2 years ago
+          hasIncomeTaxLiability: false, // Default to startup status
+          quarterlyPayrollTax: 15000, // Default quarterly tax
+          
+          // R&D team
           technicalEmployees: state.expenses.technicalEmployees,
           averageTechnicalSalary: state.expenses.averageTechnicalSalary,
-          rdAllocationPercentage: state.expenses.rdAllocationPercentage ?? 100, // Use user input or default to 100%
+          rdAllocationPercentage: state.expenses.rdAllocationPercentage ?? 65, // Default 65%
+          
+          // Expenses
           contractorCosts: state.expenses.contractorCosts,
           suppliesCosts: 0,
           softwareCosts: state.expenses.softwareCosts,
           cloudCosts: state.expenses.cloudCosts,
+          
+          // Prior years
           priorYearQREs: state.expenses.priorYearQREs || [],
-          isFirstTimeFiler: state.expenses.isFirstTimeFiler ?? true
+          isFirstTimeFiler: state.expenses.isFirstTimeFiler ?? true,
+          
+          // Options
+          section280CElection: 'full' as const,
+          taxYear: new Date().getFullYear(),
+          
+          // Activities (use defaults)
+          qualifyingActivities: state.qualifyingActivities
         });
         
         const results = {
