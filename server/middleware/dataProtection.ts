@@ -472,10 +472,12 @@ export function applyDataProtection() {
       '/blog',
       '/industries',
       '/demo',
+      '/help',
       '/api/leads',
       '/api/calculation',
       '/api/calculator',
-      '/api/csrf-token'
+      '/api/csrf-token',
+      '/api/help'
     ];
 
     // Check if route is public

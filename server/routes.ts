@@ -205,6 +205,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { default: feedbackRoutes } = await import('./routes/feedback.js');
   app.use("/api/feedback", feedbackRoutes);
 
+  // Register help routes
+  const { default: helpRoutes } = await import('./routes/help.js');
+  app.use("/api/help", helpRoutes);
+
   // Apply monitoring middleware
   const { applyMonitoring } = await import('./middleware/monitoring.js');
   app.use(applyMonitoring());
