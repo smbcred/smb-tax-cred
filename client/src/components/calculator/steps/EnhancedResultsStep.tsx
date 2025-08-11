@@ -30,7 +30,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import type { EnhancedCalculationResult } from '@/services/calculation/calculator.engine';
 
