@@ -481,6 +481,7 @@ export function applyDataProtection() {
       '/api/dev/integration-test',
       '/api/dev/stripe-smoke',
       '/api/dev/pdf-smoke',
+      '/api/dev/claude-smoke',
       '/api/calculator',
       '/api/csrf-token',
       '/api/help',

@@ -450,6 +450,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         results.summary.failed++;
       }
 
+      // Test 7: Claude AI
+      try {
+        const { getClaudeService } = await import('./services/claude');
+        const claudeService = getClaudeService();
+        
+        // Test with a simple prompt
+        const response = await claudeService.generateText({
+          prompt: 'Respond with exactly: "API_TEST_SUCCESS"',
+          maxTokens: 20
+        });
+        
+        results.tests.claude = { 
+          status: 'PASS', 
+          hasApiKey: !!process.env.CLAUDE_API_KEY,
+          responseLength: response.content.length,
+          tokensUsed: response.tokensUsed.total
+        };
+        results.summary.passed++;
+      } catch (error: any) {
+        results.tests.claude = { status: 'FAIL', error: error.message };
+        results.summary.failed++;
+      }
+
       res.json({
         ...results,
         overallStatus: results.summary.failed === 0 ? 'ALL_SYSTEMS_GO' : 'SOME_ISSUES',
@@ -518,6 +541,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({
           success: false,
           error: error.message
+        });
+      }
+    });
+
+    // Dev-only Claude AI test
+    app.post("/api/dev/claude-smoke", async (req, res) => {
+      try {
+        const { getClaudeService } = await import('./services/claude');
+        const claudeService = getClaudeService();
+
+        const { prompt = 'Generate a brief technical summary in exactly 20 words', maxTokens = 50 } = req.body;
+
+        const response = await claudeService.generateText({
+          prompt,
+          maxTokens
+        });
+
+        res.json({
+          success: true,
+          content: response.content,
+          tokensUsed: response.tokensUsed,
+          model: response.model,
+          finishReason: response.finishReason
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: error.message,
+          type: error.type || 'unknown'
         });
       }
     });
