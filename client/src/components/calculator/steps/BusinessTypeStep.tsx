@@ -73,6 +73,17 @@ export const BusinessTypeStep: React.FC<BusinessTypeStepProps> = ({
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
           What type of business are you?
         </h3>
+        <p className="text-gray-600 mb-4">
+          Select the option that best describes your primary business activities
+        </p>
+        <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-blue-800">
+            <span className="font-medium">🚀 Enhanced 2025 Calculator:</span>
+          </div>
+          <p className="text-blue-700 text-sm mt-1">
+            Get QSB payroll tax offset benefits, legislative updates, and industry insights in your results.
+          </p>
+        </div>
         <p className="text-gray-600">
           Select the option that best describes your primary business activities
         </p>
