@@ -79,9 +79,9 @@ _Source: rd-saas-complete-guide.v2.md_
 
 | Task ID | Title | Status | Acceptance |
 |---|---|---|---|
-| 6.1.1 | DB prep: admin flag, audit & webhook logs | [ ] | [📋](./acceptance/6.1.1.md) |
-| 6.1.2 | Server RBAC: auth + adminOnly middleware | [ ] | [📋](./acceptance/6.1.2.md) |
-| 6.1.3 | Admin API (read): leads, customers, documents, payments, webhooks | [ ] | [📋](./acceptance/6.1.3.md) |
+| 6.1.1 | DB prep: admin flag, audit & webhook logs | [x] | [📋](./acceptance/6.1.1.md) |
+| 6.1.2 | Server RBAC: auth + adminOnly middleware | [x] | [📋](./acceptance/6.1.2.md) |
+| 6.1.3 | Admin API (read): leads, customers, documents, payments, webhooks | [x] | [📋](./acceptance/6.1.3.md) |
 | 6.1.4 | Admin UI: /admin with tables, filters, detail drawer | [ ] | [📋](./acceptance/6.1.4.md) |
 | 6.1.5 | Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail | [ ] | [📋](./acceptance/6.1.5.md) |
 | 6.1.6 | Security hardening: rate-limit, no public URLs, short-lived presigns | [ ] | [📋](./acceptance/6.1.6.md) |
