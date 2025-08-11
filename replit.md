@@ -71,3 +71,9 @@ Preferred communication style: Simple, everyday language.
 - **Components**: UserFeedbackWidget with multiple trigger modes (float, inline, button) and rating systems.
 - **API**: RESTful feedback endpoints with validation, analytics, and testing session tracking.
 - **Database**: User feedback and testing session tables with comprehensive metadata and participant tracking.
+
+### Admin Back-Office System
+- **Database**: Admin user flags, audit logs for tracking administrative actions, and webhook logs for monitoring.
+- **Authentication**: JWT-based RBAC middleware with admin-only route protection and proper 401/403 error handling.
+- **API**: RESTful admin endpoints for user management, system monitoring, audit trails, and webhook logs.
+- **Security**: Complete audit trail logging, IP address tracking, and secure admin session management.

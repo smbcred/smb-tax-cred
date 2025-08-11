@@ -61,6 +61,7 @@ import {
   FieldEncryption 
 } from "./middleware/encryption";
 import checkoutRoutes from "./routes/checkout.js";
+import { adminRouter } from "./routes/admin";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -4173,6 +4174,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Register admin routes (protected by admin authentication)
+  app.use("/api/admin", adminRouter);
 
   const httpServer = createServer(app);
   return httpServer;

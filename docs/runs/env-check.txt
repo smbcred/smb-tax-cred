@@ -1,0 +1,19 @@
+Environment Variables Sanity Check - $(date)
+
+NEON_DB_URL: present: true
+STRIPE_SECRET_KEY: present: false
+STRIPE_PUBLISHABLE_KEY: present: true
+SENDGRID_API_KEY: present: true
+MAKE_WEBHOOK_URL: present: true
+MAKE_CALLBACK_TOKEN: present: false
+AWS_ACCESS_KEY_ID: present: false
+AWS_SECRET_ACCESS_KEY: present: false
+AWS_REGION: present: false
+AWS_S3_BUCKET: present: false
+DOCUMINT_API_KEY: present: true
+DOCUMINT_TEMPLATE_RD_PACKAGE: present: true
+AIRTABLE_API_KEY: present: true
+AIRTABLE_BASE_ID: present: true
+CLAUDE_API_KEY: present: true
+
+Note: Missing keys may indicate need for user to provide secrets or configuration.

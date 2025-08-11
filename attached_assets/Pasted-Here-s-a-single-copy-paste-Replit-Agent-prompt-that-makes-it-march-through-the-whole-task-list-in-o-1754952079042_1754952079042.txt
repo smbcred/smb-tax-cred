@@ -1,0 +1,87 @@
+Here’s a single, copy-paste Replit Agent prompt that makes it march through the whole task list in order, re-verify acceptance, fix gaps, and document everything as it goes.
+
+⸻
+
+Replit Agent Prompt — “Sequential Task Runner + Full Documentation”
+
+Scope: Start at the top of /docs/TASKS_for_v2.md and proceed sequentially through all tasks (including the new Phase 6 Admin tasks) until you hit a blocker. Treat all completed checkmarks as untrusted—re-verify against /docs/acceptance/*.md.
+
+Timebox: If this run exceeds ~90 minutes, stop gracefully and print a summary table of progress + next steps.
+
+Read first:
+	•	/docs/TASKS_for_v2.md
+	•	/docs/PROGRESS.md (create if missing)
+	•	/docs/BLOCKERS.md
+	•	/docs/rd-saas-complete-guide.v2.md
+	•	/docs/acceptance/*.md
+	•	src/config/pricing.ts (single source of truth)
+
+Env sanity (once at start): Log a masked presence check to /docs/runs/env-check.txt:
+	•	NEON_DB_URL, STRIPE_SECRET_KEY, SENDGRID_API_KEY, MAKE_WEBHOOK_URL, MAKE_CALLBACK_TOKEN, AWS_*, DOCUMINT_*, AIRTABLE_*
+	•	Show only “present: true/false” (no secrets).
+
+Automation harness (create if missing):
+	1.	scripts/acceptance/verifyTask.mjs with helpers in scripts/acceptance/checks/:
+	•	filesExist(paths[])
+	•	lintAll() / typecheckAll() / buildAll()
+	•	runServerTests() / runClientTests()
+	•	supertestCheck({ method, path, body, expect })
+	2.	npm scripts in root package.json:
+
+"scripts": {
+  "typecheck:all": "npm --prefix client run typecheck && npm --prefix server run typecheck",
+  "lint:all": "npm --prefix client run lint && npm --prefix server run lint",
+  "build:all": "npm --prefix client run build && npm --prefix server run build",
+  "test:server": "npm --prefix server test -- --run",
+  "test:client": "npm --prefix client test -- --run",
+  "accept:task": "node scripts/acceptance/verifyTask.mjs"
+}
+
+
+
+Per-task operating loop (for each task in order):
+	1.	Open /docs/acceptance/<task-id>.md. Convert every “Definition of Done”, “Functional”, and “Non-Functional” bullet into concrete checks.
+	2.	Verify via the harness:
+	•	Run lint:all, typecheck:all, build:all, and any specific tests/curls noted in the acceptance file.
+	•	For API checks, use supertest (no external calls) and paste the key status codes in the acceptance file’s Evidence block.
+	3.	Remediate minimally to pass each unchecked item:
+	•	Prefer design tokens (new design system), never hardcode pricing (import src/config/pricing.ts).
+	•	For calc logic: ASC 14% of excess; 6% when no prior QREs; contractors at 65% of qualifying portion.
+	•	For security: rate-limit public endpoints; no secrets in logs; presigned URLs short-lived.
+	4.	Re-verify until all bullets pass or you hit a true blocker.
+	5.	Document:
+	•	In /docs/acceptance/<task-id>.md, tick boxes and append an Evidence section (commands run, test counts, sample responses).
+	•	Append a bullet to /docs/PROGRESS.md (what changed, why, key files/commits).
+	•	Save any raw outputs under /docs/runs/<task-id>.txt (e.g., test summaries or curl outputs).
+	6.	Commit with semantic messages:
+	•	code fixes: fix(<area>): satisfy acceptance for <task-id>
+	•	tests: test(<area>): add coverage for <task-id>
+	•	docs only: docs(acceptance): update evidence for <task-id>
+	7.	If blocked: add a concise entry to /docs/BLOCKERS.md (what, why, what’s needed). Do not tick boxes. Commit docs as chore(blockers): note blocker for <task-id>.
+
+Guardrails to confirm on the way:
+	•	Design system: All new UI uses the new tokens; no mixed hex/HSL; dark mode via ThemeProvider.
+	•	Pricing: Every place that shows a fee imports from src/config/pricing.ts.
+	•	Lead capture (1.4.x): overlay doesn’t block typing; POST /api/leads validates + rate-limits; duplicate handling is idempotent.
+	•	Integrations:
+	•	S3: AES256, no public ACLs, presigned URLs ≤ 15 min.
+	•	SendGrid: uses dynamic templates; from address verified.
+	•	Make: secret header verified inbound; callback uses Bearer token.
+	•	Stripe: webhook signature verified; idempotency keys on create.
+	•	Documint: uses api_key header; preview in dev, live in prod; flat vars if using Designer.
+
+Verification commands to run frequently:
+
+npm run lint:all
+npm run typecheck:all
+npm run build:all
+npm run test:server
+npm run test:client
+
+Stop condition: When you complete all tasks in the scope or hit a blocker that requires external input.
+
+Final output for this run: Print a table with columns: Task ID, Title, Status (DONE/BLOCKED), Boxes Checked (x/y), Key Commits (hashes), Notes. Also print any new/updated files under /docs/runs/.
+
+⸻
+
+If you want me to narrow the scope (e.g., “start at 1.4.1 and go through 3.3.3 only”), tell me the range and I’ll tweak the prompt.

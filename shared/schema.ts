@@ -13,6 +13,7 @@ export const airtableSyncStatusEnum = pgEnum("airtable_sync_status", ["pending",
 export const supportCategoryEnum = pgEnum("support_category", ["technical", "billing", "general", "calculator", "documentation", "account"]);
 export const supportPriorityEnum = pgEnum("support_priority", ["low", "medium", "high", "urgent"]);
 export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "waiting_customer", "escalated", "resolved", "closed"]);
+export const auditActionEnum = pgEnum("audit_action", ["create", "update", "delete", "view", "approve", "reject", "export"]);
 
 // Users table with enhanced fields
 export const users = pgTable("users", {
@@ -34,6 +35,7 @@ export const users = pgTable("users", {
   createdFromLead: boolean("created_from_lead").default(true),
   leadCapturedAt: timestamp("lead_captured_at"),
   accountStatus: varchar("account_status", { length: 50 }).default("active"), // For compatibility
+  isAdmin: boolean("is_admin").default(false), // Admin flag for RBAC
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -516,6 +518,47 @@ export const chatMessages = pgTable("chat_messages", {
   timestampIdx: index("idx_chat_messages_timestamp").on(table.timestamp),
 }));
 
+// Admin audit logs table for tracking administrative actions
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  adminUserId: varchar("admin_user_id").references(() => users.id).notNull(),
+  action: auditActionEnum("action").notNull(),
+  entityType: varchar("entity_type", { length: 100 }).notNull(), // 'user', 'company', 'document', etc.
+  entityId: varchar("entity_id").notNull(),
+  before: jsonb("before"), // Previous state (for updates/deletes)
+  after: jsonb("after"), // New state (for creates/updates)
+  ipAddress: inet("ip_address"),
+  userAgent: text("user_agent"),
+  reason: text("reason"), // Admin's reason for the action
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  adminUserIdIdx: index("idx_audit_logs_admin_user_id").on(table.adminUserId),
+  actionIdx: index("idx_audit_logs_action").on(table.action),
+  entityTypeIdx: index("idx_audit_logs_entity_type").on(table.entityType),
+  entityIdIdx: index("idx_audit_logs_entity_id").on(table.entityId),
+  createdAtIdx: index("idx_audit_logs_created_at").on(table.createdAt),
+}));
+
+// Webhook logs table for tracking incoming webhooks
+export const webhookLogs = pgTable("webhook_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  source: varchar("source", { length: 50 }).notNull(), // 'stripe', 'sendgrid', 'documint', etc.
+  status: varchar("status", { length: 20 }).notNull(), // 'success', 'error', 'pending'
+  event: varchar("event", { length: 100 }).notNull(),
+  payloadSha256: varchar("payload_sha256", { length: 64 }).notNull(), // Hash for security
+  responseCode: integer("response_code"),
+  processingTimeMs: integer("processing_time_ms"),
+  errorMessage: text("error_message"),
+  ipAddress: inet("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  sourceIdx: index("idx_webhook_logs_source").on(table.source),
+  statusIdx: index("idx_webhook_logs_status").on(table.status),
+  eventIdx: index("idx_webhook_logs_event").on(table.event),
+  createdAtIdx: index("idx_webhook_logs_created_at").on(table.createdAt),
+}));
+
 // Insert schemas
 export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
   id: true,
@@ -647,6 +690,17 @@ export const insertLeadSchema = createInsertSchema(leads).omit({
   convertedToUser: true,
   convertedAt: true,
   airtableSyncStatus: true,
+});
+
+// Admin-specific schemas
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWebhookLogSchema = createInsertSchema(webhookLogs).omit({
+  id: true,
+  createdAt: true,
 });
 
 
