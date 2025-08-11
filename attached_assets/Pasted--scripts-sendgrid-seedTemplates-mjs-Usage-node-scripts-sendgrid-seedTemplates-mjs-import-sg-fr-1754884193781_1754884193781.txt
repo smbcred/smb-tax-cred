@@ -1,0 +1,215 @@
+// scripts/sendgrid/seedTemplates.mjs
+// Usage: node scripts/sendgrid/seedTemplates.mjs
+import sg from '@sendgrid/client';
+
+if (!process.env.SENDGRID_API_KEY) {
+  console.error('Missing SENDGRID_API_KEY in env');
+  process.exit(1);
+}
+sg.setApiKey(process.env.SENDGRID_API_KEY);
+
+const BRAND = {
+  companyName: 'SMBTaxCredits',
+  primary: '#2E5AAC',
+  secondary: '#1E8E5A',
+};
+
+// Helper: upsert a dynamic template by name, then add a published version
+async function upsertTemplate({ name, subject, html }) {
+  // 1) List existing dynamic templates
+  const [resp, body] = await sg.request({
+    method: 'GET',
+    url: '/v3/templates?generations=dynamic',
+  });
+  const existing = (body?.result || []).find(t => t.name === name);
+
+  let templateId = existing?.id;
+  if (!templateId) {
+    // 2) Create the template
+    const [, created] = await sg.request({
+      method: 'POST',
+      url: '/v3/templates',
+      body: { name, generation: 'dynamic' },
+    });
+    templateId = created.id;
+  }
+
+  // 3) Add a new version (active=1 publishes it)
+  await sg.request({
+    method: 'POST',
+    url: `/v3/templates/${templateId}/versions`,
+    body: {
+      name: 'v1',
+      active: 1,
+      subject,
+      html_content: html,
+      plain_content: 'This email requires an HTML-capable client.',
+    },
+  });
+
+  return templateId;
+}
+
+// ---- HTML blocks (inline footer; pass preformatted values from your app) ----
+const sharedFooter = `
+<hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0;">
+<p style="font-size:12px;color:#6B7280;line-height:1.6;">
+  This email contains estimates for informational purposes only and is not tax advice.
+  Need help? <a href="{{supportUrl}}" style="color:${BRAND.primary};">Contact support</a>.
+</p>
+<p style="font-size:12px;color:#9CA3AF;">© {{year}} ${BRAND.companyName}.com • {{companyAddress}}</p>
+`;
+
+const wrap = (inner) => `<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#F9FAFB;font-family:Inter,Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+      <table width="640" style="background:#fff;margin:24px;padding:24px;border-radius:12px;border:1px solid #E5E7EB;">
+        <tr><td>${inner}${sharedFooter}</td></tr>
+      </table>
+    </td></tr></table>
+  </body>
+</html>`;
+
+// 1) Welcome
+const welcome = {
+  name: 'Welcome',
+  subject: 'Welcome to {{companyName}}, {{name}}!',
+  html: wrap(`
+    <h1 style="margin:0 0 8px;color:#111827;">Welcome, {{name}} 👋</h1>
+    <p style="margin:0 0 16px;color:#374151;">
+      You’re set up with <strong>{{companyName}}</strong>. Start in your dashboard to finish intake and lock in your R&D credit estimate.
+    </p>
+    <p>
+      <a href="{{dashboardUrl}}" style="display:inline-block;background:${BRAND.primary};color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;">
+        Go to Dashboard
+      </a>
+    </p>
+  `),
+};
+
+// 2) Lead Credit Report (after lead capture)
+// NOTE: pass preformatted strings for amounts/rates in your data.
+const leadReport = {
+  name: 'Lead Credit Report',
+  subject: 'Your estimated R&D credit: ${{credit.estimate}} for {{taxYear}}',
+  html: wrap(`
+    <h1 style="margin:0 0 4px;color:#111827;">Your R&D Credit Estimate</h1>
+    <p style="margin:0 0 16px;color:#6B7280;">Tax Year {{taxYear}} • Method: {{method}}</p>
+
+    <div style="background:#F3F4F6;border-radius:10px;padding:16px;margin-bottom:16px;">
+      <p style="margin:0;color:#111827;font-size:18px;">
+        Estimated Credit: <strong>${'${'}{credit.estimate}{'}</strong>'}
+        <span style="color:#6B7280;font-size:14px;">(effective rate ~ {{credit.effectiveRatePct}}%)</span>
+      </p>
+      {{#if pricing.tierLabel}}
+      <p style="margin:6px 0 0;color:#374151;">
+        Service Fee: <strong>{{pricing.tierLabel}}</strong> — ${{pricing.fee}}
+      </p>
+      {{/if}}
+    </div>
+
+    <h3 style="margin:16px 0 8px;color:#111827;">Qualified Research Expenses (QRE) — Draft</h3>
+    <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse;border:1px solid #E5E7EB;">
+      <tr style="background:#F9FAFB;">
+        <th align="left" style="border-bottom:1px solid #E5E7EB;">Category</th>
+        <th align="right" style="border-bottom:1px solid #E5E7EB;">Amount</th>
+      </tr>
+      {{#if qres.wages}}<tr><td>Wages (allocated)</td><td align="right">${'${'}{qres.wages}{'}</td></tr>{{/if}}
+      {{#if qres.contractors}}<tr><td>Contractors (65% eligible)</td><td align="right">${'${'}{qres.contractors}{'}</td></tr>{{/if}}
+      {{#if qres.supplies}}<tr><td>Supplies</td><td align="right">${'${'}{qres.supplies}{'}</td></tr>{{/if}}
+      {{#if qres.software}}<tr><td>Software Licenses</td><td align="right">${'${'}{qres.software}{'}</td></tr>{{/if}}
+      {{#if qres.cloud}}<tr><td>Cloud Computing</td><td align="right">${'${'}{qres.cloud}{'}</td></tr>{{/if}}
+    </table>
+
+    {{#if isQSB}}
+    <div style="background:#ECFDF5;border:1px solid #D1FAE5;border-radius:10px;padding:12px;margin:16px 0;">
+      <strong style="color:#065F46;">QSB Payroll Offset:</strong>
+      You may apply up to ${{qsb.maxOffset}} of the credit against payroll taxes (Form 8974), subject to eligibility.
+    </div>
+    {{/if}}
+
+    <p style="margin:16px 0;color:#374151;">
+      Next, complete your intake so we can generate your IRS package (Form 6765 + narrative) and finalize numbers.
+    </p>
+
+    <p>
+      <a href="{{next.intakeUrl}}" style="display:inline-block;background:${BRAND.secondary};color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;margin-right:8px;">
+        Complete Intake
+      </a>
+      <a href="{{next.dashboardUrl}}" style="display:inline-block;background:${BRAND.primary};color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;">
+        View Dashboard
+      </a>
+    </p>
+
+    <p style="margin:16px 0 0;color:#6B7280;font-size:13px;line-height:1.6;">
+      This estimate uses ASC by default. If there were no QREs in the prior three years, ASC is 6% of current-year QREs; otherwise it’s 14% of the excess over 50% of the 3-year average.
+      Contractor costs are counted at 65% of the qualifying portion.
+    </p>
+  `),
+};
+
+// 3) Docs Ready
+const docsReady = {
+  name: 'Docs Ready',
+  subject: 'Your R&D documents are ready for {{taxYear}} — download link inside',
+  html: wrap(`
+    <h1 style="margin:0 0 8px;color:#111827;">Documents ready</h1>
+    <p style="margin:0 0 16px;color:#374151;">Hi {{name}}, your {{taxYear}} R&D credit package is ready.</p>
+    <p>
+      <a href="{{downloadUrl}}" style="display:inline-block;background:${BRAND.primary};color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;">
+        Download package
+      </a>
+      <span style="color:#6B7280;font-size:12px;margin-left:8px;">Link expires in {{expiresInMinutes}} min</span>
+    </p>
+    <p style="margin:16px 0 0;color:#6B7280;font-size:13px;">If the link expires, grab a fresh one from your dashboard.</p>
+  `),
+};
+
+// 4) Receipt
+const receipt = {
+  name: 'Receipt',
+  subject: 'Payment received: ${{amount}} — {{tierName}}',
+  html: wrap(`
+    <h1 style="margin:0 0 8px;color:#111827;">Thanks for your payment</h1>
+    <p style="margin:0 0 8px;color:#374151;">Amount: <strong>${'${'}{amount}{'}</strong> • {{tierName}}</p>
+    <p style="margin:0 0 16px;color:#6B7280;">Paid on {{paymentDate}} • Card ending {{last4}}</p>
+    <p><a href="{{invoiceUrl}}" style="color:${BRAND.primary};">View invoice</a></p>
+  `),
+};
+
+// 5) Password Reset
+const reset = {
+  name: 'Password Reset',
+  subject: 'Reset your password (expires in {{expiresInMinutes}} minutes)',
+  html: wrap(`
+    <h1 style="margin:0 0 8px;color:#111827;">Reset your password</h1>
+    <p style="margin:0 0 16px;color:#374151;">Hi {{name}}, click below to reset your password. This link expires in {{expiresInMinutes}} minutes.</p>
+    <p>
+      <a href="{{resetUrl}}" style="display:inline-block;background:${BRAND.primary};color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;">
+        Reset Password
+      </a>
+    </p>
+  `),
+};
+
+async function main() {
+  const items = [welcome, leadReport, docsReady, receipt, reset];
+  const results = {};
+  for (const t of items) {
+    const id = await upsertTemplate(t);
+    results[t.name] = id;
+    console.log(`✔ ${t.name}: ${id}`);
+  }
+  console.log('\nAdd these to your secrets:');
+  console.log(`SENDGRID_TEMPLATE_WELCOME=${results['Welcome']}`);
+  console.log(`SENDGRID_TEMPLATE_LEAD_REPORT=${results['Lead Credit Report']}`);
+  console.log(`SENDGRID_TEMPLATE_DOCS_READY=${results['Docs Ready']}`);
+  console.log(`SENDGRID_TEMPLATE_RECEIPT=${results['Receipt']}`);
+  console.log(`SENDGRID_TEMPLATE_RESET=${results['Password Reset']}`);
+}
+
+main().catch(e => {
+  console.error('Seed failed:', e?.response?.body || e.message);
+  process.exit(1);
+});
