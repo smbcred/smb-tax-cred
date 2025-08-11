@@ -70,8 +70,12 @@ import {
   calculatorExpensesSchema,
   companyInfoSchema,
   intakeFormSubmissionSchema,
+  documents,
   type CalculatorExpenses,
 } from "@shared/schema";
+import { z } from "zod";
+import { eq, sql } from "drizzle-orm";
+import { db } from "./db";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
@@ -3687,6 +3691,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
+
+  // Document generation with S3 storage endpoints
+  app.post("/api/docs/generate", authenticateToken, async (req: any, res) => {
+    try {
+      // Validate request body
+      const generateDocSchema = z.object({
+        customerId: z.string().min(1),
+        taxYear: z.number().min(2000).max(new Date().getFullYear() + 1),
+        docType: z.enum(['form_6765', 'technical_narrative', 'compliance_memo']),
+        payload: z.record(z.any()),
+        companyId: z.string().min(1),
+        intakeFormId: z.string().min(1),
+      });
+
+      const validatedRequest = generateDocSchema.parse(req.body);
+      
+      console.log('Document generation request:', {
+        userId: req.user.id,
+        customerId: validatedRequest.customerId,
+        docType: validatedRequest.docType,
+        taxYear: validatedRequest.taxYear,
+      });
+
+      // Import and use the document orchestrator
+      const { documentOrchestrator } = await import('./services/documents/orchestrator');
+      
+      const result = await documentOrchestrator.generateAndStoreDoc({
+        ...validatedRequest,
+        userId: req.user.id,
+      });
+
+      res.json({
+        success: true,
+        documentId: result.documentId,
+        s3Key: result.s3Key,
+        bucket: result.bucket,
+        size: result.size,
+        sha256Hash: result.sha256Hash,
+      });
+
+    } catch (error: any) {
+      console.error('Document generation failed:', error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Document generation failed',
+      });
+    }
+  });
+
+  app.get("/api/docs/:id/url", authenticateToken, async (req: any, res) => {
+    try {
+      const { id: documentId } = req.params;
+      
+      // Get document from database
+      const [document] = await db.select().from(documents).where(eq(documents.id, documentId));
+      
+      if (!document) {
+        return res.status(404).json({
+          success: false,
+          error: 'Document not found',
+        });
+      }
+
+      // Verify ownership
+      if (document.userId !== req.user.id) {
+        AccessLogger.logDataAccess(
+          req,
+          'access_denied',
+          `document:${documentId}`,
+          [PIICategory.PERSONAL_IDENTIFIERS],
+          false,
+          'User attempted to access document they do not own'
+        );
+        
+        return res.status(403).json({
+          success: false,
+          error: 'Access denied',
+        });
+      }
+
+      if (!document.s3Key) {
+        return res.status(404).json({
+          success: false,
+          error: 'Document not available in storage',
+        });
+      }
+
+      // Generate 5-minute presigned URL
+      const { createS3Service } = await import('./services/storage/s3');
+      const s3Service = createS3Service();
+      const url = await s3Service.getPdfUrl(document.s3Key, 300); // 5 minutes
+
+      // Update last accessed timestamp
+      await db.update(documents)
+        .set({ 
+          lastAccessedAt: new Date(),
+          downloadCount: sql`${documents.downloadCount} + 1`
+        })
+        .where(eq(documents.id, documentId));
+
+      AccessLogger.logDataAccess(
+        req,
+        'document_download',
+        `document:${documentId}`,
+        [PIICategory.BUSINESS_DATA],
+        true,
+        `Generated presigned URL for document ${document.documentType}`
+      );
+
+      res.json({
+        success: true,
+        url,
+        expiresIn: 300,
+        documentName: document.documentName,
+        documentType: document.documentType,
+        size: document.fileSizeBytes,
+      });
+
+    } catch (error: any) {
+      console.error('Failed to generate document URL:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to generate download URL',
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

@@ -258,6 +258,11 @@ export const documents = pgTable("documents", {
   s3Key: varchar("s3_key", { length: 500 }),
   s3Url: text("s3_url"),
   s3VersionId: varchar("s3_version_id", { length: 255 }),
+  sha256Hash: varchar("sha256_hash", { length: 64 }),
+  
+  // Tax year and customer ID for S3 key generation
+  taxYear: integer("tax_year").notNull(),
+  customerId: varchar("customer_id", { length: 255 }).notNull(),
   
   // Access control
   accessExpiresAt: timestamp("access_expires_at"),

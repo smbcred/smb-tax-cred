@@ -27,7 +27,7 @@ Preferred communication style: Simple, everyday language.
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM for type-safe operations.
 - **Connection**: Neon serverless PostgreSQL with connection pooling.
-- **Schema**: Comprehensive database schema for users, companies, calculations, payments, intake forms, leads, and documents, with Drizzle Kit for migrations.
+- **Schema**: Comprehensive database schema for users, companies, calculations, payments, intake forms, leads, and documents with full S3 metadata tracking, generation status, and secure access logging. Drizzle Kit handles all migrations.
 
 ### Authentication and Authorization
 - **Strategy**: JWT tokens stored in localStorage.
@@ -51,6 +51,7 @@ Preferred communication style: Simple, everyday language.
 ### AI and Document Generation
 - **Claude API**: AI-powered narrative generation for R&D tax credit documentation.
 - **Documint**: PDF generation service for IRS-compliant forms and reports.
+- **Document Orchestrator**: Integrated service that coordinates Claude AI, Documint PDF generation, and S3 storage for complete document workflows.
 
 ### Communication Services
 - **SendGrid**: Email delivery for notifications and document delivery.
@@ -58,7 +59,7 @@ Preferred communication style: Simple, everyday language.
 - **Make.com**: Automation orchestration for business process workflows.
 
 ### Cloud Storage
-- **AWS S3**: Document storage and secure file delivery.
+- **AWS S3**: Document storage and secure file delivery with presigned URLs, AES256 encryption, and automated lifecycle management.
 
 ### UI Component System
 - **Radix UI**: Accessible, unstyled component primitives.

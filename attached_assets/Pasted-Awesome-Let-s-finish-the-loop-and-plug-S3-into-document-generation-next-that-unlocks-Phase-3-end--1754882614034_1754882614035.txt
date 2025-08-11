@@ -1,0 +1,52 @@
+Awesome. Let’s finish the loop and plug S3 into document generation next — that unlocks Phase 3 end-to-end.
+
+What happens next (quick plan)
+	1.	Doc orchestration: Generate PDF → upload to S3 → save record → return signed URL.
+	2.	DB: Ensure documents has s3_key, bucket, mime, size, sha256, customerId, taxYear, docType, status.
+	3.	API:
+	•	POST /api/docs/generate (server-side only) → kicks off generation, returns job id.
+	•	GET /api/docs/:id/url → checks auth/ownership → returns 5-min presigned URL.
+	4.	Make: Final step POSTs to /api/webhooks/make with documentId and S3 key; your server marks status ready.
+	5.	Email: SendGrid template gets the short-lived URL (or a link to your /api/docs/:id/url endpoint).
+
+⸻
+
+Replit Agent prompt — “Wire S3 into Doc Generation (3.2.2 + 3.3.1)”
+
+Goal: Integrate the new S3 service into the document generator (Form 6765 + narrative), store records, expose a secure download URL, and pass acceptance for 3.2.2 and 3.3.1.
+
+Do:
+	1.	DB: Add/confirm documents columns: id, customerId, taxYear, docType, status, mime, size, sha256, bucket, s3_key, createdAt, updatedAt. Migration + model.
+	2.	Orchestrator: Implement generateAndStoreDoc({ customerId, taxYear, docType, payload }) that:
+	•	calls Documint (using DOCUMINT_API_KEY) to get a PDF buffer,
+	•	computes sha256 + size,
+	•	uses uploadPdf(buffer, key) from services/storage/s3,
+	•	upserts the documents row and returns { documentId }.
+	3.	API:
+	•	POST /api/docs/generate (auth required): validates input, calls orchestrator, returns { documentId }.
+	•	GET /api/docs/:id/url (auth required): verifies ownership, calls getPdfUrl(key, 300), returns { url }.
+	4.	Make callback: Update /api/webhooks/make handler to accept { documentId } and mark status ready; if given raw buffer/URL, save to S3 then mark ready.
+	5.	SendGrid: Update the “documents ready” email to include the /api/docs/:id/url link (not a long-lived S3 link).
+	6.	Tests:
+	•	Mock Documint → returns small PDF buffer.
+	•	Orchestrator test asserts: S3 called with AES256, DB row saved with correct fields.
+	•	GET /api/docs/:id/url returns 401 (no auth), 403 (not owner), 200 (+short-lived URL) for owner.
+	7.	Docs: Tick boxes in /docs/acceptance/3.2.2.md and /docs/acceptance/3.3.1.md, update /docs/PROGRESS.md, mark tasks done in /docs/TASKS_for_v2.md.
+
+Guardrails:
+	•	No public ACLs; only presigned GET.
+	•	Fail fast in production if DOCUMINT_API_KEY or any AWS_* is missing.
+	•	Signed URL expiry ≤ 1 hour (use 5–15 min by default).
+
+Run:
+
+npm --prefix server run typecheck && npm --prefix server run lint && npm --prefix server run test && npm --prefix server run build
+
+Commits:
+	•	feat(docs): generate + store PDFs to S3 (3.2.2/3.3.1)
+	•	test(docs): orchestrator + secure download
+	•	docs(acceptance): mark 3.2.2 & 3.3.1 complete
+
+⸻
+
+If you’d rather jump to another integration (Stripe webhooks, Make scenario callback, or SendGrid), say which and I’ll hand you a focused prompt.
