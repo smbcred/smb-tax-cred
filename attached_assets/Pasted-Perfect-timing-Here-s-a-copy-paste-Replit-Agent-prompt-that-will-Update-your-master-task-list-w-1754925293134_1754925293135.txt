@@ -1,0 +1,184 @@
+Perfect timing. Here’s a copy-paste Replit Agent prompt that will:
+	•	Update your master task list with a brand-new Phase 6: Admin & Operations
+	•	Add a full Admin Back-Office MVP breakdown (subtasks 6.1.1 → 6.1.7)
+	•	Create acceptance stubs under /docs/acceptance/ for each subtask + a master 6.1.md
+	•	Wire in DoD/Functional/Non-functional checklists tailored to your stack
+	•	Add a “make a user admin” snippet + notes to PROGRESS
+
+⸻
+
+Replit Agent Prompt — “Add Admin Back-Office MVP tasks + acceptance stubs”
+
+Goal: Add an Admin Back-Office MVP to the plan and create acceptance checklists so we can build it later with confidence.
+
+Read first:
+	•	/docs/TASKS_for_v2.md
+	•	/docs/PROGRESS.md (create if missing)
+	•	/docs/BLOCKERS.md
+
+1) Update the task list
+In /docs/TASKS_for_v2.md, append a new section exactly like this (keep existing format):
+
+# Phase 6: Admin & Operations
+
+## 6.1 Admin Back-Office (MVP)
+- 6.1.1 DB prep: admin flag, audit & webhook logs
+- 6.1.2 Server RBAC: auth + adminOnly middleware
+- 6.1.3 Admin API (read): leads, customers, documents, payments, webhooks
+- 6.1.4 Admin UI: /admin with tables, filters, detail drawer
+- 6.1.5 Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail
+- 6.1.6 Security hardening: rate-limit, no public URLs, short-lived presigns
+- 6.1.7 Tests & QA: RBAC, audit logs, action stubs
+
+2) Create acceptance stubs
+Create these files under /docs/acceptance/ with the exact contents below:
+
+/docs/acceptance/6.1.md
+
+# 6.1 Admin Back-Office (MVP) — Acceptance
+
+## Definition of Done (check all)
+[ ] Phase 6 tasks 6.1.1 → 6.1.7 present in TASKS_for_v2.md  
+[ ] All 6.1.x acceptance files created and linked here  
+[ ] Admin surface reachable at /admin (guarded)  
+[ ] README snippet: how to grant admin & where audit logs live
+
+## Evidence
+- Links to commits, screenshots, and passing test output.
+
+/docs/acceptance/6.1.1.md
+
+# 6.1.1 DB prep: admin flag, audit & webhook logs
+
+## Definition of Done
+[ ] users.is_admin boolean (default false)  
+[ ] audit_logs table (admin_user_id, action, entity_type, entity_id, before, after, created_at)  
+[ ] webhook_logs table (source, status, event, payload_sha256, created_at)  
+[ ] Drizzle schema + migration committed  
+[ ] .env.example updated if needed
+
+## Functional Checks
+[ ] Migration up/down runs locally  
+[ ] Can insert a webhook_logs row from code path (mock)  
+[ ] Query audit_logs by entity works
+
+## Non-Functional
+[ ] PII safe (no secrets in logs)  
+[ ] Indices on created_at, entity_id (if large tables)
+
+/docs/acceptance/6.1.2.md
+
+# 6.1.2 Server RBAC: auth + adminOnly middleware
+
+## DoD
+[ ] adminOnly middleware present and tested  
+[ ] /api/admin/* routes all use auth + adminOnly  
+[ ] 403 for non-admins; 200 for admins
+
+## Functional
+[ ] Supertest: non-admin → 403  
+[ ] Supertest: admin → 200 on a sample /api/admin/ping
+
+## Security
+[ ] No leakage of presigned URLs or secrets in error bodies
+
+/docs/acceptance/6.1.3.md
+
+# 6.1.3 Admin API (read)
+
+## DoD
+[ ] GET /api/admin/leads (search, date filters)  
+[ ] GET /api/admin/customers  
+[ ] GET /api/admin/documents?status=ready|pending  
+[ ] GET /api/admin/payments  
+[ ] GET /api/admin/webhooks?source=stripe|make|sendgrid
+
+## Functional
+[ ] Returns paginated JSON (cursor or limit/offset)  
+[ ] Sort by created_at desc  
+[ ] 403 for non-admin, 200 for admin (tests)
+
+## Non-Functional
+[ ] Rate-limit on /api/admin/* reads  
+[ ] N+1 avoided (basic joins/selects)
+
+/docs/acceptance/6.1.4.md
+
+# 6.1.4 Admin UI
+
+## DoD
+[ ] /admin route with sidebar tabs: Leads, Customers, Payments, Documents, Webhooks  
+[ ] Tables using React Query + TanStack Table  
+[ ] Search + date filters; loading/empty states  
+[ ] Detail drawer with key fields and quick links (e.g., "Get signed URL" button hitting /api/docs/:id/url for 5–15 min link)
+
+## UX & Accessibility
+[ ] Uses design tokens; AA contrast; proper roles/labels  
+[ ] Keyboard focus states visible
+
+/docs/acceptance/6.1.5.md
+
+# 6.1.5 Actions (safe) + audit trail
+
+## DoD
+[ ] POST /api/admin/documents/:id/resend-email (SendGrid stub OK)  
+[ ] POST /api/admin/documents/:id/regenerate (Documint → S3 path exists)  
+[ ] POST /api/admin/payments/:id/refund (Stripe stub OK)  
+[ ] Each action writes a row to audit_logs
+
+## Functional
+[ ] Supertest for 200 happy & 403 non-admin  
+[ ] Audit row contains action, entity_type/id, admin_user_id
+
+## Safety
+[ ] No long-lived S3 URLs; generate presigned on demand  
+[ ] Idempotency guard (same action twice logs once or marks duplicate)
+
+/docs/acceptance/6.1.6.md
+
+# 6.1.6 Security hardening
+
+## DoD
+[ ] express-rate-limit on /api/admin/*  
+[ ] Helmet headers on admin routes  
+[ ] Server never returns secrets; logs are masked
+
+## Optional (note if deferred)
+[ ] IP allowlist (config-based)  
+[ ] TOTP 2FA for admins
+
+/docs/acceptance/6.1.7.md
+
+# 6.1.7 Tests & QA
+
+## DoD
+[ ] RBAC tests (admin vs non-admin)  
+[ ] Action tests (resend/regenerate/refund) with mocks  
+[ ] Snapshot of an audit_logs entry in tests  
+[ ] Lighthouse (or axe) pass on /admin basics
+
+## Evidence
+[ ] Test count & summary pasted here  
+[ ] Screenshots or CLI outputs linked
+
+3) Add helper snippet
+Create /docs/admin/README.md with:
+
+## Grant admin
+UPDATE users SET is_admin = true WHERE email = 'you@yourdomain.com';
+
+## Notes
+- All /api/admin/* are protected by auth + adminOnly.
+- Actions write to audit_logs; review regularly.
+
+4) Housekeeping
+	•	Append a bullet to /docs/PROGRESS.md: “Added Phase 6 tasks and acceptance stubs for Admin Back-Office MVP.”
+	•	Do not mark any 6.1.x tasks as done. These are planning artifacts only.
+
+5) Output
+	•	Print a short table of the files created/updated with paths.
+	•	Show the new Phase 6 block from TASKS_for_v2.md.
+
+⸻
+
+If you’d rather keep it to one acceptance file (e.g., /docs/acceptance/admin-mvp.md) instead of 7, say the word and I’ll give you a slimmer prompt.

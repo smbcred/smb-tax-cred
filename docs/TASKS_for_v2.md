@@ -65,3 +65,24 @@ _Source: rd-saas-complete-guide.v2.md_
 | 5.2.2 | Support System Setup | [x] | [📋](./acceptance/5.2.2.md) |
 | 5.3.1 | Production Deployment | [x] | [📋](./acceptance/5.3.1.md) |
 | 5.3.2 | Marketing Launch | [x] | [📋](./acceptance/5.3.2.md) |
+
+# Phase 6: Admin & Operations
+
+## 6.1 Admin Back-Office (MVP)
+- 6.1.1 DB prep: admin flag, audit & webhook logs
+- 6.1.2 Server RBAC: auth + adminOnly middleware
+- 6.1.3 Admin API (read): leads, customers, documents, payments, webhooks
+- 6.1.4 Admin UI: /admin with tables, filters, detail drawer
+- 6.1.5 Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail
+- 6.1.6 Security hardening: rate-limit, no public URLs, short-lived presigns
+- 6.1.7 Tests & QA: RBAC, audit logs, action stubs
+
+| Task ID | Title | Status | Acceptance |
+|---|---|---|---|
+| 6.1.1 | DB prep: admin flag, audit & webhook logs | [ ] | [📋](./acceptance/6.1.1.md) |
+| 6.1.2 | Server RBAC: auth + adminOnly middleware | [ ] | [📋](./acceptance/6.1.2.md) |
+| 6.1.3 | Admin API (read): leads, customers, documents, payments, webhooks | [ ] | [📋](./acceptance/6.1.3.md) |
+| 6.1.4 | Admin UI: /admin with tables, filters, detail drawer | [ ] | [📋](./acceptance/6.1.4.md) |
+| 6.1.5 | Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail | [ ] | [📋](./acceptance/6.1.5.md) |
+| 6.1.6 | Security hardening: rate-limit, no public URLs, short-lived presigns | [ ] | [📋](./acceptance/6.1.6.md) |
+| 6.1.7 | Tests & QA: RBAC, audit logs, action stubs | [ ] | [📋](./acceptance/6.1.7.md) |

@@ -2,6 +2,8 @@
 
 ## Latest Changes
 
+### 📋 Added Phase 6 tasks and acceptance stubs for Admin Back-Office MVP (2025-08-11)
+
 ### ✅ Task 5.3.2: Marketing Launch (2025-08-11)
 - **[Marketing Launch Strategy](docs/marketing/launch-strategy.md)**: Comprehensive go-to-market strategy with target audience analysis, value proposition, content marketing strategy, SEO implementation, social media strategy, paid marketing approach, launch timeline, success metrics, budget allocation, and risk mitigation plans
 - **[Press Kit](docs/marketing/press-kit.md)**: Complete press kit with company overview, key statistics, leadership information, product details, competitive advantages, milestones, media assets, customer success stories, industry recognition, key messages, contact information, and FAQ sections
