@@ -37,6 +37,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, isNotNull, lt } from "drizzle-orm";
+import { generateId } from "./utils/security";
 
 // Type for user creation with just essential fields
 type CreateUserData = {
@@ -86,7 +87,7 @@ export interface IStorage {
   getDocument(id: string): Promise<Document | undefined>;
   getDocumentsByIntakeFormId(intakeFormId: string): Promise<Document[]>;
   getDocumentsByUserId(userId: string): Promise<Document[]>;
-  createDocument(document: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document>;
+  createDocument(document: { intakeFormId: string; companyId: string; userId: string; documentType: string; documentName: string; s3Url?: string; status?: string; expirationDate?: Date }): Promise<Document>;
   updateDocument(id: string, updates: Partial<Document>): Promise<Document>;
 
   // Lead operations
@@ -597,7 +598,7 @@ export class DatabaseStorage implements IStorage {
 
     if (!success && error) {
       updates.processingError = error;
-      updates.retryCount = sql`${webhookEvents.retryCount} + 1`;
+      updates.retryCount = sql`${webhookEvents.retryCount} + 1` as any;
     }
 
     return this.updateWebhookEvent(eventId, updates);
@@ -688,8 +689,8 @@ export class DatabaseStorage implements IStorage {
     };
 
     if (makeData) {
-      updates.makeExecutionId = makeData.executionId;
-      updates.makeScenarioId = makeData.scenarioId;
+      updates.makeExecutionId = makeData.executionId || null;
+      updates.makeScenarioId = makeData.scenarioId || null;
       updates.responseData = makeData.responseData;
     }
 
@@ -710,14 +711,17 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`Workflow trigger not found: ${triggerId}`);
     }
 
+    const currentRetryCount = trigger.retryCount || 0;
+    const maxRetries = trigger.maxRetries || 3;
+
     const updates: Partial<WorkflowTrigger> = {
       lastError: error,
-      retryCount: trigger.retryCount + 1,
+      retryCount: currentRetryCount + 1,
     };
 
-    if (shouldRetry && trigger.retryCount < trigger.maxRetries) {
+    if (shouldRetry && currentRetryCount < maxRetries) {
       // Calculate next retry time with exponential backoff
-      const delayMs = Math.min(1000 * Math.pow(2, trigger.retryCount), 30000);
+      const delayMs = Math.min(1000 * Math.pow(2, currentRetryCount), 30000);
       updates.nextRetryAt = new Date(Date.now() + delayMs);
       updates.status = 'pending'; // Will be retried
     } else {

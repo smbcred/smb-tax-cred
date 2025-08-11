@@ -7,55 +7,10 @@ import rateLimit from "express-rate-limit";
 import crypto from "crypto";
 import { storage } from "./storage";
 
-// Import performance optimization middleware
-import { 
-  cacheMiddleware, 
-  invalidateCache, 
-  etagMiddleware, 
-  compressionMiddleware,
-  queryCache 
-} from "./middleware/caching";
-import { 
-  apiRateLimit, 
-  authRateLimit as authRL, 
-  strictRateLimit, 
-  userRateLimit 
-} from "./middleware/rateLimit";
-import { 
-  OptimizedQueryBuilder, 
-  PaginationOptimizer, 
-  QueryPerformanceMonitor,
-  ConnectionPoolOptimizer 
-} from "./services/queryOptimizer";
-
-// Import security middleware
-import { 
-  maskSecrets 
-} from "./middleware/security";
-import { 
-  csrfTokenProvider, 
-  csrfProtection, 
-  csrfTokenEndpoint,
-  csrfApiProtection 
-} from "./middleware/csrf";
-import { 
-  validateBody, 
-  validateQuery, 
-  userRegistrationValidation,
-  userLoginValidation 
-} from "./middleware/validation";
-
-// Import data protection middleware
-import { 
-  applyDataProtection,
-  dataAccessControl,
-  AccessLogger,
-  PIICategory 
-} from "./middleware/dataProtection";
-import { 
-  secureTransmission,
-  FieldEncryption 
-} from "./middleware/encryption";
+// Import necessary middleware
+import { PIICategory } from "./middleware/dataProtection";
+import { csrfTokenProvider, csrfTokenEndpoint, csrfProtection } from "./middleware/csrf";
+import { userRegistrationValidation, userLoginValidation } from "./middleware/validation";
 import checkoutRoutes from "./routes/checkout.js";
 import { adminRouter } from "./routes/admin";
 import { healthRouter } from "./routes/health";
@@ -92,6 +47,7 @@ import {
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { db } from "./db";
+import { passwordSecurity, logSecurityEvent, generateId } from "./utils/security";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
