@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "check": "tsc --noEmit",
+    "check:watch": "tsc --noEmit --watch",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "deadcode": "npm run deadcode:knip && npm run deadcode:depcheck && npm run deadcode:tsprune",
+    "deadcode:knip": "knip --config knip.json",
+    "deadcode:depcheck": "depcheck --ignores='@types/*,eslint-*,@replit/*'",
+    "deadcode:tsprune": "ts-prune --ignore 'src/.*\\.test\\.ts|deprecated/.*'",
+    "audit:security": "npm audit --audit-level moderate",
+    "audit:deps": "npm ls --depth=0",
+    "quality": "npm run check && npm run lint && npm run deadcode",
+    "precommit": "npm run quality",
+    "ci": "npm run quality && npm run build && npm test"
+  }
+}

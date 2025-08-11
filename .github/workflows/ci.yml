@@ -1,0 +1,126 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: TypeScript type checking
+      run: npm run check
+      
+    - name: ESLint code quality
+      run: npx eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0
+      
+    - name: Dead code detection
+      run: |
+        echo "Running dead code analysis..."
+        npx knip --config knip.json || echo "Knip found issues - review recommended"
+        npx depcheck --ignores="@types/*,eslint-*,@replit/*" || echo "Depcheck found issues - review recommended"
+        npx ts-prune --ignore "src/.*\.test\.ts|deprecated/.*" || echo "TS-Prune found issues - review recommended"
+      
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        
+    - name: Run unit tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+        JWT_SECRET: test-secret-key
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      if: matrix.node-version == '20.x'
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          client/dist/
+        retention-days: 7
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Security audit
+      run: npm audit --audit-level moderate
+      
+    - name: Check for deprecated packages
+      run: npx check-is-deprecated $(npm ls --depth=0 --json | jq -r '.dependencies | keys[]') || echo "Some packages may be deprecated"
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Check for unused dependencies
+      run: |
+        npm ci
+        npx depcheck --json > depcheck-results.json
+        cat depcheck-results.json
+        
+    - name: Validate package-lock.json
+      run: npm ls --depth=0
+
+  notify-status:
+    runs-on: ubuntu-latest
+    needs: [quality-gates, security-scan, dependency-check]
+    if: always()
+    
+    steps:
+    - name: Report CI Status
+      run: |
+        if [[ "${{ needs.quality-gates.result }}" == "success" && 
+              "${{ needs.security-scan.result }}" == "success" && 
+              "${{ needs.dependency-check.result }}" == "success" ]]; then
+          echo "✅ All CI checks passed"
+          exit 0
+        else
+          echo "❌ CI pipeline failed - check job logs"
+          exit 1
+        fi

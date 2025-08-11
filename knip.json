@@ -1,0 +1,39 @@
+{
+  "entry": [
+    "client/src/main.tsx",
+    "server/index.ts",
+    "shared/**/*.ts"
+  ],
+  "project": [
+    "client/src/**/*.{ts,tsx}",
+    "server/**/*.ts",
+    "shared/**/*.ts",
+    "tests/**/*.{ts,js}",
+    "e2e/**/*.ts"
+  ],
+  "ignore": [
+    "dist/**",
+    "node_modules/**",
+    "deprecated/**",
+    "**/*.test.{ts,tsx,js}",
+    "**/__tests__/**",
+    ".cache/**"
+  ],
+  "ignoreDependencies": [
+    "@replit/*",
+    "@types/*",
+    "eslint-*",
+    "prettier",
+    "vite",
+    "tsx",
+    "drizzle-kit"
+  ],
+  "ignoreBinaries": [
+    "tsx",
+    "vite",
+    "drizzle-kit",
+    "eslint",
+    "prettier",
+    "tsc"
+  ]
+}

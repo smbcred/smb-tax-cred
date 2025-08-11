@@ -58,6 +58,7 @@ import {
 } from "./middleware/encryption";
 import checkoutRoutes from "./routes/checkout.js";
 import { adminRouter } from "./routes/admin";
+import { healthRouter } from "./routes/health";
 
 // Define authentication middleware directly
 function isAuthenticated(req: any, res: any, next: any) {
@@ -206,6 +207,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // CSRF protection for API endpoints  
   app.use("/api", csrfTokenProvider());
+  
+  // Register health and monitoring routes (no auth required)
+  app.use("/api", healthRouter);
   
   // Register checkout routes
   app.use("/api/checkout", checkoutRoutes);
