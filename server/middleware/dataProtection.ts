@@ -473,18 +473,24 @@ export function applyDataProtection() {
       '/industries',
       '/demo',
       '/help',
+      '/support',
       '/api/leads',
       '/api/calculation',
       '/api/calculator',
       '/api/csrf-token',
-      '/api/help'
+      '/api/help',
+      '/api/support/tickets',
+      '/api/support/knowledge-base',
+      '/api/support/chat',
+      '/api/support/metrics'
     ];
 
     // Check if route is public
     const isPublicRoute = publicRoutes.some(route => 
       req.path === route || 
       req.path.startsWith(route + '/') ||
-      req.path.startsWith('/api/auth/') // Auth routes are handled separately
+      req.path.startsWith('/api/auth/') || // Auth routes are handled separately
+      req.path.startsWith('/api/support/') // Support routes are public
     );
 
     // In development, allow all Vite assets and source files

@@ -209,7 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { default: helpRoutes } = await import('./routes/help.js');
   app.use("/api/help", helpRoutes);
 
-  // Register support routes
+  // Register support routes (public endpoints for customer support)
   const { default: supportRoutes } = await import('./routes/support.js');
   app.use("/api/support", supportRoutes);
 
