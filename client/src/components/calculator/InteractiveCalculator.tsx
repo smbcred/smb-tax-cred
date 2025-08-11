@@ -26,6 +26,60 @@ import { calculateRDTaxCredit, businessTypes } from "@/services/calculator.servi
 import type { CalculatorExpenses, CalculationResult } from "@shared/schema";
 import { formatCurrency } from "@/utils/calculations";
 
+// CTA Button with development mode gating
+interface CTAButtonProps {
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  className?: string;
+  children: React.ReactNode;
+  results: CalculationResult;
+  onDebugLog?: (message: string) => void;
+}
+
+function CTAButton({ size = 'default', className, children, results, onDebugLog }: CTAButtonProps) {
+  const isDevelopment = import.meta.env.DEV;
+  const minEligibleCredit = 5000;
+  const isEligible = results.federalCredit >= minEligibleCredit;
+  
+  const handleClick = () => {
+    if (isDevelopment) {
+      const debugInfo = {
+        mode: 'development',
+        eligible: isEligible,
+        federalCredit: results.federalCredit,
+        minRequired: minEligibleCredit,
+        timestamp: new Date().toISOString()
+      };
+      
+      const message = `CTA clicked in development mode - Eligible: ${isEligible}, Credit: $${results.federalCredit.toLocaleString()}`;
+      onDebugLog?.(message);
+      console.log('[CTA Debug]:', debugInfo);
+      
+      // Show alert in development
+      alert(`Development Mode:\n\nCredit Amount: $${results.federalCredit.toLocaleString()}\nEligible for service: ${isEligible ? 'Yes' : 'No'}\nMinimum required: $${minEligibleCredit.toLocaleString()}`);
+    } else {
+      // Production behavior
+      if (isEligible) {
+        window.location.href = '/get-started';
+      } else {
+        // Track low-value leads differently
+        console.log('Low-value lead:', results);
+      }
+    }
+  };
+  
+  return (
+    <Button 
+      size={size} 
+      className={className}
+      onClick={handleClick}
+      disabled={isDevelopment ? false : !isEligible}
+      variant={isEligible ? 'default' : 'secondary'}
+    >
+      {children}
+    </Button>
+  );
+}
+
 interface CalculatorState extends CalculatorExpenses {
   businessType: string;
   hasQualifyingActivities: boolean;
@@ -179,10 +233,15 @@ export function InteractiveCalculator() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t">
-              <Button size="lg" className="flex-1" onClick={() => window.location.href = '/get-started'}>
+              <CTAButton 
+                size="lg" 
+                className="flex-1" 
+                results={calculateResults()}
+                onDebugLog={(message) => console.log('[DEV DEBUG]:', message)}
+              >
                 Get Professional Documentation
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </CTAButton>
               <Button size="lg" variant="outline" onClick={resetCalculator}>
                 Calculate Another Scenario
               </Button>
@@ -199,7 +258,7 @@ export function InteractiveCalculator() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="container max-w-4xl mx-auto px-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -221,6 +280,7 @@ export function InteractiveCalculator() {
                   {businessTypes.map((type) => (
                     <button
                       key={type.id}
+                      data-testid={`business-type-${type.id}`}
                       onClick={() => {
                         updateState({ businessType: type.id });
                         setStep(2);
@@ -255,6 +315,7 @@ export function InteractiveCalculator() {
                     </Label>
                     <Input
                       id="wages"
+                      data-testid="wages-input"
                       type="number"
                       placeholder="0"
                       value={state.wages || ''}
@@ -271,6 +332,7 @@ export function InteractiveCalculator() {
                     </Label>
                     <Input
                       id="contractors"
+                      data-testid="contractors-input"
                       type="number"
                       placeholder="0"
                       value={state.contractors || ''}
@@ -287,6 +349,7 @@ export function InteractiveCalculator() {
                     </Label>
                     <Input
                       id="supplies"
+                      data-testid="supplies-input"
                       type="number"
                       placeholder="0"
                       value={state.supplies || ''}
@@ -303,6 +366,7 @@ export function InteractiveCalculator() {
                     </Label>
                     <Input
                       id="cloud"
+                      data-testid="cloud-input"
                       type="number"
                       placeholder="0"
                       value={state.cloud || ''}
@@ -319,6 +383,7 @@ export function InteractiveCalculator() {
                   Back
                 </Button>
                 <Button 
+                  data-testid="calculate-button"
                   onClick={handleCalculate}
                   disabled={state.wages + state.contractors + state.supplies + state.cloud === 0}
                   className="flex items-center gap-2"
