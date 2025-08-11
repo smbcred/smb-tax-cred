@@ -482,6 +482,7 @@ export function applyDataProtection() {
       '/api/dev/stripe-smoke',
       '/api/dev/pdf-smoke',
       '/api/dev/claude-smoke',
+      '/api/dev/documint/preview',
       '/api/calculator',
       '/api/csrf-token',
       '/api/help',

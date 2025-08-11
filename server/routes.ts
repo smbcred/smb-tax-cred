@@ -61,6 +61,7 @@ import {
   FieldEncryption 
 } from "./middleware/encryption";
 import checkoutRoutes from "./routes/checkout.js";
+import { documintService } from "./src/services/documint.js";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -191,8 +192,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Secure transmission middleware
   app.use(secureTransmission());
   
-  // CSRF protection for API endpoints  
-  app.use("/api", csrfTokenProvider());
+  // CSRF protection for API endpoints (skip dev routes in development)
+  app.use("/api", (req, res, next) => {
+    if (process.env.NODE_ENV !== 'production' && req.path.startsWith('/dev/')) {
+      return next();
+    }
+    csrfTokenProvider()(req, res, next);
+  });
   
   // Register checkout routes
   app.use("/api/checkout", checkoutRoutes);
@@ -570,6 +576,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: false,
           error: error.message,
           type: error.type || 'unknown'
+        });
+      }
+    });
+
+    // Dev-only Documint preview route (no authentication required)
+    app.post("/api/dev/documint/preview", async (req, res) => {
+      try {
+        // Check if Documint service is configured
+        const config = documintService.getConfig();
+        
+        if (!config.hasApiKey || !config.hasTemplateId) {
+          return res.status(400).json({
+            success: false,
+            error: "Documint service not fully configured",
+            config: {
+              hasApiKey: config.hasApiKey,
+              hasTemplateId: config.hasTemplateId,
+              previewMode: config.previewMode
+            }
+          });
+        }
+
+        // Sample R&D package data for testing
+        const sampleData = {
+          companyName: "Test Company Inc",
+          companyAddress: "123 Main St, Anytown USA 12345", 
+          taxYear: new Date().getFullYear() - 1,
+          ein: "12-3456789",
+          federalCredit: 75000,
+          totalQRE: 500000,
+          qreBreakdown: {
+            wages: 300000,
+            contractors: 100000,
+            supplies: 50000,
+            cloudAndSoftware: 50000,
+            total: 500000
+          },
+          qualifyingActivities: [
+            "AI/ML Model Development",
+            "Process Optimization",
+            "Custom Software Development"
+          ],
+          businessType: "Technology Services",
+          rdAllocationPercentage: 65,
+          qsbAnalysis: {
+            isEligible: true,
+            quarterlyBenefit: 125000,
+            payrollOffsetAvailable: true
+          },
+          legislativeContext: {
+            alerts: [
+              {
+                type: "warning" as const,
+                message: "Section 174 requires capitalization and amortization for 2022+",
+                impact: "May reduce immediate tax benefits but spreads over 5 years"
+              },
+              {
+                type: "benefit" as const,
+                message: "QSB payroll tax offset available",
+                impact: "Up to $500k in quarterly cash benefits"
+              }
+            ]
+          }
+        };
+
+        // Generate document using Documint service
+        const result = await documintService.generateAndStoreRDPackage(sampleData);
+
+        res.json({
+          success: true,
+          documentId: result.documentId,
+          s3Url: result.s3Url,
+          previewMode: result.previewMode,
+          sampleData: sampleData,
+          timestamp: new Date().toISOString()
+        });
+
+      } catch (error: any) {
+        console.error('Documint preview test failed:', error);
+        res.status(500).json({
+          success: false,
+          error: error.message,
+          timestamp: new Date().toISOString()
         });
       }
     });
