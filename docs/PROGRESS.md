@@ -2,6 +2,17 @@
 
 ## Latest Changes
 
+**Task 6.1.5: Admin Actions with Audit Trail (2025-08-11)**
+✓ Implemented three safe admin action endpoints with proper authentication
+✓ POST /api/admin/documents/:id/resend-email (SendGrid stub)
+✓ POST /api/admin/documents/:id/regenerate (Documint → S3 stub) 
+✓ POST /api/admin/payments/:id/refund (Stripe stub)
+✓ Added comprehensive audit logging for all admin actions
+✓ Implemented idempotency guards (10-minute duplicate detection)
+✓ Enhanced schema with regeneratedAt, userEmail, refund fields
+✓ Created comprehensive test suite with 200/403 verification
+✓ [Files: server/routes/admin.ts, shared/schema.ts, tests/admin-actions.test.ts]
+
 ### 📋 Added Phase 6 tasks and acceptance stubs for Admin Back-Office MVP (2025-08-11)
 
 ### ✅ Task 5.3.2: Marketing Launch (2025-08-11)

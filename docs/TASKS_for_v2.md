@@ -83,6 +83,6 @@ _Source: rd-saas-complete-guide.v2.md_
 | 6.1.2 | Server RBAC: auth + adminOnly middleware | [x] | [📋](./acceptance/6.1.2.md) |
 | 6.1.3 | Admin API (read): leads, customers, documents, payments, webhooks | [x] | [📋](./acceptance/6.1.3.md) |
 | 6.1.4 | Admin UI: /admin with tables, filters, detail drawer | [x] | [📋](./acceptance/6.1.4.md) |
-| 6.1.5 | Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail | [ ] | [📋](./acceptance/6.1.5.md) |
+| 6.1.5 | Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail | [x] | [📋](./acceptance/6.1.5.md) |
 | 6.1.6 | Security hardening: rate-limit, no public URLs, short-lived presigns | [ ] | [📋](./acceptance/6.1.6.md) |
 | 6.1.7 | Tests & QA: RBAC, audit logs, action stubs | [ ] | [📋](./acceptance/6.1.7.md) |

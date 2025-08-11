@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { requireAdmin } from '../middleware/adminAuth';
 import { db } from '../db';
 import { users, companies, auditLogs, webhookLogs, documents, intakeForms, leads, payments, calculations } from '../../shared/schema';
-import { eq, desc, count, sql } from 'drizzle-orm';
+import { eq, desc, count, sql, and } from 'drizzle-orm';
 import rateLimit from 'express-rate-limit';
 
 // Rate limiting for admin read endpoints (100 requests per 15 minutes)
@@ -436,6 +436,268 @@ router.get('/webhook-logs', async (req, res) => {
   } catch (error) {
     console.error('Webhook logs error:', error);
     res.status(500).json({ error: 'Failed to fetch webhook logs' });
+  }
+});
+
+/**
+ * Admin Action: Resend document email
+ */
+router.post('/documents/:id/resend-email', async (req, res) => {
+  try {
+    const documentId = req.params.id;
+    const adminUserId = req.user?.id;
+    const reason = req.body.reason || 'Manual email resend requested';
+
+    // Check if document exists
+    const [document] = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.id, documentId))
+      .limit(1);
+
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    // Idempotency check - check if same action was done recently (within 10 minutes)
+    const recentAudit = await db
+      .select()
+      .from(auditLogs)
+      .where(
+        and(
+          eq(auditLogs.adminUserId, adminUserId),
+          eq(auditLogs.action, 'resend_email'),
+          eq(auditLogs.entityType, 'document'),
+          eq(auditLogs.entityId, documentId),
+          sql`${auditLogs.createdAt} > NOW() - INTERVAL '10 minutes'`
+        )
+      )
+      .limit(1);
+
+    if (recentAudit.length > 0) {
+      return res.json({ 
+        success: true, 
+        message: 'Email resend already processed recently',
+        isDuplicate: true 
+      });
+    }
+
+    // Here would be the actual SendGrid email sending logic
+    // For now, we'll stub it as successful
+    const emailSent = true; // SendGrid stub
+
+    // Log the action to audit trail
+    await db.insert(auditLogs).values({
+      adminUserId,
+      action: 'resend_email',
+      entityType: 'document',
+      entityId: documentId,
+      after: { 
+        documentType: document.documentType,
+        recipientEmail: document.userEmail || 'unknown',
+        emailSent 
+      },
+      reason,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
+    res.json({
+      success: true,
+      message: 'Document email resent successfully',
+      documentId,
+      emailSent
+    });
+
+  } catch (error) {
+    console.error('Resend email error:', error);
+    res.status(500).json({ error: 'Failed to resend email' });
+  }
+});
+
+/**
+ * Admin Action: Regenerate document
+ */
+router.post('/documents/:id/regenerate', async (req, res) => {
+  try {
+    const documentId = req.params.id;
+    const adminUserId = req.user?.id;
+    const reason = req.body.reason || 'Manual document regeneration requested';
+
+    // Check if document exists
+    const [document] = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.id, documentId))
+      .limit(1);
+
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    // Idempotency check
+    const recentAudit = await db
+      .select()
+      .from(auditLogs)
+      .where(
+        and(
+          eq(auditLogs.adminUserId, adminUserId),
+          eq(auditLogs.action, 'regenerate_doc'),
+          eq(auditLogs.entityType, 'document'),
+          eq(auditLogs.entityId, documentId),
+          sql`${auditLogs.createdAt} > NOW() - INTERVAL '10 minutes'`
+        )
+      )
+      .limit(1);
+
+    if (recentAudit.length > 0) {
+      return res.json({ 
+        success: true, 
+        message: 'Document regeneration already processed recently',
+        isDuplicate: true 
+      });
+    }
+
+    // Here would be the actual Documint → S3 regeneration logic
+    // For now, we'll stub it and ensure S3 path exists
+    const newS3Key = `regenerated/${documentId}/${Date.now()}.pdf`;
+    const regenerated = true; // Documint + S3 stub
+
+    // Update document with new S3 key
+    await db
+      .update(documents)
+      .set({ 
+        s3Key: newS3Key,
+        updatedAt: new Date(),
+        regeneratedAt: new Date()
+      })
+      .where(eq(documents.id, documentId));
+
+    // Log the action to audit trail
+    await db.insert(auditLogs).values({
+      adminUserId,
+      action: 'regenerate_doc',
+      entityType: 'document',
+      entityId: documentId,
+      before: { s3Key: document.s3Key },
+      after: { 
+        s3Key: newS3Key,
+        regenerated,
+        originalDocumentType: document.documentType 
+      },
+      reason,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
+    res.json({
+      success: true,
+      message: 'Document regenerated successfully',
+      documentId,
+      newS3Key,
+      regenerated
+    });
+
+  } catch (error) {
+    console.error('Regenerate document error:', error);
+    res.status(500).json({ error: 'Failed to regenerate document' });
+  }
+});
+
+/**
+ * Admin Action: Process Stripe refund
+ */
+router.post('/payments/:id/refund', async (req, res) => {
+  try {
+    const paymentId = req.params.id;
+    const adminUserId = req.user?.id;
+    const reason = req.body.reason || 'Manual refund requested';
+    const amount = req.body.amount; // Optional partial refund amount
+
+    // Check if payment exists
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.id, paymentId))
+      .limit(1);
+
+    if (!payment) {
+      return res.status(404).json({ error: 'Payment not found' });
+    }
+
+    // Idempotency check
+    const recentAudit = await db
+      .select()
+      .from(auditLogs)
+      .where(
+        and(
+          eq(auditLogs.adminUserId, adminUserId),
+          eq(auditLogs.action, 'refund'),
+          eq(auditLogs.entityType, 'payment'),
+          eq(auditLogs.entityId, paymentId),
+          sql`${auditLogs.createdAt} > NOW() - INTERVAL '10 minutes'`
+        )
+      )
+      .limit(1);
+
+    if (recentAudit.length > 0) {
+      return res.json({ 
+        success: true, 
+        message: 'Refund already processed recently',
+        isDuplicate: true 
+      });
+    }
+
+    // Here would be the actual Stripe refund logic
+    // For now, we'll stub it as successful
+    const refundAmount = amount || payment.amount;
+    const stripeRefundId = `re_stub_${Date.now()}`;
+    const refunded = true; // Stripe stub
+
+    // Update payment status
+    await db
+      .update(payments)
+      .set({ 
+        status: 'refunded',
+        updatedAt: new Date(),
+        refundedAt: new Date(),
+        refundAmount: refundAmount
+      })
+      .where(eq(payments.id, paymentId));
+
+    // Log the action to audit trail
+    await db.insert(auditLogs).values({
+      adminUserId,
+      action: 'refund',
+      entityType: 'payment',
+      entityId: paymentId,
+      before: { 
+        status: payment.status,
+        amount: payment.amount 
+      },
+      after: { 
+        status: 'refunded',
+        refundAmount,
+        stripeRefundId,
+        refunded 
+      },
+      reason,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
+    res.json({
+      success: true,
+      message: 'Payment refunded successfully',
+      paymentId,
+      refundAmount,
+      stripeRefundId,
+      refunded
+    });
+
+  } catch (error) {
+    console.error('Refund payment error:', error);
+    res.status(500).json({ error: 'Failed to process refund' });
   }
 });
 

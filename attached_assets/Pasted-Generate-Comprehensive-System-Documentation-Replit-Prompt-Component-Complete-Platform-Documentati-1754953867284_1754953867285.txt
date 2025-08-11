@@ -1,0 +1,870 @@
+Generate Comprehensive System Documentation - Replit Prompt
+Component: Complete Platform Documentation
+KB References:
+
+system-architecture-explanation.md → Full System Architecture
+rd-credit-file-structure.md → File Organization
+rd-tax-credit-saas-index.md → Complete Document Index
+additional-project-specs.md → Technical Specifications
+R&D Tax Credit SAAS Implementation Guide → Business Overview
+Complete User Experience Flow.md → User Journey
+pricing_strategy_rd_platform.md → Business Logic
+rd-saas-replit-guide.md → Implementation Phases
+
+Business Context: Creates comprehensive documentation that explains how the entire SMBTaxCredits.com platform works - from helping SMBs document their AI experimentation (custom GPTs, chatbot tuning, automation testing) to generating IRS-compliant R&D tax credit documentation worth 10-16% of project costs.
+Replit Prompt
+"Generate an exhaustive markdown documentation file that explains the entire SMBTaxCredits.com system. The documentation should serve as the single source of truth for developers, covering architecture, business logic, implementation details, and operational procedures.
+SMBTaxCredits.com - Complete System Documentation
+Table of Contents
+
+Executive Overview
+System Architecture
+File Structure & Organization
+Business Logic & Rules
+User Journey & Workflows
+Component Documentation
+API Reference
+Database Schema
+External Integrations
+Security & Authentication
+Deployment & Configuration
+Testing & Quality Assurance
+
+1. Executive Overview
+1.1 Product Mission
+SMBTaxCredits.com transforms everyday AI experimentation into valuable R&D tax credits for small businesses. We serve companies USING AI tools (not building them) to improve their operations through test-and-learn cycles.
+Core Value Proposition: "Turn everyday AI experiments into tax savings"
+
+No special degree required
+If you tested, measured, and improved, you may qualify
+Federal credits worth 10-16% of project costs
+Simple flat-fee pricing, results in days
+
+1.2 Target Audience
+
+Marketing/Creative Agencies: Building custom GPTs, prompt libraries, AI workflows
+E-commerce Brands: AI chatbots, recommendation engines, automation
+Consultants: AI analysis tools, automated reporting, custom workflows
+Service Businesses: AI scheduling, operations automation, quality improvements
+Content Creators: AI content systems, custom workflows, efficiency tools
+
+1.3 Key Features
+
+Interactive Calculator - 4-step qualification and pricing flow
+Smart Intake Forms - Multi-section data collection with auto-save
+AI Document Generation - Claude-powered narrative generation
+IRS-Compliant Forms - Automated Form 6765 and 8974 creation
+Secure Delivery - S3 storage with time-limited access
+
+1.4 Technical Stack
+yamlFrontend:
+  - Framework: React 18 + TypeScript
+  - Styling: Tailwind CSS + Custom Design System
+  - State: Zustand + React Query
+  - Build: Vite
+  
+Backend:
+  - Runtime: Node.js + Express + TypeScript
+  - Database: PostgreSQL (Neon) + Drizzle ORM
+  - Auth: JWT + bcrypt
+  
+Integrations:
+  - Payments: Stripe
+  - Data: Airtable
+  - Workflow: Make.com
+  - AI: Claude API
+  - PDFs: Documint
+  - Storage: AWS S3
+  - Email: SendGrid
+2. System Architecture
+2.1 High-Level Data Flow
+mermaidgraph TB
+    subgraph User Journey
+        A[Landing Page] --> B[Calculator]
+        B --> C[Lead Capture]
+        C --> D[Stripe Checkout]
+        D --> E[Account Creation]
+        E --> F[Dashboard]
+        F --> G[Intake Forms]
+    end
+    
+    subgraph Backend Processing
+        G --> H[Airtable Sync]
+        H --> I[Make.com Trigger]
+        I --> J[Claude Generation]
+        J --> K[Documint PDFs]
+        K --> L[S3 Storage]
+        L --> M[SendGrid Email]
+    end
+    
+    M --> N[User Downloads]
+2.2 Component Architecture
+Frontend Components (/client/src/components/)
+/calculator
+  ├── CalculatorFlow.tsx      # 4-step wizard controller
+  ├── BusinessTypeStep.tsx    # Step 1: Business selection
+  ├── ActivitiesStep.tsx      # Step 2: AI activities
+  ├── ExpensesStep.tsx        # Step 3: Cost inputs
+  ├── ResultsStep.tsx         # Step 4: Credit estimate
+  └── LeadCaptureModal.tsx    # Email collection overlay
+
+/dashboard
+  ├── DashboardLayout.tsx     # Main dashboard wrapper
+  ├── ProgressCard.tsx        # Completion tracking
+  ├── DocumentsSection.tsx    # Download center
+  └── NextSteps.tsx           # Action items
+
+/forms
+  ├── IntakeFormFlow.tsx      # Multi-section controller
+  ├── CompanyInfoSection.tsx  # Business details
+  ├── RDActivitiesSection.tsx # Project descriptions
+  ├── ExpensesSection.tsx     # Detailed costs
+  └── AutoSaveIndicator.tsx   # Save status
+Backend Services (/server/src/services/)
+/auth
+  ├── jwt.service.ts          # Token generation/validation
+  └── password.service.ts     # Hashing/verification
+
+/calculation
+  ├── calculator.engine.ts    # Core R&D credit logic
+  └── pricing.service.ts      # Tier assignment
+
+/integrations
+  ├── stripe.service.ts       # Payment processing
+  ├── airtable.service.ts     # Data persistence
+  ├── make.service.ts         # Workflow triggers
+  ├── claude.service.ts       # AI narratives
+  ├── documint.service.ts     # PDF generation
+  ├── s3.service.ts           # File storage
+  └── sendgrid.service.ts     # Email delivery
+
+/processing
+  └── document.orchestrator.ts # Async coordination
+2.3 API Architecture
+All endpoints follow RESTful conventions with JWT authentication:
+Public Endpoints:
+POST   /api/calculator/estimate    # Anonymous calculation
+POST   /api/leads                  # Lead capture
+POST   /api/stripe/checkout        # Payment initiation
+
+Authenticated Endpoints:
+GET    /api/dashboard              # User dashboard data
+GET    /api/companies/:id          # Company details
+POST   /api/intake-forms           # Create form
+PUT    /api/intake-forms/:id       # Update sections
+POST   /api/intake-forms/:id/save  # Auto-save
+POST   /api/workflows/trigger      # Start generation
+GET    /api/documents              # List documents
+GET    /api/documents/:id/url      # Secure download
+3. File Structure & Organization
+3.1 Project Root Structure
+/smbtaxcredits-platform
+├── /client                   # React frontend
+│   ├── /src
+│   │   ├── /components      # UI components
+│   │   ├── /pages          # Route pages
+│   │   ├── /services       # API clients
+│   │   ├── /hooks          # Custom hooks
+│   │   ├── /utils          # Helpers
+│   │   ├── /types          # TypeScript
+│   │   └── /styles         # CSS/Tailwind
+│   ├── tailwind.config.js
+│   └── vite.config.ts
+│
+├── /server                   # Express backend
+│   ├── /src
+│   │   ├── /routes         # API routes
+│   │   ├── /controllers    # Handlers
+│   │   ├── /services       # Business logic
+│   │   ├── /middleware     # Auth, validation
+│   │   ├── /database       # Schemas
+│   │   └── /utils          # Helpers
+│   └── server.ts
+│
+├── /shared                   # Shared code
+│   ├── /types              # Common types
+│   ├── /config             # Configuration
+│   └── /validation         # Zod schemas
+│
+└── /docs                     # Documentation
+    ├── /api                # API docs
+    ├── /database           # Schema docs
+    └── /deployment         # Deploy guides
+3.2 Key Configuration Files
+javascript// /shared/config/pricing.ts
+export const pricingTiers = [
+  { tier: 0, min: 0, max: 5000, price: 399 },
+  { tier: 1, min: 5000, max: 10000, price: 500 },
+  { tier: 2, min: 10000, max: 20000, price: 750 },
+  { tier: 3, min: 20000, max: 35000, price: 1000 },
+  { tier: 4, min: 35000, max: 50000, price: 1250 },
+  { tier: 5, min: 50000, max: 100000, price: 1500 },
+  { tier: 6, min: 100000, max: 200000, price: 2000 },
+  { tier: 7, min: 200000, max: Infinity, price: 2500 }
+];
+
+// /shared/config/business.ts
+export const qualifyingActivities = {
+  'custom_gpt': 'Built custom GPTs or AI assistants',
+  'prompt_engineering': 'Refined prompts through testing',
+  'chatbot_customization': 'Tuned chatbot responses',
+  'automation_workflows': 'Created AI-powered automations',
+  'data_analysis': 'Developed AI analysis tools',
+  'content_systems': 'Built AI content workflows'
+};
+4. Business Logic & Rules
+4.1 R&D Qualification (Four-Part Test)
+All four criteria must be met:
+
+Technological in Nature - Uses computer science principles
+Elimination of Uncertainty - Technical uncertainty existed
+Process of Experimentation - Systematic testing/iteration
+Business Component - New/improved functionality
+
+4.2 Qualified Research Expenses (QREs)
+typescript// Calculation rules from calculator.engine.ts
+const calculateQREs = (input: CalculationInput) => {
+  // W-2 Wages - 100% if substantially engaged
+  const wages = input.technicalEmployees * 
+                input.averageSalary * 
+                (input.rdAllocation / 100);
+  
+  // Contractors - LIMITED to 65% per IRC Section 41
+  const contractors = input.contractorCosts * 0.65;
+  
+  // Supplies - includes cloud/AI subscriptions
+  const supplies = input.suppliesCosts + 
+                  input.cloudCosts + 
+                  input.softwareCosts;
+  
+  return { wages, contractors, supplies };
+};
+4.3 Credit Calculation (ASC Method)
+typescript// Alternative Simplified Credit - preferred for SMBs
+const calculateCredit = (qres: QREBreakdown, priorYears: number[]) => {
+  const currentYearQRE = qres.total;
+  
+  if (priorYears.length === 0) {
+    // First-time filers: 6% of all QREs
+    return currentYearQRE * 0.06;
+  }
+  
+  // Repeat filers: 14% of excess over base
+  const priorAverage = average(priorYears.slice(-3));
+  const baseAmount = priorAverage * 0.50;
+  const excess = Math.max(0, currentYearQRE - baseAmount);
+  
+  return excess * 0.14;
+};
+4.4 Pricing Assignment
+Federal credit amount determines flat-fee pricing tier:
+
+Transparent, predictable pricing
+No percentage-based fees
+Multi-year discount: $399 per additional year
+
+5. User Journey & Workflows
+5.1 Discovery to Purchase Flow
+mermaidsequenceDiagram
+    participant U as User
+    participant C as Calculator
+    participant S as Stripe
+    participant B as Backend
+    
+    U->>C: Complete 4-step calculator
+    C->>U: Show estimated credit
+    U->>C: Enter email (lead capture)
+    C->>B: Save lead to database
+    U->>S: Proceed to checkout
+    S->>B: Payment webhook
+    B->>U: Create account & send welcome
+5.2 Data Collection Flow
+
+Dashboard Access - Overview and next steps
+Company Information - Legal name, EIN, structure
+R&D Activities - Project descriptions with AI focus
+Technical Details - Challenges, iterations, outcomes
+Expense Documentation - Wages, contractors, supplies
+Review & Submit - Final validation and submission
+
+5.3 Document Generation Pipeline
+mermaidsequenceDiagram
+    participant I as Intake Form
+    participant A as Airtable
+    participant M as Make.com
+    participant C as Claude
+    participant D as Documint
+    participant S3 as AWS S3
+    participant E as SendGrid
+    
+    I->>A: Save completed data
+    A->>M: Trigger webhook
+    M->>C: Generate narratives
+    C->>M: Return text
+    M->>D: Create PDFs
+    D->>S3: Upload files
+    S3->>A: Store URLs
+    A->>E: Send notification
+    E->>User: Delivery email
+6. Component Documentation
+6.1 Calculator Component
+Purpose: Guide users through qualification and pricing
+Location: /client/src/components/calculator/
+Key features:
+
+Progressive disclosure (4 steps)
+Real-time calculation updates
+AI activity examples throughout
+Mobile-responsive design
+Lead capture at optimal moment
+
+Implementation notes:
+typescript// Example from CalculatorFlow.tsx
+const [calculationData, setCalculationData] = useState<CalculatorData>({
+  businessType: '',
+  qualifyingActivities: [],
+  technicalEmployees: 0,
+  averageSalary: 75000,
+  rdAllocation: 40, // Default 40% time on R&D
+  contractorCosts: 0,
+  suppliesCosts: 0
+});
+
+// Real-time updates with debouncing
+const debouncedCalculate = useMemo(
+  () => debounce(() => {
+    const result = RDTaxCalculator.calculate(calculationData);
+    setResults(result);
+  }, 500),
+  [calculationData]
+);
+6.2 Intake Form System
+Purpose: Collect comprehensive R&D project data
+Location: /client/src/components/forms/
+Key features:
+
+Multi-section navigation
+Auto-save every 30 seconds
+Progress persistence
+Contextual help text
+AI-specific templates
+
+Auto-save implementation:
+typescript// From IntakeFormFlow.tsx
+useEffect(() => {
+  const saveTimer = setInterval(async () => {
+    if (hasUnsavedChanges) {
+      await saveFormSection(currentSection, formData);
+      setHasUnsavedChanges(false);
+    }
+  }, 30000); // 30 seconds
+  
+  return () => clearInterval(saveTimer);
+}, [hasUnsavedChanges, currentSection, formData]);
+6.3 Document Orchestrator
+Purpose: Coordinate async document generation
+Location: /server/src/services/processing/document.orchestrator.ts
+Workflow coordination:
+typescriptasync generateDocumentPackage(intakeFormId: string) {
+  try {
+    // 1. Fetch intake data
+    const intakeData = await this.getIntakeData(intakeFormId);
+    
+    // 2. Save to Airtable
+    const airtableRecord = await airtableService.createRecord({
+      table: 'Customers',
+      fields: this.mapToAirtableFields(intakeData)
+    });
+    
+    // 3. Trigger Make.com workflow
+    const workflowId = await makeService.triggerWorkflow({
+      scenario: 'rd-document-generation',
+      data: { recordId: airtableRecord.id }
+    });
+    
+    // 4. Poll for completion
+    const documents = await this.pollForCompletion(workflowId);
+    
+    // 5. Send notification
+    await sendgridService.sendDocumentsReady({
+      to: intakeData.user.email,
+      documents: documents
+    });
+    
+    return { success: true, documents };
+  } catch (error) {
+    await this.handleGenerationError(error, intakeFormId);
+    throw error;
+  }
+}
+7. API Reference
+7.1 Public Endpoints
+POST /api/calculator/estimate
+Calculate potential R&D credit without authentication.
+Request:
+json{
+  "businessType": "agency",
+  "qualifyingActivities": ["custom_gpt", "prompt_engineering"],
+  "expenses": {
+    "technicalEmployees": 5,
+    "averageSalary": 80000,
+    "rdAllocation": 30,
+    "contractorCosts": 25000,
+    "suppliesCosts": 5000
+  }
+}
+Response:
+json{
+  "estimatedCredit": 15750,
+  "pricingTier": {
+    "tier": 2,
+    "price": 750,
+    "description": "Credits $10,000-$19,999"
+  },
+  "qreBreakdown": {
+    "wages": 120000,
+    "contractors": 16250,
+    "supplies": 5000,
+    "total": 141250
+  }
+}
+7.2 Authenticated Endpoints
+GET /api/dashboard
+Fetch complete dashboard data for logged-in user.
+Headers:
+Authorization: Bearer <jwt_token>
+Response:
+json{
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "createdAt": "2024-01-15T10:00:00Z"
+  },
+  "companies": [{
+    "id": "uuid",
+    "name": "Example Agency LLC",
+    "ein": "12-3456789"
+  }],
+  "intakeForms": [{
+    "id": "uuid",
+    "status": "in_progress",
+    "completionPercentage": 65,
+    "currentSection": "rd-activities"
+  }],
+  "documents": [{
+    "id": "uuid",
+    "type": "form_6765",
+    "status": "completed",
+    "downloadUrl": null
+  }]
+}
+POST /api/intake-forms/:id/save
+Auto-save form section data.
+Request:
+json{
+  "section": "company-info",
+  "data": {
+    "legalName": "Example Agency LLC",
+    "ein": "12-3456789",
+    "entityType": "llc",
+    "address": {
+      "street": "123 Main St",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701"
+    }
+  }
+}
+8. Database Schema
+8.1 Core Tables
+sql-- Users table
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  stripe_customer_id VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Companies table
+CREATE TABLE companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  legal_name VARCHAR(255) NOT NULL,
+  ein VARCHAR(20),
+  entity_type VARCHAR(50),
+  naics_code VARCHAR(10),
+  year_founded INTEGER,
+  address JSONB,
+  airtable_record_id VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Calculations table
+CREATE TABLE calculations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID REFERENCES companies(id),
+  lead_id UUID REFERENCES leads(id),
+  business_type VARCHAR(50),
+  qualifying_activities TEXT[],
+  expenses JSONB,
+  qre_breakdown JSONB,
+  federal_credit DECIMAL(12,2),
+  pricing_tier INTEGER,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Intake forms table
+CREATE TABLE intake_forms (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID REFERENCES companies(id),
+  user_id UUID REFERENCES users(id),
+  tax_year INTEGER NOT NULL,
+  status VARCHAR(50) DEFAULT 'not_started',
+  current_section VARCHAR(50),
+  sections_data JSONB,
+  completed_at TIMESTAMP,
+  airtable_sync_status VARCHAR(50),
+  make_webhook_status VARCHAR(50),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Documents table
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  intake_form_id UUID REFERENCES intake_forms(id),
+  document_type VARCHAR(50),
+  file_name VARCHAR(255),
+  s3_bucket VARCHAR(255),
+  s3_key TEXT,
+  file_size_bytes BIGINT,
+  sha256_hash VARCHAR(64),
+  status VARCHAR(50) DEFAULT 'pending',
+  download_count INTEGER DEFAULT 0,
+  expires_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+8.2 Indexes and Constraints
+sql-- Performance indexes
+CREATE INDEX idx_companies_user_id ON companies(user_id);
+CREATE INDEX idx_calculations_company_id ON calculations(company_id);
+CREATE INDEX idx_intake_forms_user_id ON intake_forms(user_id);
+CREATE INDEX idx_documents_intake_form_id ON documents(intake_form_id);
+CREATE INDEX idx_documents_status ON documents(status);
+
+-- Ensure data integrity
+ALTER TABLE intake_forms 
+  ADD CONSTRAINT check_valid_status 
+  CHECK (status IN ('not_started', 'in_progress', 'submitted', 'processing', 'completed'));
+
+ALTER TABLE documents
+  ADD CONSTRAINT check_valid_document_type
+  CHECK (document_type IN ('form_6765', 'form_8974', 'technical_narrative', 'compliance_memo'));
+9. External Integrations
+9.1 Stripe Integration
+Purpose: Payment processing and subscription management
+Service: /server/src/services/integrations/stripe.service.ts
+Key flows:
+
+Checkout Session Creation
+typescriptconst session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  line_items: [{
+    price_data: {
+      currency: 'usd',
+      product_data: {
+        name: 'R&D Tax Credit Documentation',
+        description: `Federal credit estimate: $${creditAmount}`
+      },
+      unit_amount: tierPrice * 100 // cents
+    },
+    quantity: 1
+  }],
+  mode: 'payment',
+  success_url: `${BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `${BASE_URL}/calculator`,
+  metadata: {
+    userId: user.id,
+    creditAmount: creditAmount.toString(),
+    tier: pricingTier.toString()
+  }
+});
+
+Webhook Processing
+
+checkout.session.completed → Create user account
+payment_intent.succeeded → Update payment status
+payment_intent.failed → Handle failures
+
+
+
+9.2 Airtable Integration
+Purpose: Structured data storage and Make.com triggering
+Service: /server/src/services/integrations/airtable.service.ts
+Schema mapping:
+typescriptconst mapToAirtable = (intakeData: IntakeFormData) => ({
+  fields: {
+    'Company Name': intakeData.companyInfo.legalName,
+    'EIN': intakeData.companyInfo.ein,
+    'Tax Year': intakeData.taxYear,
+    'Business Type': intakeData.businessType,
+    'Total QREs': intakeData.expenses.total,
+    'Federal Credit': intakeData.calculatedCredit,
+    'Status': 'Ready for Generation',
+    'User Email': intakeData.user.email,
+    'Projects': JSON.stringify(intakeData.rdActivities),
+    'Expenses Breakdown': JSON.stringify(intakeData.expenses)
+  }
+});
+9.3 Make.com Workflows
+Purpose: Orchestrate document generation pipeline
+Webhook: https://hook.us1.make.com/[webhook_id]
+Workflow steps:
+
+Receive Airtable record ID
+Fetch complete record data
+Call Claude API for narratives
+Send to Documint for PDFs
+Upload to S3
+Update Airtable with URLs
+Trigger SendGrid email
+
+9.4 Claude API Integration
+Purpose: Generate tax narratives and compliance memos
+Service: /server/src/services/integrations/claude.service.ts
+Prompt structure:
+typescriptconst generateNarrative = async (projectData: ProjectData) => {
+  const prompt = `
+    Generate a technical narrative for IRS Form 6765 based on:
+    
+    Company: ${projectData.companyName}
+    Project: ${projectData.projectName}
+    
+    Technical Challenges:
+    ${projectData.challenges.join('\n')}
+    
+    Experimentation Process:
+    ${projectData.experiments.join('\n')}
+    
+    Business Component:
+    ${projectData.businessPurpose}
+    
+    Create a 3-5 page narrative that:
+    1. Explains the technological nature
+    2. Details the uncertainties faced
+    3. Describes the experimentation process
+    4. Links to business objectives
+    
+    Use formal but accessible language suitable for IRS review.
+  `;
+  
+  return await claude.complete(prompt);
+};
+9.5 S3 Storage Integration
+Purpose: Secure document storage with controlled access
+Service: /server/src/services/integrations/s3.service.ts
+Key features:
+
+Organized folder structure: /customers/{userId}/{year}/{docType}/
+Time-limited presigned URLs (5 minutes default)
+Automatic expiration after 90 days
+SHA256 hash verification
+
+10. Security & Authentication
+10.1 JWT Authentication
+Implementation: /server/src/middleware/auth.ts
+Token structure:
+typescriptinterface JWTPayload {
+  userId: string;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
+// Token generation
+const generateToken = (user: User): string => {
+  return jwt.sign(
+    { userId: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+};
+10.2 Password Security
+
+bcrypt with 10 rounds
+Minimum 8 characters
+No password storage in logs
+Reset tokens expire in 1 hour
+
+10.3 API Security
+
+Rate limiting: 100 requests/hour per IP
+Input validation with Zod schemas
+SQL injection prevention via parameterized queries
+XSS protection with content sanitization
+
+10.4 Document Security
+
+S3 bucket private by default
+Presigned URLs for controlled access
+Access logging for audit trail
+Encryption at rest
+
+11. Deployment & Configuration
+11.1 Environment Variables
+bash# Database
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+
+# Authentication
+JWT_SECRET=your-secret-key
+BCRYPT_ROUNDS=10
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Airtable
+AIRTABLE_API_KEY=keyXXXXXX
+AIRTABLE_BASE_ID=appXXXXXX
+
+# Make.com
+MAKE_WEBHOOK_URL=https://hook.us1.make.com/xxx
+
+# Claude
+CLAUDE_API_KEY=sk-ant-xxx
+
+# AWS
+AWS_ACCESS_KEY_ID=AKIAXXXXX
+AWS_SECRET_ACCESS_KEY=xxx
+AWS_S3_BUCKET=smbtax-docs-prod
+AWS_REGION=us-east-1
+
+# SendGrid
+SENDGRID_API_KEY=SG.xxx
+
+# Application
+NODE_ENV=production
+PORT=3000
+CLIENT_URL=https://smbtaxcredits.com
+11.2 Deployment Process
+
+Build Phase
+bash# Install dependencies
+npm install
+
+# Build frontend
+cd client && npm run build
+
+# Build backend
+cd ../server && npm run build
+
+Database Migration
+bashnpm run db:migrate
+
+Start Services
+bash# Production mode
+npm run start:prod
+
+
+11.3 Health Checks
+
+/health - Basic service health
+/health/db - Database connectivity
+/health/integrations - External service status
+
+12. Testing & Quality Assurance
+12.1 Testing Strategy
+Unit Tests:
+- Calculator engine logic
+- QRE calculation formulas
+- Pricing tier assignment
+- Input validation
+
+Integration Tests:
+- API endpoint responses
+- Database operations
+- External service mocks
+
+E2E Tests:
+- Complete user journey
+- Payment flow
+- Document generation
+12.2 Key Test Cases
+typescript// Calculator tests
+describe('RDTaxCalculator', () => {
+  it('calculates first-time filer credit at 6%', () => {
+    const input = {
+      isFirstTimeFiler: true,
+      expenses: { total: 100000 }
+    };
+    const result = RDTaxCalculator.calculate(input);
+    expect(result.federalCredit).toBe(6000);
+  });
+  
+  it('applies 65% contractor limitation', () => {
+    const input = {
+      contractorCosts: 100000
+    };
+    const result = RDTaxCalculator.calculate(input);
+    expect(result.qreBreakdown.contractors).toBe(65000);
+  });
+});
+12.3 Quality Checklist
+Before deployment:
+
+ All calculations match IRS formulas
+ Disclaimers present on all pages
+ Section 174 warnings displayed
+ Mobile responsive on all devices
+ Accessibility AA compliant
+ Error states handled gracefully
+ Loading states implemented
+ Auto-save functioning
+ Document generation tested
+ Email delivery verified
+
+Appendices
+A. Glossary
+
+QRE: Qualified Research Expenses
+ASC: Alternative Simplified Credit
+Four-part test: IRS criteria for R&D qualification
+Section 174: Tax code requiring R&D capitalization
+Make.com: Workflow automation platform (formerly Integromat)
+
+B. AI Experimentation Examples
+Common qualifying activities:
+
+Custom GPT Development: Building specialized AI assistants
+Prompt Engineering: Iterative prompt refinement and testing
+Chatbot Tuning: Improving response accuracy and relevance
+Automation Workflows: Creating AI-powered business processes
+Data Analysis Tools: Developing AI-driven insights
+Content Systems: Building AI content generation workflows
+
+C. Troubleshooting Guide
+Common issues and solutions:
+
+Calculator not updating: Check debounce timing
+Auto-save failing: Verify JWT token validity
+Documents not generating: Check Make.com webhook logs
+S3 upload errors: Verify IAM permissions
+Email not sending: Check SendGrid API key
+
+D. Future Enhancements
+Planned features:
+
+Multi-year credit support
+State credit calculations
+Advanced analytics dashboard
+API for partner integrations
+Mobile applications
+Audit defense tools
+
+
+Document Version: 1.0.0
+Last Updated: January 2024
+Maintained By: SMBTaxCredits.com Development Team
+This documentation represents the complete system as implemented. For updates or corrections, please submit a pull request to the documentation repository.

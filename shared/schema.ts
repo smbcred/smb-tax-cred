@@ -13,7 +13,7 @@ export const airtableSyncStatusEnum = pgEnum("airtable_sync_status", ["pending",
 export const supportCategoryEnum = pgEnum("support_category", ["technical", "billing", "general", "calculator", "documentation", "account"]);
 export const supportPriorityEnum = pgEnum("support_priority", ["low", "medium", "high", "urgent"]);
 export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "waiting_customer", "escalated", "resolved", "closed"]);
-export const auditActionEnum = pgEnum("audit_action", ["create", "update", "delete", "view", "approve", "reject", "export"]);
+export const auditActionEnum = pgEnum("audit_action", ["create", "update", "delete", "view", "approve", "reject", "export", "resend_email", "regenerate_doc", "refund"]);
 
 // Users table with enhanced fields
 export const users = pgTable("users", {
@@ -187,6 +187,12 @@ export const payments = pgTable("payments", {
   stripePaymentIntentId: varchar("stripe_payment_intent_id"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).default("pending"),
+  
+  // Refund fields
+  refundAmount: decimal("refund_amount", { precision: 10, scale: 2 }),
+  refundedAt: timestamp("refunded_at"),
+  stripeRefundId: varchar("stripe_refund_id", { length: 255 }),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -281,6 +287,8 @@ export const documents = pgTable("documents", {
   fileName: varchar("file_name"),
   status: varchar("status", { length: 50 }).default("pending"),
   expirationDate: timestamp("expiration_date"),
+  regeneratedAt: timestamp("regenerated_at"), // For admin regeneration tracking
+  userEmail: varchar("user_email", { length: 255 }), // For email resend
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
