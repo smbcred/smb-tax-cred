@@ -64,4 +64,4 @@ _Source: rd-saas-complete-guide.v2.md_
 | 5.2.1 | User Documentation | [x] | [📋](./acceptance/5.2.1.md) |
 | 5.2.2 | Support System Setup | [x] | [📋](./acceptance/5.2.2.md) |
 | 5.3.1 | Production Deployment | [x] | [📋](./acceptance/5.3.1.md) |
-| 5.3.2 | Marketing Launch | [ ] | [📋](./acceptance/5.3.2.md) |
+| 5.3.2 | Marketing Launch | [x] | [📋](./acceptance/5.3.2.md) |

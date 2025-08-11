@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://smbtaxcredits.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /checkout/
+Disallow: /payment/
+
+# Allow important marketing pages
+Allow: /calculator
+Allow: /pricing
+Allow: /how-it-works
+Allow: /faq
+Allow: /blog/
+Allow: /industries/
+Allow: /sample-documents
+
+# Crawl delay for politeness
+Crawl-delay: 1
+
+# Block specific bots if needed
+# User-agent: BadBot
+# Disallow: /
