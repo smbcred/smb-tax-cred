@@ -27,6 +27,27 @@ import {
   QueryPerformanceMonitor,
   ConnectionPoolOptimizer 
 } from "./services/queryOptimizer";
+
+// Import security middleware
+import { 
+  applySecurity, 
+  securityHeaders, 
+  bruteForceProtection,
+  passwordSecurity,
+  logSecurityEvent 
+} from "./middleware/security";
+import { 
+  csrfTokenProvider, 
+  csrfProtection, 
+  csrfTokenEndpoint,
+  csrfApiProtection 
+} from "./middleware/csrf";
+import { 
+  validateBody, 
+  validateQuery, 
+  userRegistrationValidation,
+  userLoginValidation 
+} from "./middleware/validation";
 import checkoutRoutes from "./routes/checkout.js";
 import {
   insertUserSchema,
@@ -145,26 +166,41 @@ const calculateRDTaxCredit = (expenses: CalculatorExpenses) => {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Apply security middleware
+  app.use(applySecurity());
+  
+  // CSRF protection for API endpoints  
+  app.use("/api", csrfTokenProvider());
+  
   // Register checkout routes
   app.use("/api/checkout", checkoutRoutes);
   
-  // Auth routes with rate limiting
-  app.post("/api/auth/register", authRateLimit, async (req, res) => {
+  // CSRF token endpoints
+  app.get("/api/csrf-token", csrfTokenEndpoint());
+  app.post("/api/csrf-token/refresh", csrfProtection({ skipPaths: [] }), (req, res, next) => {
+    const refresh = require("./middleware/csrf").csrfTokenRefresh();
+    refresh(req, res, next);
+  });
+
+  // Auth routes with rate limiting and brute force protection
+  app.post("/api/auth/register", authRateLimit, bruteForceProtection(), userRegistrationValidation, async (req, res) => {
     try {
       const { email, password } = req.body;
       
-      // Basic validation
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
-      }
-      
-      if (password.length < 8) {
-        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      // Password security validation
+      const passwordValidation = passwordSecurity(password);
+      if (!passwordValidation.isValid) {
+        logSecurityEvent('weak_password_attempt', req, { email });
+        return res.status(400).json({ 
+          message: "Password does not meet security requirements",
+          errors: passwordValidation.errors
+        });
       }
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
+        logSecurityEvent('duplicate_registration_attempt', req, { email });
         return res.status(400).json({ message: "User already exists" });
       }
       
@@ -186,30 +222,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", authRateLimit, async (req, res) => {
+  app.post("/api/auth/login", authRateLimit, bruteForceProtection(), userLoginValidation, async (req, res) => {
     try {
       const { email, password } = req.body;
       
       // Find user
       const user = await storage.getUserByEmail(email);
       if (!user) {
+        logSecurityEvent('login_attempt_invalid_user', req, { email });
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
       // Verify password
       const validPassword = await bcrypt.compare(password, user.passwordHash);
       if (!validPassword) {
+        logSecurityEvent('login_attempt_invalid_password', req, { email });
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
       // Generate JWT token
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
       
+      // Mark login success to skip brute force rate limiting
+      res.locals.loginSuccess = true;
+      
+      logSecurityEvent('successful_login', req, { userId: user.id, email });
+      
       res.json({
         user: { id: user.id, email: user.email },
         token,
       });
     } catch (error: any) {
+      logSecurityEvent('login_error', req, { error: error.message });
       res.status(500).json({ message: "Login failed" });
     }
   });
