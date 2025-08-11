@@ -81,6 +81,7 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
     "framer-motion": "^11.18.2",
+    "glob": "^11.0.3",
     "happy-dom": "^18.0.1",
     "helmet": "^8.1.0",
     "input-otp": "^1.4.2",
