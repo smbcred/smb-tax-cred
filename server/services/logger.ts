@@ -330,7 +330,7 @@ export class LoggingService {
   }
 
   // Helper method to determine error severity
-  determineSeverity(error: Error | unknown, context: Partial<ErrorContext> = {}): ErrorSeverity {
+  determineSeverity(error: Error | unknown): ErrorSeverity {
     if (error instanceof Error) {
       const message = error.message.toLowerCase();
 

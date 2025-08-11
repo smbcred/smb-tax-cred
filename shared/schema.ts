@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, decimal, integer, timestamp, jsonb, boolean, uuid, pgEnum, inet, date, bigint, char, index } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { pgTable, text, varchar, decimal, integer, timestamp, jsonb, boolean, pgEnum, inet, date, bigint, char, index } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Enum types for better data integrity
