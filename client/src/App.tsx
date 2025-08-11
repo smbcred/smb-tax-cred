@@ -161,6 +161,7 @@ function Router() {
         )}
         <Route path="/demo/loading-states" component={LoadingStatesDemo} />
         <Route path="/demo/mobile" component={MobileDemo} />
+        <Route path="/demo/analytics" component={lazy(() => import("@/pages/AnalyticsDemo"))} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
