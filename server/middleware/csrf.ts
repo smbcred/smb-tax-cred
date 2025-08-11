@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { randomBytes, createHash } from 'crypto';
-import { timingSafeEqual } from './security';
+import { timingSafeEqual } from 'crypto';
 
 // CSRF token store (in production, use Redis or database)
 class CSRFTokenStore {

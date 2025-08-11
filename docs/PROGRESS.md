@@ -2,6 +2,16 @@
 
 ## Latest Changes
 
+**Task 6.1.6: Security Hardening (2025-08-11)**
+✓ Enhanced rate limiting: 50 requests/15min (admin), 10 actions/hour (actions)
+✓ Comprehensive Helmet security headers (CSP, HSTS, frame-options)
+✓ Secret masking system for logs and responses (passwords, API keys, JWTs)
+✓ Optional IP allowlist middleware with development localhost bypass
+✓ Response security middleware prevents accidental secret exposure
+✓ Enhanced error logging with secret masking on all admin endpoints
+✓ Security test suite with rate limiting, headers, and secret masking verification
+✓ [Files: server/middleware/security.ts, server/routes/admin.ts, tests/security-hardening.test.ts]
+
 **Task 6.1.5: Admin Actions with Audit Trail (2025-08-11)**
 ✓ Implemented three safe admin action endpoints with proper authentication
 ✓ POST /api/admin/documents/:id/resend-email (SendGrid stub)

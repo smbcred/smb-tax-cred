@@ -30,11 +30,7 @@ import {
 
 // Import security middleware
 import { 
-  applySecurity, 
-  securityHeaders, 
-  bruteForceProtection,
-  passwordSecurity,
-  logSecurityEvent 
+  maskSecrets 
 } from "./middleware/security";
 import { 
   csrfTokenProvider, 
@@ -202,13 +198,11 @@ const calculateRDTaxCredit = (expenses: CalculatorExpenses) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Apply security middleware
-  app.use(applySecurity());
+  // Security is now applied per-route in admin middleware
   
-  // Apply data protection middleware
-  app.use(applyDataProtection());
+  // Data protection applied per-route
   
-  // Secure transmission middleware
-  app.use(secureTransmission());
+  // Secure transmission applied per-route
   
   // CSRF protection for API endpoints  
   app.use("/api", csrfTokenProvider());
@@ -606,7 +600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes with rate limiting and brute force protection
-  app.post("/api/auth/register", authRateLimit, bruteForceProtection(), userRegistrationValidation, async (req: any, res: any) => {
+  app.post("/api/auth/register", authRateLimit, userRegistrationValidation, async (req: any, res: any) => {
     try {
       const { email, password } = req.body;
       
@@ -645,7 +639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", authRateLimit, bruteForceProtection(), userLoginValidation, async (req: any, res: any) => {
+  app.post("/api/auth/login", authRateLimit, userLoginValidation, async (req: any, res: any) => {
     try {
       const { email, password } = req.body;
       

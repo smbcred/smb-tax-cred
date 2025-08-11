@@ -8,21 +8,38 @@ import { db } from '../db';
 import { users, companies, auditLogs, webhookLogs, documents, intakeForms, leads, payments, calculations } from '../../shared/schema';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import rateLimit from 'express-rate-limit';
+import { adminHelmetConfig, ipAllowlistMiddleware, responseSecurityMiddleware, maskSecrets } from '../middleware/security';
 
-// Rate limiting for admin read endpoints (100 requests per 15 minutes)
-const adminReadRateLimit = rateLimit({
+// Strict rate limiting for admin endpoints (50 requests per 15 minutes)
+const adminRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 50, // Reduced from 100 for better security
   message: "Too many admin requests from this IP, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health checks in development
+    return process.env.NODE_ENV === 'development' && req.path === '/ping';
+  }
+});
+
+// More restrictive rate limiting for admin actions (10 actions per hour)
+const adminActionRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  message: "Too many admin actions from this IP, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const router = Router();
 
-// Apply admin authentication and rate limiting to all routes
+// Apply security middleware to all admin routes
+router.use(adminHelmetConfig);
+router.use(ipAllowlistMiddleware);
+router.use(responseSecurityMiddleware);
 router.use(requireAdmin);
-router.use(adminReadRateLimit);
+router.use(adminRateLimit);
 
 /**
  * Health check for admin routes
@@ -442,7 +459,7 @@ router.get('/webhook-logs', async (req, res) => {
 /**
  * Admin Action: Resend document email
  */
-router.post('/documents/:id/resend-email', async (req, res) => {
+router.post('/documents/:id/resend-email', adminActionRateLimit, async (req, res) => {
   try {
     const documentId = req.params.id;
     const adminUserId = req.user?.id;
@@ -510,7 +527,7 @@ router.post('/documents/:id/resend-email', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Resend email error:', error);
+    console.error('Resend email error:', maskSecrets(error));
     res.status(500).json({ error: 'Failed to resend email' });
   }
 });
@@ -518,7 +535,7 @@ router.post('/documents/:id/resend-email', async (req, res) => {
 /**
  * Admin Action: Regenerate document
  */
-router.post('/documents/:id/regenerate', async (req, res) => {
+router.post('/documents/:id/regenerate', adminActionRateLimit, async (req, res) => {
   try {
     const documentId = req.params.id;
     const adminUserId = req.user?.id;
@@ -599,7 +616,7 @@ router.post('/documents/:id/regenerate', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Regenerate document error:', error);
+    console.error('Regenerate document error:', maskSecrets(error));
     res.status(500).json({ error: 'Failed to regenerate document' });
   }
 });
@@ -607,7 +624,7 @@ router.post('/documents/:id/regenerate', async (req, res) => {
 /**
  * Admin Action: Process Stripe refund
  */
-router.post('/payments/:id/refund', async (req, res) => {
+router.post('/payments/:id/refund', adminActionRateLimit, async (req, res) => {
   try {
     const paymentId = req.params.id;
     const adminUserId = req.user?.id;
@@ -696,7 +713,7 @@ router.post('/payments/:id/refund', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Refund payment error:', error);
+    console.error('Refund payment error:', maskSecrets(error));
     res.status(500).json({ error: 'Failed to process refund' });
   }
 });
