@@ -31,6 +31,7 @@ const Healthcare = lazy(() => import("@/pages/industries/healthcare"));
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const IntakeFormPage = lazy(() => import("@/pages/IntakeFormPage"));
+const LoadingStatesDemo = lazy(() => import("@/pages/LoadingStatesDemo"));
 
 // Performance-optimized loading skeleton
 function LoadingSkeleton() {
@@ -147,6 +148,7 @@ function Router() {
             <Route path="/industries/healthcare" component={Healthcare} />
           </>
         )}
+        <Route path="/demo/loading-states" component={LoadingStatesDemo} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
