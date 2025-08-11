@@ -85,4 +85,4 @@ _Source: rd-saas-complete-guide.v2.md_
 | 6.1.4 | Admin UI: /admin with tables, filters, detail drawer | [x] | [📋](./acceptance/6.1.4.md) |
 | 6.1.5 | Actions (safe): resend email, regenerate doc, refund (Stripe), + audit trail | [x] | [📋](./acceptance/6.1.5.md) |
 | 6.1.6 | Security hardening: rate-limit, no public URLs, short-lived presigns | [x] | [📋](./acceptance/6.1.6.md) |
-| 6.1.7 | Tests & QA: RBAC, audit logs, action stubs | [ ] | [📋](./acceptance/6.1.7.md) |
+| 6.1.7 | Tests & QA: RBAC, audit logs, action stubs | [x] | [📋](./acceptance/6.1.7.md) |
