@@ -3692,6 +3692,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // Get user's documents endpoint
+  app.get("/api/documents", authenticateToken, async (req: any, res) => {
+    try {
+      const userDocuments = await db.select({
+        id: documents.id,
+        documentName: documents.documentName,
+        documentType: documents.documentType,
+        taxYear: documents.taxYear,
+        fileSizeBytes: documents.fileSizeBytes,
+        createdAt: documents.createdAt,
+        lastAccessedAt: documents.lastAccessedAt,
+        downloadCount: documents.downloadCount,
+      })
+      .from(documents)
+      .where(eq(documents.userId, req.user.id))
+      .orderBy(sql`${documents.createdAt} DESC`);
+
+      AccessLogger.logDataAccess(
+        req,
+        'list',
+        'user-documents',
+        [PIICategory.BUSINESS_DATA],
+        true,
+        `Retrieved ${userDocuments.length} documents`
+      );
+
+      res.json(userDocuments);
+
+    } catch (error: any) {
+      console.error('Failed to fetch user documents:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to fetch documents',
+      });
+    }
+  });
+
   // Document generation with S3 storage endpoints
   app.post("/api/docs/generate", authenticateToken, async (req: any, res) => {
     try {

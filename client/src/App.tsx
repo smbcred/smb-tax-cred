@@ -31,6 +31,7 @@ const Healthcare = lazy(() => import("@/pages/industries/healthcare"));
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const IntakeFormPage = lazy(() => import("@/pages/IntakeFormPage"));
+const DocumentsPage = lazy(() => import("@/pages/DocumentsPage"));
 const LoadingStatesDemo = lazy(() => import("@/pages/LoadingStatesDemo"));
 const MobileDemo = lazy(() => import("@/pages/MobileDemo"));
 const Help = lazy(() => import("@/pages/Help"));
@@ -147,6 +148,11 @@ function Router() {
             <Route path="/intake-form">
               <ProtectedRoute>
                 <IntakeFormPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/documents">
+              <ProtectedRoute>
+                <DocumentsPage />
               </ProtectedRoute>
             </Route>
             <Route path="/how-it-works" component={HowItWorks} />
