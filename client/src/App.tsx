@@ -34,6 +34,7 @@ const IntakeFormPage = lazy(() => import("@/pages/IntakeFormPage"));
 const LoadingStatesDemo = lazy(() => import("@/pages/LoadingStatesDemo"));
 const MobileDemo = lazy(() => import("@/pages/MobileDemo"));
 const Help = lazy(() => import("@/pages/Help"));
+const Support = lazy(() => import("@/pages/Support"));
 
 // Performance-optimized loading skeleton
 function LoadingSkeleton() {
@@ -119,6 +120,7 @@ function Router() {
             <Route path="/industries/services" component={ProfessionalServices} />
             <Route path="/industries/healthcare" component={Healthcare} />
             <Route path="/intake-form" component={IntakeFormPage} />
+            <Route path="/support" component={Support} />
           </>
         ) : (
           <>
@@ -158,6 +160,7 @@ function Router() {
             <Route path="/industries/ecommerce" component={Ecommerce} />
             <Route path="/industries/services" component={ProfessionalServices} />
             <Route path="/industries/healthcare" component={Healthcare} />
+            <Route path="/support" component={Support} />
           </>
         )}
         <Route path="/demo/loading-states" component={LoadingStatesDemo} />

@@ -53,6 +53,7 @@ const ResponsiveNav: React.FC<ResponsiveNavProps> = ({ onStartEstimate }) => {
     { href: "/how-it-works", label: "How It Works", external: false },
     { href: "/pricing", label: "Pricing", external: false },
     { href: "/faq", label: "FAQ", external: false },
+    { href: "/support", label: "Support", external: false },
   ];
 
   const resourceLinks = [

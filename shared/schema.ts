@@ -10,6 +10,9 @@ export const intakeStatusEnum = pgEnum("intake_status", ["not_started", "in_prog
 export const documentTypeEnum = pgEnum("document_type", ["form_6765", "form_8974", "technical_narrative", "compliance_memo", "expense_workbook", "state_form"]);
 export const subscriptionStatusEnum = pgEnum("subscription_status", ["pending", "completed", "failed", "refunded"]);
 export const airtableSyncStatusEnum = pgEnum("airtable_sync_status", ["pending", "synced", "failed", "retry"]);
+export const supportCategoryEnum = pgEnum("support_category", ["technical", "billing", "general", "calculator", "documentation", "account"]);
+export const supportPriorityEnum = pgEnum("support_priority", ["low", "medium", "high", "urgent"]);
+export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "waiting_customer", "escalated", "resolved", "closed"]);
 
 // Users table with enhanced fields
 export const users = pgTable("users", {
@@ -420,6 +423,94 @@ export const testingSessions = pgTable("testing_sessions", {
   personaIdx: index("idx_testing_sessions_persona").on(table.persona),
 }));
 
+// Support tickets table
+export const supportTickets = pgTable("support_tickets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  email: varchar("email", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  message: text("message").notNull(),
+  category: supportCategoryEnum("category").notNull(),
+  priority: supportPriorityEnum("priority").notNull().default("medium"),
+  status: ticketStatusEnum("status").notNull().default("open"),
+  assignedTo: varchar("assigned_to", { length: 255 }),
+  escalatedAt: timestamp("escalated_at"),
+  resolvedAt: timestamp("resolved_at"),
+  responseTime: integer("response_time"), // minutes
+  satisfactionRating: integer("satisfaction_rating"), // 1-5
+  metadata: jsonb("metadata").$type<{
+    userAgent?: string;
+    ipAddress?: string;
+    pageUrl?: string;
+    sessionId?: string;
+    calculationData?: any;
+    browserInfo?: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userIdIdx: index("idx_support_tickets_user_id").on(table.userId),
+  emailIdx: index("idx_support_tickets_email").on(table.email),
+  categoryIdx: index("idx_support_tickets_category").on(table.category),
+  priorityIdx: index("idx_support_tickets_priority").on(table.priority),
+  statusIdx: index("idx_support_tickets_status").on(table.status),
+  assignedToIdx: index("idx_support_tickets_assigned_to").on(table.assignedTo),
+}));
+
+// Support ticket updates/responses table
+export const supportTicketUpdates = pgTable("support_ticket_updates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketId: varchar("ticket_id").references(() => supportTickets.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id").references(() => users.id), // null if from customer
+  message: text("message").notNull(),
+  isInternal: boolean("is_internal").default(false), // internal note vs customer-visible
+  attachments: jsonb("attachments").default(sql`'[]'::jsonb`),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  ticketIdIdx: index("idx_support_ticket_updates_ticket_id").on(table.ticketId),
+  userIdIdx: index("idx_support_ticket_updates_user_id").on(table.userId),
+  isInternalIdx: index("idx_support_ticket_updates_is_internal").on(table.isInternal),
+}));
+
+// Live chat sessions table
+export const chatSessions = pgTable("chat_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  email: varchar("email", { length: 255 }),
+  name: varchar("name", { length: 255 }),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // 'active', 'ended'
+  assignedTo: varchar("assigned_to", { length: 255 }),
+  startedAt: timestamp("started_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+  metadata: jsonb("metadata").$type<{
+    userAgent?: string;
+    ipAddress?: string;
+    pageUrl?: string;
+    sessionId?: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userIdIdx: index("idx_chat_sessions_user_id").on(table.userId),
+  statusIdx: index("idx_chat_sessions_status").on(table.status),
+  assignedToIdx: index("idx_chat_sessions_assigned_to").on(table.assignedTo),
+}));
+
+// Live chat messages table
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").references(() => chatSessions.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id").references(() => users.id), // null if from customer
+  message: text("message").notNull(),
+  isAgent: boolean("is_agent").default(false),
+  timestamp: timestamp("timestamp").defaultNow(),
+}, (table) => ({
+  sessionIdIdx: index("idx_chat_messages_session_id").on(table.sessionId),
+  userIdIdx: index("idx_chat_messages_user_id").on(table.userId),
+  timestampIdx: index("idx_chat_messages_timestamp").on(table.timestamp),
+}));
+
 // Insert schemas
 export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
   id: true,
@@ -514,6 +605,33 @@ export const insertTestingSessionSchema = createInsertSchema(testingSessions).om
   createdAt: true,
   updatedAt: true,
   incentivePaid: true,
+});
+
+export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  responseTime: true,
+  escalatedAt: true,
+  resolvedAt: true,
+});
+
+export const insertSupportTicketUpdateSchema = createInsertSchema(supportTicketUpdates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  startedAt: true,
+  endedAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  timestamp: true,
 });
 
 export const insertLeadSchema = createInsertSchema(leads).omit({

@@ -8,6 +8,12 @@ import {
   leads,
   webhookEvents,
   workflowTriggers,
+  supportTickets,
+  supportTicketUpdates,
+  chatSessions,
+  chatMessages,
+  userFeedback,
+  testingSessions,
   type User,
   type Company,
   type Calculation,
@@ -24,6 +30,10 @@ import {
   type InsertIntakeForm,
   type InsertLead,
   type WorkflowTriggerPayload,
+  insertSupportTicketSchema,
+  insertSupportTicketUpdateSchema,
+  insertChatSessionSchema,
+  insertChatMessageSchema,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, isNotNull, lt } from "drizzle-orm";
@@ -88,6 +98,38 @@ export interface IStorage {
   // Airtable sync operations
   syncToAirtable(intakeFormId: string): Promise<string>;
   updateAirtableSync(intakeFormId: string, recordId: string, status: string): Promise<void>;
+
+  // User feedback operations
+  getUserFeedback(id: string): Promise<any>;
+  getUserFeedbackBySession(sessionId: string): Promise<any[]>;
+  createUserFeedback(feedback: any): Promise<any>;
+  updateUserFeedback(id: string, updates: any): Promise<any>;
+
+  // Testing session operations
+  getTestingSession(id: string): Promise<any>;
+  createTestingSession(session: any): Promise<any>;
+  updateTestingSession(id: string, updates: any): Promise<any>;
+
+  // Support ticket operations
+  createSupportTicket(ticket: any): Promise<any>;
+  getSupportTicket(id: string): Promise<any>;
+  getSupportTicketsByUserId(userId: string): Promise<any[]>;
+  updateSupportTicket(id: string, updates: any): Promise<any>;
+  getSupportMetrics(): Promise<any>;
+
+  // Support ticket updates
+  createSupportTicketUpdate(update: any): Promise<any>;
+  getSupportTicketUpdates(ticketId: string): Promise<any[]>;
+
+  // Chat operations
+  createChatSession(session: any): Promise<any>;
+  getChatSession(id: string): Promise<any>;
+  updateChatSession(id: string, updates: any): Promise<any>;
+  createChatMessage(message: any): Promise<any>;
+  getChatMessages(sessionId: string): Promise<any[]>;
+
+  // Knowledge base operations
+  searchKnowledgeBase(query: string, category?: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -742,6 +784,154 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(workflowTriggers.timeoutAt));
+  }
+
+  // Support ticket operations
+  async createSupportTicket(ticketData: any): Promise<any> {
+    const [ticket] = await db.insert(supportTickets).values(ticketData).returning();
+    return ticket;
+  }
+
+  async getSupportTicket(id: string): Promise<any> {
+    const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.id, id));
+    return ticket;
+  }
+
+  async getSupportTicketsByUserId(userId: string): Promise<any[]> {
+    return db.select().from(supportTickets)
+      .where(eq(supportTickets.userId, userId))
+      .orderBy(desc(supportTickets.createdAt));
+  }
+
+  async updateSupportTicket(id: string, updates: any): Promise<any> {
+    const [ticket] = await db.update(supportTickets)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(supportTickets.id, id))
+      .returning();
+    return ticket;
+  }
+
+  async getSupportMetrics(): Promise<any> {
+    const totalTickets = await db.select({ count: sql`count(*)` }).from(supportTickets);
+    const openTickets = await db.select({ count: sql`count(*)` })
+      .from(supportTickets)
+      .where(sql`status IN ('open', 'in_progress')`);
+    
+    return {
+      totalTickets: totalTickets[0]?.count || 0,
+      openTickets: openTickets[0]?.count || 0,
+      avgResponseTime: 120, // placeholder
+      satisfactionScore: 4.2, // placeholder
+      escalationRate: 5 // placeholder
+    };
+  }
+
+  // Support ticket updates
+  async createSupportTicketUpdate(updateData: any): Promise<any> {
+    const [update] = await db.insert(supportTicketUpdates).values(updateData).returning();
+    return update;
+  }
+
+  async getSupportTicketUpdates(ticketId: string): Promise<any[]> {
+    return db.select().from(supportTicketUpdates)
+      .where(eq(supportTicketUpdates.ticketId, ticketId))
+      .orderBy(desc(supportTicketUpdates.createdAt));
+  }
+
+  // Chat operations
+  async createChatSession(sessionData: any): Promise<any> {
+    const [session] = await db.insert(chatSessions).values(sessionData).returning();
+    return session;
+  }
+
+  async getChatSession(id: string): Promise<any> {
+    const [session] = await db.select().from(chatSessions).where(eq(chatSessions.id, id));
+    return session;
+  }
+
+  async updateChatSession(id: string, updates: any): Promise<any> {
+    const [session] = await db.update(chatSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(chatSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async createChatMessage(messageData: any): Promise<any> {
+    const [message] = await db.insert(chatMessages).values(messageData).returning();
+    return message;
+  }
+
+  async getChatMessages(sessionId: string): Promise<any[]> {
+    return db.select().from(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId))
+      .orderBy(desc(chatMessages.timestamp));
+  }
+
+  // Knowledge base operations
+  async searchKnowledgeBase(query: string, category?: string): Promise<any[]> {
+    // Simple implementation - searches help articles
+    // In a real implementation, you'd use full-text search
+    return [
+      {
+        id: 'kb-1',
+        title: 'Getting Started with R&D Tax Credits',
+        category: 'general',
+        url: '/help#getting-started',
+        excerpt: 'Learn the basics of R&D tax credits and how our platform helps...'
+      },
+      {
+        id: 'kb-2', 
+        title: 'Using the Calculator',
+        category: 'calculator',
+        url: '/help#calculator',
+        excerpt: 'Step-by-step guide to using our R&D tax credit calculator...'
+      }
+    ];
+  }
+
+  // User feedback operations (existing methods)
+  async getUserFeedback(id: string): Promise<any> {
+    const [feedback] = await db.select().from(userFeedback).where(eq(userFeedback.id, id));
+    return feedback;
+  }
+
+  async getUserFeedbackBySession(sessionId: string): Promise<any[]> {
+    return db.select().from(userFeedback)
+      .where(eq(userFeedback.sessionId, sessionId))
+      .orderBy(desc(userFeedback.createdAt));
+  }
+
+  async createUserFeedback(feedbackData: any): Promise<any> {
+    const [feedback] = await db.insert(userFeedback).values(feedbackData).returning();
+    return feedback;
+  }
+
+  async updateUserFeedback(id: string, updates: any): Promise<any> {
+    const [feedback] = await db.update(userFeedback)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(userFeedback.id, id))
+      .returning();
+    return feedback;
+  }
+
+  // Testing session operations
+  async getTestingSession(id: string): Promise<any> {
+    const [session] = await db.select().from(testingSessions).where(eq(testingSessions.id, id));
+    return session;
+  }
+
+  async createTestingSession(sessionData: any): Promise<any> {
+    const [session] = await db.insert(testingSessions).values(sessionData).returning();
+    return session;
+  }
+
+  async updateTestingSession(id: string, updates: any): Promise<any> {
+    const [session] = await db.update(testingSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(testingSessions.id, id))
+      .returning();
+    return session;
   }
 }
 
