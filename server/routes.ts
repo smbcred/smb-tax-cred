@@ -342,13 +342,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { getDocumintService } = await import('./services/documint');
         const documintService = getDocumintService();
         
-        // Check service availability (mock response)
+        // Check service availability with proper Form6765 data structure
+        const testData = {
+          companyName: 'Test Company Inc',
+          taxYear: 2024,
+          businessType: 'corporation' as const,
+          currentYearExpenses: {
+            wages: 50000,
+            contractors: 25000,
+            supplies: 5000,
+            total: 80000
+          },
+          rdActivities: [{
+            activity: 'AI Testing',
+            description: 'Testing AI implementation',
+            hours: 100,
+            wages: 10000,
+            category: 'testing' as const
+          }],
+          technicalChallenges: ['AI integration complexity'],
+          uncertainties: ['Performance optimization'],
+          innovations: ['Novel AI approach'],
+          businessPurpose: 'Improve business efficiency',
+          calculations: {
+            totalQualifiedExpenses: 80000,
+            ascPercentage: 6,
+            baseAmount: 0,
+            creditAmount: 8000,
+            riskLevel: 'low' as const
+          }
+        };
+        
         const response = await documintService.generatePDF({
           templateId: 'form6765',
-          data: { test: true }
+          data: testData
         });
         
-        results.tests.documint = { status: 'PASS', mockUsed: true };
+        results.tests.documint = { 
+          status: 'PASS', 
+          hasApiKey: !!process.env.DOCUMINT_API_KEY,
+          responseId: response.id,
+          responseStatus: response.status
+        };
         results.summary.passed++;
       } catch (error: any) {
         results.tests.documint = { status: 'FAIL', error: error.message };
