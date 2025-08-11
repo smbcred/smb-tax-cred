@@ -48,6 +48,18 @@ import {
   userRegistrationValidation,
   userLoginValidation 
 } from "./middleware/validation";
+
+// Import data protection middleware
+import { 
+  applyDataProtection,
+  dataAccessControl,
+  AccessLogger,
+  PIICategory 
+} from "./middleware/dataProtection";
+import { 
+  secureTransmission,
+  FieldEncryption 
+} from "./middleware/encryption";
 import checkoutRoutes from "./routes/checkout.js";
 import {
   insertUserSchema,
@@ -168,6 +180,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Apply security middleware
   app.use(applySecurity());
+  
+  // Apply data protection middleware
+  app.use(applyDataProtection());
+  
+  // Secure transmission middleware
+  app.use(secureTransmission());
   
   // CSRF protection for API endpoints  
   app.use("/api", csrfTokenProvider());
