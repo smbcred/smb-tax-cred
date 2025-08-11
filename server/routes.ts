@@ -3086,6 +3086,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Error reporting endpoint
+  app.post("/api/errors/report", async (req: any, res) => {
+    try {
+      const { getLoggingService } = await import("./services/logger");
+      const logger = getLoggingService();
+
+      const { message, stack, name, context } = req.body;
+
+      if (!message || !context) {
+        return res.status(400).json({
+          success: false,
+          error: 'Error message and context are required',
+        });
+      }
+
+      // Create error object
+      const error = new Error(message);
+      error.name = name || 'ClientError';
+      error.stack = stack;
+
+      // Determine severity and category
+      const severity = logger.determineSeverity(error, context);
+      const category = logger.categorizeError(error, context);
+
+      // Log the error
+      const errorId = logger.logError(message, error, severity, category, context);
+
+      res.json({
+        success: true,
+        errorId,
+        message: 'Error reported successfully',
+      });
+
+    } catch (error: any) {
+      console.error("Error reporting failed:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to report error"
+      });
+    }
+  });
+
+  // Error statistics endpoint
+  app.get("/api/errors/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const { days = 7 } = req.query;
+
+      const { getLoggingService } = await import("./services/logger");
+      const logger = getLoggingService();
+
+      const stats = logger.getErrorStats(parseInt(days as string));
+
+      res.json({
+        success: true,
+        stats,
+        period: `Last ${days} days`,
+      });
+
+    } catch (error: any) {
+      console.error("Error stats error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || "Failed to get error statistics"
+      });
+    }
+  });
+
   // Payment routes with Stripe
   app.post("/api/create-payment-intent", authenticateToken, async (req: any, res) => {
     try {
