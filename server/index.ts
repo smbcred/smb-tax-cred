@@ -83,5 +83,19 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // QA finish-line manual acceptance checklist
+    console.log('\n=== QA FINISH-LINE CHECKLIST ===');
+    console.table([
+      { item:"Homepage CTA points to /calculator", pass:"TODO" },
+      { item:"Calculator shows correct credit with 65% cap", pass:"TODO" },
+      { item:"OBBBA expensing banner visible", pass:"TODO" },
+      { item:"CTA redirects to Stripe Checkout (test)", pass:"TODO" },
+      { item:"Post-payment lands on Dashboard", pass:"TODO" },
+      { item:"Intake saves and restores on refresh", pass:"TODO" },
+      { item:"Docs generate OR friendly error + retry", pass:"TODO" },
+      { item:"Light mode only (no dark artifacts)", pass:"TODO" }
+    ]);
+    console.log('=== Manually verify each item and update pass status ===\n');
   });
 })();
