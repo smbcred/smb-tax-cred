@@ -3,13 +3,11 @@ import { LoggingService } from './logger';
 import { retryService } from './retryService';
 import {
   JobDefinition,
-  JobResult,
   JobStatus,
   JobPriority,
   IntegrationType,
   QueueStats,
   jobDefinitionSchema,
-  jobResultSchema,
 } from '../../shared/types/integrations';
 
 interface QueuedJob extends JobDefinition {

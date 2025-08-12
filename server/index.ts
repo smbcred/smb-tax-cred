@@ -1,4 +1,4 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express from "express";
 import cookieParser from "cookie-parser";
 import crypto from "crypto";
 import { registerRoutes } from "./routes";

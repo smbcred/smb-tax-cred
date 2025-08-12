@@ -2,7 +2,6 @@ import { EventEmitter } from 'events';
 import { LoggingService } from './logger';
 import {
   RetryConfig,
-  RetryStrategy,
   getNextRetryDelay,
   isRetryableError,
 } from '../../shared/types/integrations';

@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Lightbulb, Calendar, Target, Beaker, Cog } from 'lucide-react';
+import { Plus, Trash2, Lightbulb, Target, Beaker, Cog } from 'lucide-react';
 import { projectTemplates, aiToolOptions, rdMethodologyExamples, generateProjectId } from '@/data/rd-project-templates';
-import { rdActivitiesSchema, rdProjectSchema } from '@shared/schema';
+import { rdActivitiesSchema } from '@shared/schema';
 
 interface RDActivitiesSectionProps {
   data: any;

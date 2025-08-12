@@ -78,7 +78,7 @@ export function applyLawRegimeAdjustments(
 ): any {
   const config = LAW_REGIME_CALCULATIONS[regime];
   
-  let adjustedCalculation = { ...baseCalculation };
+  const adjustedCalculation = { ...baseCalculation };
 
   // Apply Section 174 capitalization impact
   if (config.section174Capitalization) {

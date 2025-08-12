@@ -1,5 +1,4 @@
-import { AccessLogger, PIICategory, DataClassification, PrivacyCompliance } from '../middleware/dataProtection';
-import { FieldEncryption } from '../middleware/encryption';
+import { AccessLogger } from '../middleware/dataProtection';
 
 // Compliance frameworks
 export enum ComplianceFramework {

@@ -1,6 +1,6 @@
 // Analytics service for tracking user behavior and performance metrics
 
-import { AnalyticsEvent, ConversionFunnel, UserJourney, ABTest, ABTestAssignment, PerformanceMetric, EventCategory, EventName } from '../../../shared/types/analytics';
+import { AnalyticsEvent, EventCategory, EventName } from '../../../shared/types/analytics';
 
 export class AnalyticsService {
   private sessionId: string;

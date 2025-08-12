@@ -188,7 +188,7 @@ export function useComplianceMemo() {
       });
     },
     onError: (error: any) => {
-      let title = 'Generation Failed';
+      const title = 'Generation Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {

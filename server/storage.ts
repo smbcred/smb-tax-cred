@@ -23,17 +23,12 @@ import {
   type Lead,
   type WebhookEvent,
   type WorkflowTrigger,
-  type InsertUser,
   type InsertCompany,
   type InsertCalculation,
   type InsertPayment,
   type InsertIntakeForm,
   type InsertLead,
   type WorkflowTriggerPayload,
-  insertSupportTicketSchema,
-  insertSupportTicketUpdateSchema,
-  insertChatSessionSchema,
-  insertChatMessageSchema,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, isNotNull, lt } from "drizzle-orm";

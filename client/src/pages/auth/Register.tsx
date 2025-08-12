@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
+import {  Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
 
 const Register = () => {
   return (

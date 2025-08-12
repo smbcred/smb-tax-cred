@@ -1,12 +1,12 @@
 import { useFormProgress } from '@/hooks/useFormProgress';
 import { useAuth } from '@/hooks/useAuth';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Circle, Clock, Save } from 'lucide-react';
+import { CheckCircle, Circle, Save } from 'lucide-react';
 import FormSection from '@/components/forms/FormSection';
 import { SaveIndicator } from '@/components/ui/save-indicator';
 

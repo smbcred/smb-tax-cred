@@ -33,9 +33,7 @@ import {
   InnovationResult, 
   ExpenseBreakdown,
   ValidationResult,
-  InnovationActivity,
-  BusinessType,
-  InnovationDepth
+  InnovationActivity
 } from '@/types/innovation-calculation.types';
 
 export class InnovationCalculatorEngine {

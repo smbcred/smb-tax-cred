@@ -2,7 +2,6 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { storage } from '../storage';
 import { SupportService } from '../services/supportService';
-import { SupportCategory, SupportPriority } from '@shared/types/support';
 import { 
   insertSupportTicketSchema, 
   insertSupportTicketUpdateSchema,

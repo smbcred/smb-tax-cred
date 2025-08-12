@@ -1,7 +1,5 @@
 import { EventEmitter } from 'events';
 import { LoggingService } from './logger';
-import { queueService } from './queueService';
-import { retryService } from './retryService';
 import {
   IntegrationType,
   IntegrationStatus,
@@ -9,7 +7,6 @@ import {
   RecoveryConfig,
   StatusUpdate,
   ManualIntervention,
-  JobPriority,
   DEFAULT_RECOVERY_CONFIGS,
   shouldEscalate,
 } from '../../shared/types/integrations';

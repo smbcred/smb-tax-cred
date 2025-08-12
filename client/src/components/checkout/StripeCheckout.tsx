@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CreditCard, Shield, Clock } from 'lucide-react';
 import { assignPricingTier } from '../../../../shared/config/pricing';
-import { apiRequest } from '@/lib/queryClient';
 import getStripe from '@/services/stripe';
 
 interface StripeCheckoutProps {

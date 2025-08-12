@@ -177,7 +177,7 @@ export function FormErrorBoundary({ children }: { children: ReactNode }) {
             Form Error
           </h4>
           <p className="text-sm text-red-600 dark:text-red-300 mb-4">
-            The form couldn't load properly. Your data is safe.
+            The form couldn&apos;t load properly. Your data is safe.
           </p>
           <Button onClick={retry} size="sm" variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />

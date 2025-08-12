@@ -1,4 +1,4 @@
-import { SupportTicket, SupportCategory, SupportPriority, TicketStatus, SLAConfig } from '@shared/types/support';
+import { SupportCategory, SupportPriority, SLAConfig } from '@shared/types/support';
 
 export class SupportService {
   private static slaConfig: SLAConfig = {

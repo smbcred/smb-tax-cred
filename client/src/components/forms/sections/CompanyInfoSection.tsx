@@ -3,11 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, Building, MapPin, Calendar, Hash, Globe, Phone } from 'lucide-react';
+import { Search, Building, MapPin, Hash, Phone } from 'lucide-react';
 import { industryOptions, entityTypeOptions, usStates } from '@/data/industry-options';
-import { searchNAICSCodes, getNAICSByCode, type NAICSCode } from '@/data/naics-codes';
+import { searchNAICSCodes, type NAICSCode } from '@/data/naics-codes';
 import { companyInfoSchema } from '@shared/schema';
 
 interface CompanyInfoSectionProps {

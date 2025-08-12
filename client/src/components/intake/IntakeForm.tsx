@@ -12,12 +12,12 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { intakeFormService, companyService } from "@/services/api.service";
+import { intakeFormService } from "@/services/api.service";
 import { useToast } from "@/hooks/use-toast";
 import CompanyInfo from "./CompanyInfo";
 import { companyInfoSchema, type CompanyInfoData } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const FORM_SECTIONS = [
   { id: "company_info", title: "Company Information", icon: "fas fa-building" },

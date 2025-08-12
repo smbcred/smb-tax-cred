@@ -11,11 +11,9 @@ import {
   XCircle, 
   Clock, 
   Cpu, 
-  HardDrive, 
-  Database,
+  HardDrive,
   TrendingUp,
-  AlertCircle,
-  Server
+  AlertCircle
 } from 'lucide-react';
 
 interface MonitoringDashboardProps {

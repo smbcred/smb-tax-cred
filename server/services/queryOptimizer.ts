@@ -1,4 +1,4 @@
-import { sql, eq, and, or, desc, asc, count, max, min, avg, sum } from 'drizzle-orm';
+import { and, desc, asc, count, max, min, avg, sum } from 'drizzle-orm';
 import { queryCache } from '../middleware/caching';
 
 // Query optimization utilities for database operations

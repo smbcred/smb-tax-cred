@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Download, ArrowLeft, Mail, Clock, FileText, CreditCard, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Mail, Clock, FileText, CreditCard, CheckCircle2 } from 'lucide-react';
 
 const CheckoutSuccess: React.FC = () => {
   const [location, setLocation] = useLocation();

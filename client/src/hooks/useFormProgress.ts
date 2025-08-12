@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import type { FormProgress, FormSection } from '@shared/schema';
 

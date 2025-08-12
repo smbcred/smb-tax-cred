@@ -5,7 +5,6 @@
  */
 
 // Import from centralized config
-import { PRICING_TIERS as CENTRAL_TIERS, PricingTier as CentralTier, getPricingTier, formatPrice } from '../../src/config/pricing';
 
 // Legacy interface for compatibility
 export interface PricingTier {

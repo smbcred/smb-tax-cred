@@ -9,8 +9,6 @@ import {
   DollarSign, 
   Users, 
   Calendar,
-  AlertTriangle,
-  Info,
   Building,
   TrendingUp,
   CreditCard,

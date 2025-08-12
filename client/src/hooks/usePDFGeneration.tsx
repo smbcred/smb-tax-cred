@@ -128,7 +128,7 @@ export function usePDFGeneration() {
       queryClient.invalidateQueries({ queryKey: ['/api/pdf/status'] });
     },
     onError: (error: any) => {
-      let title = 'PDF Generation Failed';
+      const title = 'PDF Generation Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {

@@ -14,8 +14,7 @@ import {
   UptimeStatus,
   IncidentReport,
   MonitoringConfig,
-  MonitoringDashboard,
-  MonitoringEvent
+  MonitoringDashboard
 } from '../../shared/types/monitoring';
 
 class MonitoringService extends EventEmitter {

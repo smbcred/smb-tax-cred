@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, BookOpen, MessageCircle, FileText, Video, AlertCircle, ExternalLink } from 'lucide-react';
+import { Search, BookOpen, MessageCircle, FileText, AlertCircle, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

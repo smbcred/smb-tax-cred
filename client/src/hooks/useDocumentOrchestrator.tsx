@@ -165,7 +165,7 @@ export function useDocumentOrchestrator() {
       queryClient.invalidateQueries({ queryKey: ['/api/documents/jobs'] });
     },
     onError: (error: any) => {
-      let title = 'Generation Failed';
+      const title = 'Generation Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {

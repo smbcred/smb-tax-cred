@@ -8,21 +8,14 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Skeleton, 
   SkeletonCard, 
-  SkeletonTable, 
   SkeletonForm, 
-  SkeletonCalculator, 
-  SkeletonDashboard 
+  SkeletonCalculator 
 } from "@/components/ui/skeleton";
 
 import {
   LoadingSpinner,
-  InlineSpinner,
   ButtonSpinner,
-  CardLoader,
-  TableLoader,
-  FormLoader,
   CalculatorLoader,
-  DocumentLoader,
   PaymentLoader,
   UploadLoader
 } from "@/components/ui/loading-spinner";
@@ -44,7 +37,6 @@ import {
 } from "@/components/ui/error-boundary";
 
 import {
-  HelpfulTooltip,
   FieldHelpTooltip,
   InfoTooltip,
   WarningTooltip,

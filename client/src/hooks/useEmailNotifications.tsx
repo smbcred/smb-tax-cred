@@ -93,7 +93,7 @@ export function useEmailNotifications() {
       queryClient.invalidateQueries({ queryKey: ['/api/email/stats'] });
     },
     onError: (error: any) => {
-      let title = 'Email Failed';
+      const title = 'Email Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {

@@ -4,12 +4,9 @@
  */
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp,
   DollarSign,
-  Calendar,
-  Users,
   AlertTriangle,
   CheckCircle,
   Info,
@@ -21,14 +18,12 @@ import {
   BarChart3,
   FileText,
   ArrowUpRight,
-  ArrowDownRight,
-  ChevronRight,
   Building
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import type { EnhancedCalculationResult } from '@/services/calculation/calculator.engine';

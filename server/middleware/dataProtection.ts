@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { FieldEncryption, DataMasking } from './encryption';
+import { DataMasking } from './encryption';
 
 // Data classification levels
 export enum DataClassification {

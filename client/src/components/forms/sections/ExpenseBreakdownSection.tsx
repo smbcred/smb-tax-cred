@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { CalendarIcon, PlusIcon, TrashIcon, DollarSignIcon, PercentIcon, TrendingUpIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon, DollarSignIcon, PercentIcon, TrendingUpIcon } from 'lucide-react';
 import { SUPPLY_CATEGORIES, SOFTWARE_CATEGORIES, JOB_ROLES, CONTRACTOR_TYPES } from '@/data/expense-categories';
 
 interface Employee {

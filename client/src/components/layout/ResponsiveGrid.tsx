@@ -6,7 +6,6 @@
 
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { IconType } from 'react-icons';
 
 interface GridItemProps {
   icon: React.ReactNode;

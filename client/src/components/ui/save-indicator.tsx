@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Save, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { CheckCircle, Clock, Save, AlertTriangle, WifiOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SaveIndicatorProps {

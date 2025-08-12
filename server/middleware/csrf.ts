@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { randomBytes, createHash } from 'crypto';
-import { timingSafeEqual } from 'crypto';
+import { randomBytes, createHash , timingSafeEqual } from 'crypto';
 
 // CSRF token store (in production, use Redis or database)
 class CSRFTokenStore {
@@ -156,7 +155,7 @@ export function csrfProtection(options: {
     const sessionId = getSessionId(req);
     
     // Get token from various sources
-    let token = req.headers['x-csrf-token'] as string ||
+    const token = req.headers['x-csrf-token'] as string ||
                req.headers['x-xsrf-token'] as string ||
                req.body?._csrf ||
                req.query._csrf as string;

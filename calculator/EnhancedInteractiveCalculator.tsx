@@ -9,8 +9,7 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Sparkles,
-  AlertTriangle,
-  CheckCircle
+  AlertTriangle
 } from 'lucide-react';
 
 // Enhanced imports

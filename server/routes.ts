@@ -34,21 +34,18 @@ function isAuthenticated(req: any, res: any, next: any) {
   }
 }
 import {
-  insertUserSchema,
   insertCompanySchema,
   insertCalculationSchema,
-  insertLeadSchema,
   leadCaptureSchema,
   calculatorExpensesSchema,
   companyInfoSchema,
-  intakeFormSubmissionSchema,
   documents,
   type CalculatorExpenses,
 } from "@shared/schema";
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { db } from "./db";
-import { passwordSecurity, logSecurityEvent, generateId } from "./utils/security";
+import { passwordSecurity, logSecurityEvent } from "./utils/security";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");

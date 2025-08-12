@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
-import { Calculator, FileText, CheckCircle2, AlertCircle, TrendingUp, Building2, Code2, FlaskConical, Users, Lightbulb, ArrowRight } from "lucide-react";
+import { Calculator, FileText, CheckCircle2, AlertCircle, TrendingUp, Building2, Code2, FlaskConical, ArrowRight } from "lucide-react";
 import ResponsiveNav from "@/components/navigation/ResponsiveNav";
 import { Footer } from "@/components/layout/Footer";
 

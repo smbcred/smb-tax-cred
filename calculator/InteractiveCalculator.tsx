@@ -7,10 +7,7 @@
 import { useState, useReducer, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ChevronRight, 
-  ChevronLeft, 
   Sparkles,
-  HelpCircle,
   AlertCircle,
   CheckCircle,
   FileText,
@@ -32,7 +29,7 @@ import { ExpenseInputsStepNew as ExpenseInputsStep } from './steps/ExpenseInputs
 import { ResultsDisplayStep } from './steps/ResultsDisplayStep';
 import { ProgressIndicator } from './ProgressIndicator';
 import { LeadCaptureModal } from '@/components/leadCapture/LeadCaptureModal';
-import { RDTaxCalculator, EnhancedRDTaxCalculator } from '@/services/calculation/calculator.engine';
+import { EnhancedRDTaxCalculator } from '@/services/calculation/calculator.engine';
 
 // Calculator state interface
 interface CalculatorState {

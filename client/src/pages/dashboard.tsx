@@ -10,7 +10,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { dashboardService } from "@/services/api.service";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import ProgressOverview from "@/components/dashboard/ProgressOverview";

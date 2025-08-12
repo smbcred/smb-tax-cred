@@ -109,7 +109,7 @@ export function useS3Storage() {
       queryClient.invalidateQueries({ queryKey: ['/api/s3/stats'] });
     },
     onError: (error: any) => {
-      let title = 'Upload Failed';
+      const title = 'Upload Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {

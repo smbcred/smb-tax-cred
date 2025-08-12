@@ -3,7 +3,7 @@
  * @description Simplified, working version of expense inputs
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AIExpenseOptimizer } from '../AIExpenseOptimizer';
 

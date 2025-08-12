@@ -100,7 +100,7 @@ export function useDownloadSystem() {
       queryClient.invalidateQueries({ queryKey: ['/api/downloads/stats'] });
     },
     onError: (error: any) => {
-      let title = 'Download Failed';
+      const title = 'Download Failed';
       let description = error.message;
 
       if (error.details && Array.isArray(error.details)) {
