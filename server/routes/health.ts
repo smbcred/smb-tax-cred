@@ -182,4 +182,4 @@ router.get('/status', async (req: Request, res: Response) => {
   }
 });
 
-export { router as healthRouter };
+export default router;

@@ -718,4 +718,4 @@ router.post('/payments/:id/refund', adminActionRateLimit, async (req, res) => {
   }
 });
 
-export { router as adminRouter };
+export default router;

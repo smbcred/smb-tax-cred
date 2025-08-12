@@ -1,7 +1,9 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import crypto from "crypto";
-import { registerRoutes } from "./routes";
+import { createServer, type Server } from "http";
+import apiRoutes from "./routes";
+import srcRoutes from "./src/routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -57,7 +59,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  // Mount auto-discovered routes
+  app.use("/api", apiRoutes);
+  app.use("/api", srcRoutes);
+  
+  const server = createServer(app);
 
   // Add global error handling
   const { createErrorHandler } = await import("./middleware/errorHandler");

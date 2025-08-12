@@ -21,8 +21,8 @@ Preferred communication style: Simple, everyday language.
 - **Runtime**: Node.js with Express.js REST API server.
 - **Language**: TypeScript.
 - **Authentication**: JWT-based authentication with bcrypt password hashing.
-- **API Design**: RESTful endpoints with error handling and logging middleware.
-- **File Structure**: Modular route handlers with storage layer abstraction.
+- **API Design**: RESTful endpoints with auto-mounting route system, error handling and logging middleware.
+- **File Structure**: Modular route handlers with storage layer abstraction and resilient auto-mounting system.
 
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM for type-safe operations.
