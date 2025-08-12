@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLawRegime } from '@/hooks/useLawRegime';
+import { tierFor } from '@shared/config/pricing';
 import { ChevronRight, ChevronLeft, Info, DollarSign, Calculator, FileText, CheckCircle } from 'lucide-react';
 
 // Calculation functions
@@ -53,20 +54,7 @@ const calculatorSchema = z.object({
 
 type CalculatorForm = z.infer<typeof calculatorSchema>;
 
-// Pricing tiers
-const pricingTiers = [
-  { min: 0, max: 25000, price: 2997 },
-  { min: 25001, max: 75000, price: 4997 },
-  { min: 75001, max: 150000, price: 7997 },
-  { min: 150001, max: 300000, price: 11997 },
-  { min: 300001, max: 500000, price: 15997 },
-  { min: 500001, max: 1000000, price: 24997 },
-  { min: 1000001, max: Infinity, price: 34997 },
-];
-
-function getPricingTier(credit: number) {
-  return pricingTiers.find(tier => credit >= tier.min && credit <= tier.max) || pricingTiers[0];
-}
+// Use centralized pricing configuration
 
 const STORAGE_KEY = 'rd-calculator-data';
 
@@ -100,7 +88,7 @@ export default function CreditCalculator() {
       try {
         const data = JSON.parse(saved);
         Object.entries(data).forEach(([key, value]) => {
-          setValue(key as keyof CalculatorForm, value);
+          setValue(key as keyof CalculatorForm, value as any);
         });
       } catch (e) {
         console.warn('Failed to load saved calculator data');
@@ -130,7 +118,7 @@ export default function CreditCalculator() {
     : undefined;
 
   const creditResult = ascCredit(currentQRE, priorQREs);
-  const pricingTier = getPricingTier(creditResult.credit);
+  const pricingTier = tierFor(creditResult.credit);
 
   const canProceedStep1 = watchedValues.email && !errors.email && currentQRE > 0;
   const canProceedStep2 = !watchedValues.hasPriorQREs || (
@@ -141,9 +129,6 @@ export default function CreditCalculator() {
 
   const formatCurrency = (amount: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
-
-  const formatNumber = (amount: number) => 
-    new Intl.NumberFormat('en-US').format(amount);
 
   return (
     <div className="max-w-screen-lg mx-auto p-4 md:p-6">
@@ -461,7 +446,7 @@ export default function CreditCalculator() {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Credit Range:</span>
                         <span className="font-medium">
-                          {formatCurrency(pricingTier.min)} - {pricingTier.max === Infinity ? '1M+' : formatCurrency(pricingTier.max)}
+                          {formatCurrency(pricingTier.min)} - {pricingTier.max === Infinity ? '200K+' : formatCurrency(pricingTier.max)}
                         </span>
                       </div>
                       <div className="flex justify-between font-medium text-green-600">
