@@ -17,13 +17,25 @@ interface IntakeFormProps {
 export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
   const { user } = useAuth();
 
-  // Auto-save mutation
+  // Auto-save mutation with visible feedback
   const autoSaveMutation = useMutation({
     mutationFn: async ({ data, section }: { data: any; section: string }) => {
       return apiRequest('POST', `/api/intake-forms/${intakeFormId}/save`, {
         section,
         data,
       });
+    },
+    onError: (error: any) => {
+      // Show inline error for autosave failures
+      const errorMessage = document.createElement('div');
+      errorMessage.className = 'fixed top-20 right-4 bg-amber-100 border border-amber-400 text-amber-700 px-4 py-3 rounded z-50';
+      errorMessage.innerHTML = `⚠️ Auto-save failed: ${error.message}. Changes will be saved when connection is restored.`;
+      document.body.appendChild(errorMessage);
+      setTimeout(() => {
+        if (document.body.contains(errorMessage)) {
+          document.body.removeChild(errorMessage);
+        }
+      }, 10000);
     },
   });
 
@@ -33,11 +45,21 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
       return apiRequest('POST', `/api/intake-forms/${intakeFormId}/submit`, submissionData);
     },
     onSuccess: (response) => {
-      alert('Form submitted successfully!');
+      // Show visible success feedback
+      const successMessage = document.createElement('div');
+      successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+      successMessage.innerHTML = '✓ Form submitted successfully!';
+      document.body.appendChild(successMessage);
+      setTimeout(() => document.body.removeChild(successMessage), 5000);
       console.log('Submission successful:', response);
     },
     onError: (error: any) => {
-      alert(`Submission failed: ${error.message}`);
+      // Show visible error feedback
+      const errorMessage = document.createElement('div');
+      errorMessage.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+      errorMessage.innerHTML = `✗ Submission failed: ${error.message}`;
+      document.body.appendChild(errorMessage);
+      setTimeout(() => document.body.removeChild(errorMessage), 8000);
       console.error('Submission error:', error);
     },
   });
@@ -58,7 +80,7 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
     autoSave,
   } = useFormProgress({
     intakeFormId,
-    autoSaveDelay: 2000,
+    autoSaveDelay: 30000, // 30 seconds as requested
   });
 
   const currentSection = getCurrentSection();
@@ -169,17 +191,53 @@ export default function IntakeForm({ intakeFormId }: IntakeFormProps) {
               hasUnsavedChanges={autoSave.hasUnsavedChanges}
               isOnline={autoSave.isOnline}
             />
-            {autoSave.error && (
+            <div className="flex items-center space-x-2">
+              {autoSave.error && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    autoSave.manualSave();
+                    // Show retry feedback
+                    const retryMessage = document.createElement('div');
+                    retryMessage.className = 'fixed top-4 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded z-50';
+                    retryMessage.innerHTML = '🔄 Retrying save...';
+                    document.body.appendChild(retryMessage);
+                    setTimeout(() => {
+                      if (document.body.contains(retryMessage)) {
+                        document.body.removeChild(retryMessage);
+                      }
+                    }, 3000);
+                  }}
+                  disabled={autoSave.isAutoSaving}
+                  className="text-xs h-8"
+                >
+                  Retry Save
+                </Button>
+              )}
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={autoSave.manualSave}
-                disabled={autoSave.isAutoSaving}
-                className="text-xs h-6"
+                onClick={() => {
+                  autoSave.manualSave();
+                  // Show manual save feedback
+                  const saveMessage = document.createElement('div');
+                  saveMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                  saveMessage.innerHTML = '💾 Saving manually...';
+                  document.body.appendChild(saveMessage);
+                  setTimeout(() => {
+                    if (document.body.contains(saveMessage)) {
+                      document.body.removeChild(saveMessage);
+                    }
+                  }, 2000);
+                }}
+                disabled={autoSave.isAutoSaving || !autoSave.hasUnsavedChanges}
+                className="text-xs h-8"
               >
-                Retry Save
+                <Save className="w-3 h-3 mr-1" />
+                Save Now
               </Button>
-            )}
+            </div>
           </div>
         </div>
       </div>

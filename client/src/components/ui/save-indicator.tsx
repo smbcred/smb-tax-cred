@@ -84,11 +84,17 @@ export function SaveIndicator({
   };
 
   return (
-    <div className={cn('flex items-center text-xs', getStatusColor(), className)}>
+    <div className={cn('flex items-center text-sm font-medium px-3 py-2 rounded-md border', getStatusColor(), className, {
+      'bg-green-50 border-green-200': status === 'saved',
+      'bg-blue-50 border-blue-200': status === 'saving',
+      'bg-red-50 border-red-200': status === 'error',
+      'bg-amber-50 border-amber-200': hasUnsavedChanges && status !== 'saving',
+      'bg-gray-50 border-gray-200': !hasUnsavedChanges && status === 'idle',
+    })}>
       {getStatusIcon()}
-      <span className="ml-1">{getStatusText()}</span>
+      <span className="ml-2">{getStatusText()}</span>
       {!isOnline && (
-        <WifiOff className="w-3 h-3 ml-2 text-slate-400" />
+        <WifiOff className="w-4 h-4 ml-2 text-slate-400" />
       )}
     </div>
   );

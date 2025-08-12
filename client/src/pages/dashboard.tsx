@@ -22,6 +22,26 @@ import type { DashboardResponse } from "@shared/schema";
 export default function Dashboard() {
   const { user } = useAuth();
   
+  // Check for Stripe success parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get('session_id');
+  
+  // Show payment success message if coming from Stripe
+  if (sessionId && !sessionStorage.getItem('stripe_success_shown')) {
+    sessionStorage.setItem('stripe_success_shown', 'true');
+    setTimeout(() => {
+      const successMessage = document.createElement('div');
+      successMessage.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
+      successMessage.innerHTML = '🎉 Payment successful! Welcome to your dashboard.';
+      document.body.appendChild(successMessage);
+      setTimeout(() => {
+        if (document.body.contains(successMessage)) {
+          document.body.removeChild(successMessage);
+        }
+      }, 6000);
+    }, 500);
+  }
+  
   const { data: dashboardData, isLoading, error } = useQuery<DashboardResponse>({
     queryKey: ["/api/dashboard"],
     enabled: !!user,
