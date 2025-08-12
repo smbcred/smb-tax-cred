@@ -141,3 +141,19 @@ export function assignPricingTier(estimatedCredit: number): PricingTier {
     estimatedCredit >= tier.minCredit && estimatedCredit <= tier.maxCredit
   ) || pricingTiers[pricingTiers.length - 1]; // Default to highest tier
 }
+
+// Simplified tiers for the new calculator
+export const simplifiedTiers = [
+  { tier: 0, min: 0, max: 5000, price: 399, priceId: process.env.NODE_ENV === "production" ? "price_live_0" : "price_test_0" },
+  { tier: 1, min: 5000, max: 10000, price: 500, priceId: process.env.NODE_ENV === "production" ? "price_live_1" : "price_test_1" },
+  { tier: 2, min: 10000, max: 20000, price: 750, priceId: process.env.NODE_ENV === "production" ? "price_live_2" : "price_test_2" },
+  { tier: 3, min: 20000, max: 35000, price: 1000, priceId: process.env.NODE_ENV === "production" ? "price_live_3" : "price_test_3" },
+  { tier: 4, min: 35000, max: 50000, price: 1250, priceId: process.env.NODE_ENV === "production" ? "price_live_4" : "price_test_4" },
+  { tier: 5, min: 50000, max: 100000, price: 1500, priceId: process.env.NODE_ENV === "production" ? "price_live_5" : "price_test_5" },
+  { tier: 6, min: 100000, max: 200000, price: 2000, priceId: process.env.NODE_ENV === "production" ? "price_live_6" : "price_test_6" },
+  { tier: 7, min: 200000, max: Infinity, price: 2500, priceId: process.env.NODE_ENV === "production" ? "price_live_7" : "price_test_7" },
+];
+
+export function tierFor(credit: number) {
+  return simplifiedTiers.find(t => credit >= t.min && credit <= t.max) || simplifiedTiers[0];
+}

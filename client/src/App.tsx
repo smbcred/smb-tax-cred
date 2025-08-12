@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 // Lazy load components for better performance
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Landing = lazy(() => import("@/pages/landing"));
+const Calculator = lazy(() => import("@/pages/Calculator"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Checkout = lazy(() => import("@/pages/checkout"));
 const CheckoutSuccess = lazy(() => import("@/pages/checkout/success"));
@@ -104,6 +105,7 @@ function Router() {
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
+            <Route path="/calculator" component={Calculator} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/checkout" component={Checkout} />

@@ -1,0 +1,397 @@
+got it — here’s a single, copy-paste Replit prompt that (1) restores the calculator flow you liked, (2) fixes the CTA to actually go to Stripe Checkout, and (3) forces the site back to light mode so dark mode doesn’t wreck the UI.
+
+paste everything between the lines into Replit and run it as one prompt:
+
+⸻
+
+REPLIT PROMPT — Restore Calculator UX, Fix Checkout CTA, Force Light Mode
+
+You are a senior TypeScript/React/Node engineer. Apply the following changes without inventing new frameworks. Keep React + Vite + Tailwind + Express + Drizzle. Make atomic commits with clear messages.
+
+⸻
+
+PART 0 — Preflight
+	1.	Env vars (Replit → Tools → Secrets)
+	•	LAW_REGIME=OBBBA_174A_EXPENSE
+	•	PAYROLL_OFFSET_CAP=500000
+	•	STRIPE_SECRET_KEY=sk_test_... (test key)
+	•	CLIENT_URL=http://localhost:5173 (or your dev URL)
+	•	SERVER_URL=http://localhost:5000 (if needed)
+	2.	Ensure Tailwind is wired
+	•	client/src/index.css must start with:
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+	3.	Light mode (disable dark mode sitewide for now)
+	•	client/tailwind.config.*: set darkMode: 'class' (or leave as is), but we will not add the dark class anywhere.
+	•	Remove dark class from <html>/<body> if present in client/index.html or a theme provider.
+	•	Create/patch client/src/providers/ThemeProvider.tsx:
+
+import { createContext, useContext } from "react";
+type ThemeCtx = { mode: "light"; toggleMode: () => void };
+const Ctx = createContext<ThemeCtx>({ mode: "light", toggleMode: () => {} });
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Force light mode for now
+  if (typeof document !== "undefined") document.documentElement.classList.remove("dark");
+  return <Ctx.Provider value={{ mode: "light", toggleMode: () => {} }}>{children}</Ctx.Provider>;
+}
+export const useTheme = () => useContext(Ctx);
+
+
+	•	Make sure your app uses <ThemeProvider> at the root.
+
+Commit: chore(ui): force light mode and remove dark styling sitewide
+
+⸻
+
+PART 1 — Calculator UX (4 steps + lead capture)
+
+Create client/src/components/calculator/CreditCalculator.tsx with a clean wizard. Use Tailwind containers and grids; no “dark:” classes.
+
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { tierFor } from "@/shared/config/pricing"; // create in Part 3
+import { useLawRegime } from "@/hooks/useLawRegime"; // tiny hook below
+
+const CalcSchema = z.object({
+  email: z.string().email("Enter a valid email"),
+  wages: z.number().min(0),
+  contractors: z.number().min(0),
+  supplies: z.number().min(0),
+  cloud: z.number().min(0),
+  software: z.number().min(0),
+  priorQre0: z.number().min(0).optional(),
+  priorQre1: z.number().min(0).optional(),
+  priorQre2: z.number().min(0).optional(),
+  hasHistory: z.boolean().default(false),
+});
+type CalcForm = z.infer<typeof CalcSchema>;
+
+function computeQRE(f: CalcForm) {
+  return (f.wages || 0) + (f.contractors || 0) * 0.65 + (f.supplies || 0) + (f.cloud || 0) + (f.software || 0);
+}
+function computeASC(qre: number, f: CalcForm) {
+  if (!f.hasHistory) return { method: "ASC_6_FIRST_TIME", credit: Math.round(qre * 0.06) };
+  const arr = [f.priorQre0 || 0, f.priorQre1 || 0, f.priorQre2 || 0];
+  const avg = (arr[0] + arr[1] + arr[2]) / 3;
+  const excess = Math.max(0, qre - 0.5 * avg);
+  return { method: "ASC_14_EXCESS", credit: Math.round(excess * 0.14) };
+}
+
+export default function CreditCalculator() {
+  const { isCapitalization } = useLawRegime();
+  const form = useForm<CalcForm>({ resolver: zodResolver(CalcSchema), mode: "onChange", defaultValues: {
+    email: "", wages: 0, contractors: 0, supplies: 0, cloud: 0, software: 0, hasHistory: false
+  }});
+  const [step, setStep] = useState(1);
+  const values = form.watch();
+  const qre = useMemo(() => computeQRE(values), [values]);
+  const asc = useMemo(() => computeASC(qre, values), [qre, values]);
+  const tier = tierFor(asc.credit);
+
+  // localStorage autosave
+  useEffect(() => {
+    const s = JSON.stringify(values);
+    localStorage.setItem("calc_draft", s);
+  }, [values]);
+  useEffect(() => {
+    const raw = localStorage.getItem("calc_draft");
+    if (raw) try { form.reset(JSON.parse(raw)); } catch {}
+  }, []);
+
+  const canNext = form.formState.isValid;
+
+  return (
+    <div className="max-w-screen-lg mx-auto p-4 md:p-6 text-gray-900">
+      <h1 className="text-2xl md:text-3xl font-semibold mb-6">R&D Credit Estimator</h1>
+
+      {!isCapitalization && (
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm">
+          Note: Current rules reflect immediate expensing of §174 research costs (OBBBA). Confirm your filing-year treatment with a tax professional.
+        </div>
+      )}
+
+      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        {step === 1 && (
+          <section>
+            <h2 className="text-xl font-medium mb-4">1) Tell us about you</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <label className="block">
+                <span className="block text-sm mb-1">Contact email</span>
+                <input type="email" {...form.register("email")} className="w-full border rounded-md p-2" placeholder="you@company.com" />
+                <p className="text-red-600 text-sm mt-1">{form.formState.errors.email?.message}</p>
+              </label>
+              <label className="block">
+                <span className="block text-sm mb-1">W-2 wages (R&D)</span>
+                <input type="number" {...form.register("wages", { valueAsNumber: true })} className="w-full border rounded-md p-2" />
+              </label>
+              <label className="block">
+                <span className="block text-sm mb-1">Contractors (R&D)</span>
+                <input type="number" {...form.register("contractors", { valueAsNumber: true })} className="w-full border rounded-md p-2" />
+                <span className="text-xs text-gray-600">We’ll apply the 65% limiter automatically.</span>
+              </label>
+              <label className="block">
+                <span className="block text-sm mb-1">Supplies</span>
+                <input type="number" {...form.register("supplies", { valueAsNumber: true })} className="w-full border rounded-md p-2" />
+              </label>
+              <label className="block">
+                <span className="block text-sm mb-1">Cloud</span>
+                <input type="number" {...form.register("cloud", { valueAsNumber: true })} className="w-full border rounded-md p-2" />
+              </label>
+              <label className="block">
+                <span className="block text-sm mb-1">Software</span>
+                <input type="number" {...form.register("software", { valueAsNumber: true })} className="w-full border rounded-md p-2" />
+              </label>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" disabled={!canNext} onClick={() => setStep(2)} className="btn btn-primary disabled:opacity-50 px-4 py-2 rounded-md bg-blue-600 text-white">Next</button>
+            </div>
+          </section>
+        )}
+
+        {step === 2 && (
+          <section>
+            <h2 className="text-xl font-medium mb-4">2) Prior-year QREs (optional)</h2>
+            <label className="inline-flex items-center gap-2 mb-4">
+              <input type="checkbox" {...form.register("hasHistory")} />
+              <span className="text-sm">I have QREs for the prior 3 years</span>
+            </label>
+            {values.hasHistory && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <input type="number" placeholder="Year -1" {...form.register("priorQre0", { valueAsNumber: true })} className="border rounded-md p-2" />
+                <input type="number" placeholder="Year -2" {...form.register("priorQre1", { valueAsNumber: true })} className="border rounded-md p-2" />
+                <input type="number" placeholder="Year -3" {...form.register("priorQre2", { valueAsNumber: true })} className="border rounded-md p-2" />
+              </div>
+            )}
+            <div className="mt-6 flex justify-between">
+              <button type="button" onClick={() => setStep(1)} className="px-4 py-2 rounded-md border">Back</button>
+              <button type="button" onClick={() => setStep(3)} className="btn btn-primary px-4 py-2 rounded-md bg-blue-600 text-white">See results</button>
+            </div>
+          </section>
+        )}
+
+        {step === 3 && (
+          <section>
+            <h2 className="text-xl font-medium mb-2">3) Estimated credit</h2>
+            <p className="text-sm text-gray-700 mb-4">Numbers refresh instantly; we’ll also verify with the server.</p>
+            <div className="rounded-lg border p-4">
+              <div className="flex justify-between">
+                <span>QRE (with 65% contractor cap):</span>
+                <strong>${qre.toLocaleString()}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span>Method:</span>
+                <strong>{asc.method}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span>Estimated federal credit:</span>
+                <strong className="text-blue-700">${asc.credit.toLocaleString()}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span>Pricing tier:</span>
+                <strong>Tier {tier.tier} — ${tier.price}</strong>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-between">
+              <button type="button" onClick={() => setStep(2)} className="px-4 py-2 rounded-md border">Back</button>
+              <CheckoutCTA form={form} credit={asc.credit} />
+            </div>
+          </section>
+        )}
+      </form>
+    </div>
+  );
+}
+
+// Inline CTA component with robust gating + redirect flow
+function CheckoutCTA({ form, credit }: { form: ReturnType<typeof useForm<CalcForm>>, credit: number }) {
+  const [loading, setLoading] = useState(false);
+  const email = form.getValues("email");
+  const tier = tierFor(credit);
+  const emailValid = !!email && email.includes("@");
+  const ctaDisabled = !form.formState.isValid || !emailValid || loading;
+
+  async function onCheckout() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId: tier.priceId, metadata: { credit, tier: tier.tier, email } })
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url; // server returns session.url
+      } else {
+        console.error("No checkout URL returned", data);
+        alert("Unable to start checkout. Please try again.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Checkout error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (import.meta.env.DEV) {
+    console.debug("CTA state", {
+      valid: form.formState.isValid, emailValid, loading, credit, tier
+    });
+  }
+
+  return (
+    <button disabled={ctaDisabled} onClick={onCheckout}
+      className="btn btn-primary px-4 py-2 rounded-md bg-blue-600 text-white disabled:opacity-50">
+      {loading ? "Processing…" : "Continue to Checkout"}
+    </button>
+  );
+}
+
+Create tiny hook client/src/hooks/useLawRegime.ts (if missing):
+
+export function useLawRegime() {
+  const regime = (import.meta.env.VITE_LAW_REGIME || "OBBBA_174A_EXPENSE") as
+    | "OBBBA_174A_EXPENSE"
+    | "TCJA_174_CAPITALIZE_2022_2025";
+  return { regime, isCapitalization: regime === "TCJA_174_CAPITALIZE_2022_2025" };
+}
+
+Create a route page client/src/pages/Calculator.tsx that renders <CreditCalculator /> and register /calculator in your router.
+
+Commit: feat(calculator): restore 3-step estimator with lead capture and instant ASC compute
+
+⸻
+
+PART 2 — Pricing tiers + Stripe price mapping
+
+Create shared/config/pricing.ts:
+
+export const pricingTiers = [
+  { tier: 0, min: 0, max: 5000, price: 399,  priceId: process.env.NODE_ENV === "production" ? "price_live_0" : "price_test_0" },
+  { tier: 1, min: 5000, max: 10000, price: 500, priceId: process.env.NODE_ENV === "production" ? "price_live_1" : "price_test_1" },
+  { tier: 2, min: 10000, max: 20000, price: 750, priceId: process.env.NODE_ENV === "production" ? "price_live_2" : "price_test_2" },
+  { tier: 3, min: 20000, max: 35000, price: 1000, priceId: process.env.NODE_ENV === "production" ? "price_live_3" : "price_test_3" },
+  { tier: 4, min: 35000, max: 50000, price: 1250, priceId: process.env.NODE_ENV === "production" ? "price_live_4" : "price_test_4" },
+  { tier: 5, min: 50000, max: 100000, price: 1500, priceId: process.env.NODE_ENV === "production" ? "price_live_5" : "price_test_5" },
+  { tier: 6, min: 100000, max: 200000, price: 2000, priceId: process.env.NODE_ENV === "production" ? "price_live_6" : "price_test_6" },
+  { tier: 7, min: 200000, max: Infinity, price: 2500, priceId: process.env.NODE_ENV === "production" ? "price_live_7" : "price_test_7" }
+];
+export function tierFor(credit:number){
+  const t = pricingTiers.find(t => credit >= t.min && credit < t.max);
+  if(!t) throw new Error("No pricing tier for credit="+credit);
+  return t;
+}
+
+Replace "price_test_X" with your real Stripe Test Price IDs.
+
+Commit: feat(pricing): add tier mapping with Stripe Price IDs
+
+⸻
+
+PART 3 — Stripe Checkout endpoint (server → returns session.url)
+
+Create server/src/services/integrations/stripe.service.ts:
+
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: "2024-06-20" });
+
+export async function createCheckoutSession(params: {
+  priceId: string;
+  successUrl: string;
+  cancelUrl: string;
+  metadata?: Record<string, string|number|boolean>;
+}) {
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    line_items: [{ price: params.priceId, quantity: 1 }],
+    success_url: params.successUrl + "?session_id={CHECKOUT_SESSION_ID}",
+    cancel_url: params.cancelUrl,
+    metadata: Object.fromEntries(Object.entries(params.metadata || {}).map(([k,v]) => [k, String(v)])),
+  });
+  return session;
+}
+
+Create server/src/controllers/stripe.controller.ts:
+
+import { Request, Response } from "express";
+import { createCheckoutSession } from "../services/integrations/stripe.service";
+
+export async function postCheckout(req: Request, res: Response) {
+  try {
+    const { priceId, metadata } = req.body || {};
+    if (!priceId) return res.status(400).json({ error: "Missing priceId" });
+    const base = process.env.CLIENT_URL || "http://localhost:5173";
+    const session = await createCheckoutSession({
+      priceId,
+      successUrl: `${base}/dashboard`,
+      cancelUrl: `${base}/calculator`,
+      metadata
+    });
+    return res.json({ url: session.url });
+  } catch (e:any) {
+    console.error("Stripe checkout error", e);
+    return res.status(500).json({ error: "CHECKOUT_ERROR" });
+  }
+}
+
+Add a route server/src/routes/stripe.routes.ts:
+
+import { Router } from "express";
+import { postCheckout } from "../controllers/stripe.controller";
+const r = Router();
+r.post("/checkout", postCheckout);
+export default r;
+
+Wire it in your server app (e.g., server/src/index.ts or server/src/server.ts):
+
+import stripeRoutes from "./routes/stripe.routes";
+app.use("/api/stripe", stripeRoutes);
+
+Commit: feat(checkout): add Stripe Checkout endpoint returning session.url
+
+⸻
+
+PART 4 — Hook up the route & test
+	1.	Route /calculator → renders CreditCalculator.
+	2.	Open the calculator, fill example values:
+	•	Wages: 200000, Contractors: 80000, Supplies: 10000, Cloud: 5000, Software: 3000
+	•	Email: you@company.com
+	3.	Results step should show an estimate & tier.
+	4.	Click Continue to Checkout → should redirect to Stripe Checkout (test mode).
+	5.	Pay with test card 4242 4242 4242 4242 (any future date, CVC 123).
+	6.	You should land on /dashboard.
+
+If the button stays disabled, check DevTools Console for the “CTA state” log; fix whichever field is false (usually missing priceId or email).
+
+⸻
+
+PART 5 — Polish
+	•	Ensure calculator wrapper uses max-w-screen-lg mx-auto p-4 md:p-6.
+	•	Remove any remaining dark: classes in calculator components.
+	•	Keep the banner for OBBBA expensing visible (isCapitalization === false).
+
+Commits:
+	•	style(calculator): enforce light mode tokens and container spacing
+	•	fix(checkout): add dev console for CTA gating and catch errors
+
+⸻
+
+ACCEPTANCE
+	•	Light mode everywhere; no dark styling.
+	•	Calculator completes steps with inline validation.
+	•	Results page shows credit & tier.
+	•	Checkout CTA redirects to Stripe (no more dead button).
+	•	After payment, you see the Dashboard.
+
+If anything fails, print the exact file+line and I will produce a minimal patch.
+
+⸻
+
+that’s it. paste the prompt in, let it work, then try the flow. if the CTA still doesn’t fire, copy the “CTA state” line from your console and i’ll give you the 1-line fix.
