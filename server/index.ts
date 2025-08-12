@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
+import crypto from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -7,6 +8,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Add request_id middleware
+app.use((req, res, next) => {
+  (req as any).request_id = crypto.randomUUID();
+  next();
+});
+
+// Health endpoints
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+app.get("/readyz", async (_req, res) => {
+  // TODO: ping DB/Stripe if available; for now return ok:true
+  res.json({ ok: true });
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -22,13 +36,17 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
+      const requestId = (req as any).request_id;
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (requestId) {
+        logLine += ` [${requestId}]`;
+      }
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      if (logLine.length > 120) {
+        logLine = logLine.slice(0, 119) + "…";
       }
 
       log(logLine);

@@ -790,8 +790,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Your information has been saved successfully',
       });
     } catch (error: any) {
-      // Log error for debugging
-      console.error('Lead capture error:', error);
+      // Log error for debugging with request_id
+      const requestId = (req as any).request_id;
+      console.error('Lead capture error:', {
+        error: error.message,
+        requestId,
+        stack: error.stack,
+      });
       
       // Return user-friendly error
       if (error.name === 'ZodError') {
@@ -799,11 +804,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: false,
           message: 'Please check your information and try again',
           errors: error.errors,
+          requestId,
         });
       } else {
         res.status(400).json({ 
           success: false,
           message: error.message || 'Failed to save your information',
+          requestId,
         });
       }
     }
@@ -1199,9 +1206,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         documents
       });
     } catch (error: any) {
-      console.error("Documents retrieval error:", error);
+      const requestId = (req as any).request_id;
+      console.error("Documents retrieval error:", {
+        error: error.message,
+        requestId,
+        stack: error.stack,
+      });
       res.status(500).json({ 
-        message: error.message || "Failed to retrieve documents"
+        message: error.message || "Failed to retrieve documents",
+        requestId,
       });
     }
   });
@@ -1234,9 +1247,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         document
       });
     } catch (error: any) {
-      console.error("Document creation error:", error);
+      const requestId = (req as any).request_id;
+      console.error("Document creation error:", {
+        error: error.message,
+        requestId,
+        stack: error.stack,
+      });
       res.status(500).json({ 
-        message: error.message || "Failed to create document"
+        message: error.message || "Failed to create document",
+        requestId,
       });
     }
   });
@@ -1271,9 +1290,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         document: updatedDocument
       });
     } catch (error: any) {
-      console.error("Document URL update error:", error);
+      const requestId = (req as any).request_id;
+      console.error("Document URL update error:", {
+        error: error.message,
+        requestId,
+        stack: error.stack,
+      });
       res.status(500).json({ 
-        message: error.message || "Failed to update document URL"
+        message: error.message || "Failed to update document URL",
+        requestId,
       });
     }
   });
@@ -1309,9 +1334,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         document: updatedDocument
       });
     } catch (error: any) {
-      console.error("Document status update error:", error);
+      const requestId = (req as any).request_id;
+      console.error("Document status update error:", {
+        error: error.message,
+        requestId,
+        stack: error.stack,
+      });
       res.status(500).json({ 
-        message: error.message || "Failed to update document status"
+        message: error.message || "Failed to update document status",
+        requestId,
       });
     }
   });
@@ -2504,8 +2535,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error: any) {
-      // Generate request ID for error tracking
-      const requestId = `req_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 5)}`;
+      // Use existing request_id from middleware or generate one
+      const requestId = (req as any).request_id || `req_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 5)}`;
       
       console.error("Document generation request error:", {
         error: error.message,

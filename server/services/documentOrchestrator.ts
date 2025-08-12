@@ -559,6 +559,7 @@ export class DocumentOrchestrator extends EventEmitter {
       retryCount: job.retryCount,
       requestId,
       userId: job.userId,
+      timestamp: new Date().toISOString(),
     });
 
     // Determine if we should retry
