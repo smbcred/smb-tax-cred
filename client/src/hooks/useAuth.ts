@@ -33,6 +33,7 @@ export function useAuth() {
 
       return response.json();
     },
+    enabled: !!localStorage.getItem("auth_token"), // Only fetch if token exists
     retry: false,
   });
 
