@@ -48,7 +48,8 @@ export async function postCheckout(req: Request, res: Response) {
     
     res.json({ url: session.url });
   } catch (e: any) {
-    console.error("Stripe checkout error", e);
+    const rid = (req as any).request_id;
+    console.error("Stripe checkout error", { rid, err: e });
     res.status(500).json({ error: "CHECKOUT_ERROR" });
   }
 }

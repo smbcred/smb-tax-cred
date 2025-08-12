@@ -61,7 +61,7 @@ export function useAuth() {
         await apiRequest("POST", "/api/auth/logout", {});
       } catch (error) {
         // Continue with logout even if API call fails
-        console.warn("Logout API call failed:", error);
+        if (import.meta.env.DEV) console.debug("Logout API call failed:", error);
       }
     }
     

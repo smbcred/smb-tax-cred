@@ -36,7 +36,7 @@ export function ErrorFallback({
       setCopiedErrorId(true);
       setTimeout(() => setCopiedErrorId(false), 2000);
     } catch (err) {
-      console.error('Failed to copy error ID:', err);
+      if (import.meta.env.DEV) console.debug('Failed to copy error ID:', err);
     }
   };
 

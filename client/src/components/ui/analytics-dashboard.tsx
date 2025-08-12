@@ -88,7 +88,7 @@ export function AnalyticsDashboard() {
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      console.error('Dashboard data fetch error:', err);
+      if (import.meta.env.DEV) console.debug('Dashboard data fetch error:', err);
     } finally {
       setLoading(false);
     }

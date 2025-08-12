@@ -174,7 +174,7 @@ export const LazyComponents = {
 export function useComponentPreloader() {
   const preload = (componentName: keyof typeof LazyComponents) => {
     // This would be implemented based on your routing system
-    console.log(`Preloading component: ${componentName}`);
+    if (import.meta.env.DEV) console.debug(`Preloading component: ${componentName}`);
   };
 
   const preloadOnHover = (componentName: keyof typeof LazyComponents) => {

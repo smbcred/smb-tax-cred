@@ -279,7 +279,7 @@ export function usePayment() {
   ): Promise<T> => {
     return execute(`payment_${paymentId}`, paymentFn, {
       onRetry: (attempt) => {
-        console.log(`Payment retry attempt ${attempt} for ${paymentId}`);
+        if (import.meta.env.DEV) console.debug(`Payment retry attempt ${attempt} for ${paymentId}`);
       }
     });
   }, [execute]);

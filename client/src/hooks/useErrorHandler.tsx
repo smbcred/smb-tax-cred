@@ -50,11 +50,11 @@ export function useErrorHandler() {
     },
     onSuccess: (errorId) => {
       if (errorId) {
-        console.log('Error reported successfully:', errorId);
+        if (import.meta.env.DEV) console.debug('Error reported successfully:', errorId);
       }
     },
     onError: (error) => {
-      console.error('Failed to report error:', error);
+      if (import.meta.env.DEV) console.debug('Failed to report error:', error);
       toast({
         title: 'Error Reporting Failed',
         description: 'We couldn\'t report this error automatically. Please contact support if the issue persists.',

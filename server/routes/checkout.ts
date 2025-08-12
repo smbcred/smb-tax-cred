@@ -90,7 +90,8 @@ router.post('/session', checkoutRateLimit, validateCheckoutSession, async (req: 
       },
     });
   } catch (error) {
-    console.error('Checkout session creation failed:', error);
+    const rid = (req as any).request_id;
+    console.error('Checkout session creation failed:', { rid, error });
     res.status(500).json({
       error: 'Failed to create checkout session',
       message: 'Please try again or contact support if the problem persists.',
@@ -117,7 +118,8 @@ router.get('/session/:sessionId', async (req, res) => {
       status: 'Session retrieval not fully implemented - use webhooks for status updates',
     });
   } catch (error) {
-    console.error('Session retrieval failed:', error);
+    const rid = (req as any).request_id;
+    console.error('Session retrieval failed:', { rid, error });
     res.status(500).json({
       error: 'Failed to retrieve session',
     });

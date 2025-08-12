@@ -53,7 +53,7 @@ export function useLeadCapture() {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
     },
     onError: (err: Error) => {
-      console.error('Lead capture error:', err);
+      if (import.meta.env.DEV) console.debug('Lead capture error:', err);
       setError(err.message || 'Something went wrong. Please try again.');
     }
   });

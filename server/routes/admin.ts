@@ -86,7 +86,8 @@ router.get('/dashboard', async (req, res) => {
       recentActivity,
     });
   } catch (error) {
-    console.error('Dashboard error:', error);
+    const rid = (req as any).request_id;
+    console.error('Dashboard error:', { rid, error });
     res.status(500).json({ error: 'Failed to load dashboard data' });
   }
 });
@@ -130,7 +131,8 @@ router.get('/leads', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Failed to fetch leads:', error);
+    const rid = (req as any).request_id;
+    console.error('Failed to fetch leads:', { rid, error });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch leads'
@@ -179,7 +181,8 @@ router.get('/customers', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Failed to fetch customers:', error);
+    const rid = (req as any).request_id;
+    console.error('Failed to fetch customers:', { rid, error });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customers'

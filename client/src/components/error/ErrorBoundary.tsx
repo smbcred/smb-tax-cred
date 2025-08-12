@@ -92,7 +92,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         }),
       });
 
-      console.error('Error boundary caught an error:', {
+      if (import.meta.env.DEV) console.debug('Error boundary caught an error:', {
         errorId,
         error: error.message,
         stack: error.stack,
@@ -100,10 +100,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       });
 
     } catch (reportingError) {
-      console.error('Failed to report error:', reportingError);
+      if (import.meta.env.DEV) console.debug('Failed to report error:', reportingError);
       
       // Fallback: log to browser console with structured data
-      console.error('ERROR_BOUNDARY_FALLBACK', {
+      if (import.meta.env.DEV) console.debug('ERROR_BOUNDARY_FALLBACK', {
         errorId,
         originalError: {
           message: error.message,

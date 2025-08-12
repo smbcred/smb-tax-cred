@@ -89,7 +89,7 @@ export function useStatusPolling(triggerId: string, options: StatusPollingOption
       });
     },
     onError: (error: Error) => {
-      console.error('Start polling error:', error);
+      if (import.meta.env.DEV) console.debug('Start polling error:', error);
       onError?.(error.message);
       toast({
         title: "Monitoring Failed",
@@ -123,7 +123,7 @@ export function useStatusPolling(triggerId: string, options: StatusPollingOption
       });
     },
     onError: (error: Error) => {
-      console.error('Stop polling error:', error);
+      if (import.meta.env.DEV) console.debug('Stop polling error:', error);
       onError?.(error.message);
     },
   });
@@ -173,7 +173,7 @@ export function useStatusPolling(triggerId: string, options: StatusPollingOption
           }
         }
       } catch (error: any) {
-        console.error('Polling error:', error);
+        if (import.meta.env.DEV) console.debug('Polling error:', error);
         onError?.(error.message);
       }
     }, interval);
