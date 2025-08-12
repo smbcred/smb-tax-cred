@@ -20,13 +20,49 @@ interface Document {
   downloadCount: number | null;
 }
 
-interface DocumentGenerationRequest {
-  customerId: string;
+interface CompanyContext {
+  companyName: string;
   taxYear: number;
-  docType: 'form_6765' | 'technical_narrative' | 'compliance_memo';
-  payload: Record<string, any>;
-  companyId: string;
-  intakeFormId: string;
+  industry: string;
+  businessType: 'corporation' | 'llc' | 'partnership' | 'sole_proprietorship';
+}
+
+interface RdActivity {
+  activity: string;
+  description: string;
+  timeSpent: number;
+  category: 'experimentation' | 'testing' | 'analysis' | 'development' | 'evaluation';
+}
+
+interface ProjectContext {
+  projectName: string;
+  projectDescription: string;
+  rdActivities: RdActivity[];
+  technicalChallenges: string[];
+  uncertainties: string[];
+  innovations: string[];
+  businessPurpose: string;
+}
+
+interface ExpenseContext {
+  totalExpenses: number;
+  wageExpenses: number;
+  contractorExpenses: number;
+  supplyExpenses: number;
+}
+
+interface DocumentOptions {
+  includeNarrative?: boolean;
+  includeComplianceMemo?: boolean;
+  includePDF?: boolean;
+}
+
+interface DocumentGenerationRequest {
+  companyContext: CompanyContext;
+  projectContext: ProjectContext;
+  expenseContext: ExpenseContext;
+  documentOptions: DocumentOptions;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
 }
 
 export default function DocumentsPage() {
@@ -40,39 +76,69 @@ export default function DocumentsPage() {
     enabled: true,
   });
 
-  // Generate document mutation
+  // Document generation error state
+  const [generationError, setGenerationError] = useState<{
+    message: string;
+    isRetryable: boolean;
+    requestId?: string;
+  } | null>(null);
+
+  // Generate document mutation with friendly error handling
   const generateDocMutation = useMutation({
     mutationFn: async (request: DocumentGenerationRequest) => {
-      const response = await fetch('/api/docs/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(request),
-      });
+      try {
+        setGenerationError(null);
+        const response = await fetch('/api/documents/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(request),
+        });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Document generation failed');
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Check if it's a transient error (503) that should show friendly message
+          if (response.status === 503) {
+            throw {
+              message: "We couldn't generate your documents right now. Please try again in a few minutes.",
+              isRetryable: true,
+              requestId: data.requestId,
+            };
+          }
+          
+          // Other errors get more specific messaging
+          throw {
+            message: data.error || 'Document generation failed',
+            isRetryable: response.status >= 500, // Server errors are retryable
+          };
+        }
+
+        return data;
+      } catch (error: any) {
+        // Network errors or unexpected issues
+        if (!error.message) {
+          throw {
+            message: "We couldn't generate your documents right now. Please try again in a few minutes.",
+            isRetryable: true,
+          };
+        }
+        throw error;
       }
-
-      return response.json();
     },
     onSuccess: (data) => {
       toast({
-        title: "Document Generated",
-        description: `Your ${generatingDocType?.replace('_', ' ')} has been generated successfully.`,
+        title: "Document Generation Started",
+        description: `Your ${generatingDocType?.replace('_', ' ')} is being generated.`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/documents'] });
       setGeneratingDocType(null);
+      setGenerationError(null);
     },
     onError: (error: any) => {
-      toast({
-        title: "Generation Failed",
-        description: error.message || "Failed to generate document. Please try again.",
-        variant: "destructive",
-      });
+      setGenerationError(error);
       setGeneratingDocType(null);
     },
   });
@@ -110,36 +176,25 @@ export default function DocumentsPage() {
 
   const handleGenerateDocument = (docType: 'form_6765' | 'technical_narrative' | 'compliance_memo') => {
     setGeneratingDocType(docType);
+    setGenerationError(null);
     
     // For now, use sample data - this would come from the user's actual intake form
-    const sampleRequest: DocumentGenerationRequest = {
-      customerId: 'user-customer-' + Date.now(),
-      taxYear: 2024,
-      docType,
-      payload: {
+    const sampleRequest = {
+      companyContext: {
         companyName: 'Sample Company Inc.',
-        ein: '12-3456789',
-        businessType: 'corporation',
-        currentYearExpenses: {
-          wages: 250000,
-          contractors: 75000,
-          supplies: 15000,
-          total: 340000,
-        },
-        calculations: {
-          totalQualifiedExpenses: 340000,
-          ascPercentage: 14,
-          baseAmount: 47600,
-          creditAmount: 47600,
-          riskLevel: 'low',
-        },
+        taxYear: 2024,
+        industry: 'technology',
+        businessType: 'corporation' as const,
+      },
+      projectContext: {
+        projectName: 'AI Innovation Project',
+        projectDescription: 'Developing machine learning models for business optimization',
         rdActivities: [
           {
             activity: 'AI Model Development',
             description: 'Developing machine learning models for business optimization',
-            hours: 520,
-            wages: 45000,
-            category: 'experimentation',
+            timeSpent: 520,
+            category: 'experimentation' as const,
           },
         ],
         technicalChallenges: ['Model accuracy optimization', 'Data preprocessing'],
@@ -147,11 +202,27 @@ export default function DocumentsPage() {
         innovations: ['Custom neural architecture', 'Automated feature engineering'],
         businessPurpose: 'Enhance operational efficiency through AI automation',
       },
-      companyId: 'sample-company-id',
-      intakeFormId: 'sample-intake-id',
+      expenseContext: {
+        totalExpenses: 340000,
+        wageExpenses: 250000,
+        contractorExpenses: 75000,
+        supplyExpenses: 15000,
+      },
+      documentOptions: {
+        includeNarrative: docType === 'technical_narrative',
+        includeComplianceMemo: docType === 'compliance_memo',
+        includePDF: docType === 'form_6765',
+      },
+      priority: 'normal' as const,
     };
 
     generateDocMutation.mutate(sampleRequest);
+  };
+
+  const handleRetryGeneration = () => {
+    if (generatingDocType) {
+      handleGenerateDocument(generatingDocType as any);
+    }
   };
 
   const handleDownload = (documentId: string) => {
@@ -218,6 +289,39 @@ export default function DocumentsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Friendly error display */}
+          {generationError && (
+            <div className="mt-4 mb-6 border border-amber-300 bg-amber-50 p-4 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-amber-800 mb-3">
+                    {generationError.message}
+                  </p>
+                  {generationError.requestId && (
+                    <p className="text-xs text-amber-600 mb-3">
+                      Request ID: {generationError.requestId}
+                    </p>
+                  )}
+                  {generationError.isRetryable && (
+                    <Button
+                      onClick={handleRetryGeneration}
+                      variant="outline"
+                      size="sm"
+                      disabled={generateDocMutation.isPending}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                    >
+                      {generateDocMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : null}
+                      Try Again
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="border-2 border-dashed">
               <CardContent className="p-6 text-center">

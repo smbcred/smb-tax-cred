@@ -538,20 +538,27 @@ export class DocumentOrchestrator extends EventEmitter {
   }
 
   private async handleJobError(job: DocumentJob, service: string, error: string): Promise<void> {
+    // Generate request ID for tracking provider errors
+    const requestId = `req_${job.id}_${Date.now().toString(36)}`;
+    
     const errorEntry = {
       service,
       error,
       timestamp: new Date().toISOString(),
       retryCount: job.retryCount,
+      requestId,
     };
 
     job.errors.push(errorEntry);
 
+    // Log provider errors with request ID for tracking
     console.error('Document generation service error:', {
       jobId: job.id,
       service,
       error,
       retryCount: job.retryCount,
+      requestId,
+      userId: job.userId,
     });
 
     // Determine if we should retry
@@ -560,6 +567,7 @@ export class DocumentOrchestrator extends EventEmitter {
         jobId: job.id,
         service,
         retryCount: job.retryCount + 1,
+        requestId,
       });
 
       // Schedule retry with progressive delay

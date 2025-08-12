@@ -2455,6 +2455,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return 'low';
   }
 
+  // Helper function to determine if error is transient (should return 503)
+  function isTransientError(error: any): boolean {
+    const transientIndicators = [
+      'timeout',
+      'rate limit',
+      'temporarily unavailable',
+      'service unavailable',
+      'network error',
+      'connection error',
+      'ECONNRESET',
+      'ETIMEDOUT',
+      'ENOTFOUND',
+    ];
+    
+    const errorMessage = (error.message || '').toLowerCase();
+    return transientIndicators.some(indicator => errorMessage.includes(indicator));
+  }
+
   // Document orchestrator endpoints
   app.post("/api/documents/generate", authenticateToken, async (req: any, res) => {
     try {
@@ -2486,7 +2504,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error: any) {
-      console.error("Document generation request error:", error);
+      // Generate request ID for error tracking
+      const requestId = `req_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 5)}`;
+      
+      console.error("Document generation request error:", {
+        error: error.message,
+        userId: req.user.id,
+        requestId,
+        stack: error.stack,
+      });
       
       // Handle validation errors
       if (error.name === 'ZodError') {
@@ -2494,12 +2520,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: false,
           error: 'Invalid request data',
           details: error.errors,
+          requestId,
         });
       }
 
-      res.status(500).json({ 
+      // Check if this is a transient error that should return 503
+      const isTransient = isTransientError(error);
+      const statusCode = isTransient ? 503 : 500;
+      const userMessage = isTransient 
+        ? "We couldn't generate your documents right now. Please try again in a few minutes."
+        : error.message || "Failed to start document generation";
+
+      res.status(statusCode).json({ 
         success: false,
-        error: error.message || "Failed to start document generation"
+        error: userMessage,
+        requestId,
+        isRetryable: isTransient,
       });
     }
   });
