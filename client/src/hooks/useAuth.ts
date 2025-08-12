@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface User {
@@ -9,21 +10,37 @@ interface User {
 
 export function useAuth() {
   const queryClient = useQueryClient();
+  const [token, setToken] = useState<string | null>(null);
+
+  // Track token changes reactively
+  useEffect(() => {
+    const checkToken = () => {
+      const currentToken = localStorage.getItem("auth_token");
+      setToken(currentToken);
+    };
+    
+    checkToken();
+    
+    // Listen for storage changes
+    window.addEventListener('storage', checkToken);
+    return () => window.removeEventListener('storage', checkToken);
+  }, []);
   
   const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) return null;
+      const currentToken = localStorage.getItem("auth_token");
+      if (!currentToken) return null;
 
       const response = await fetch("/api/auth/user", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
         },
       });
 
       if (response.status === 401) {
         localStorage.removeItem("auth_token");
+        setToken(null);
         return null;
       }
 
@@ -33,7 +50,7 @@ export function useAuth() {
 
       return response.json();
     },
-    enabled: !!localStorage.getItem("auth_token"), // Only fetch if token exists
+    enabled: !!token, // Only fetch if token exists
     retry: false,
   });
 

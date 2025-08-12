@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, X } from 'lucide-react';
+import { s } from "@shared/utils/safe";
 
 type AdminTab = 'leads' | 'customers' | 'documents' | 'payments' | 'webhooks';
 
@@ -24,31 +25,36 @@ export function FilterBar({ activeTab, filters, onFiltersChange }: FilterBarProp
   const [localFilters, setLocalFilters] = useState<AdminFilters>(filters);
 
   const handleSearchChange = (search: string) => {
-    const newFilters = { ...localFilters, search: search || undefined };
+    const safeSearch = s(search);
+    const newFilters = { ...localFilters, search: safeSearch || undefined };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
 
   const handleDateFromChange = (dateFrom: string) => {
-    const newFilters = { ...localFilters, dateFrom: dateFrom || undefined };
+    const safeDateFrom = s(dateFrom);
+    const newFilters = { ...localFilters, dateFrom: safeDateFrom || undefined };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
 
   const handleDateToChange = (dateTo: string) => {
-    const newFilters = { ...localFilters, dateTo: dateTo || undefined };
+    const safeDateTo = s(dateTo);
+    const newFilters = { ...localFilters, dateTo: safeDateTo || undefined };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
 
   const handleStatusChange = (status: string) => {
-    const newFilters = { ...localFilters, status: status === 'all' ? undefined : status };
+    const safeStatus = s(status);
+    const newFilters = { ...localFilters, status: safeStatus === 'all' ? undefined : safeStatus };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
 
   const handleSourceChange = (source: string) => {
-    const newFilters = { ...localFilters, source: source === 'all' ? undefined : source };
+    const safeSource = s(source);
+    const newFilters = { ...localFilters, source: safeSource === 'all' ? undefined : safeSource };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
