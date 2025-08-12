@@ -14,6 +14,7 @@ import { userRegistrationValidation, userLoginValidation } from "./middleware/va
 import checkoutRoutes from "./routes/checkout.js";
 import { adminRouter } from "./routes/admin";
 import { healthRouter } from "./routes/health";
+import stripeRoutes from "./src/routes/stripe.routes.js";
 
 // Define authentication middleware directly
 function isAuthenticated(req: any, res: any, next: any) {
@@ -169,34 +170,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register checkout routes
   app.use("/api/checkout", checkoutRoutes);
-
-  // Add Stripe checkout endpoint for new calculator
-  app.post("/api/stripe/checkout", async (req, res) => {
-    try {
-      const { priceId, metadata } = req.body;
-      
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        payment_method_types: ['card'],
-        line_items: [{
-          price: priceId,
-          quantity: 1,
-        }],
-        metadata: {
-          credit: metadata.credit,
-          tier: metadata.tier,
-          email: metadata.email,
-        },
-        success_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/calculator`,
-      });
-
-      res.json({ url: session.url });
-    } catch (error) {
-      console.error('Stripe checkout error:', error);
-      res.status(500).json({ error: 'Failed to create checkout session' });
-    }
-  });
+  
+  // Register Stripe routes
+  app.use("/api/stripe", stripeRoutes);
 
   // Register analytics routes
   const { default: analyticsRoutes } = await import('./routes/analytics.js');
