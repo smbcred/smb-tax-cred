@@ -379,12 +379,12 @@ export function useDocumentOrchestrator() {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'pending': return 'text-yellow-600 dark:text-yellow-400';
-      case 'in_progress': return 'text-blue-600 dark:text-blue-400';
-      case 'completed': return 'text-green-600 dark:text-green-400';
-      case 'failed': return 'text-red-600 dark:text-red-400';
-      case 'timeout': return 'text-orange-600 dark:text-orange-400';
-      default: return 'text-gray-600 dark:text-gray-400';
+      case 'pending': return 'text-yellow-600';
+      case 'in_progress': return 'text-blue-600';
+      case 'completed': return 'text-green-600';
+      case 'failed': return 'text-red-600';
+      case 'timeout': return 'text-orange-600';
+      default: return 'text-gray-600';
     }
   };
 

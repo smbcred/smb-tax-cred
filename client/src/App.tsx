@@ -42,15 +42,15 @@ const Admin = lazy(() => import("@/pages/Admin"));
 // Performance-optimized loading skeleton
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-white">
       <div className="animate-pulse">
         {/* Header skeleton */}
-        <div className="h-16 bg-gray-200 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="h-16 bg-gray-200 border-b border-gray-200">
           <div className="container mx-auto px-4 h-full flex items-center justify-between">
-            <div className="h-8 w-32 bg-gray-300 dark:bg-gray-700 rounded"></div>
+            <div className="h-8 w-32 bg-gray-300 rounded"></div>
             <div className="flex space-x-4">
-              <div className="h-8 w-20 bg-gray-300 dark:bg-gray-700 rounded"></div>
-              <div className="h-8 w-20 bg-gray-300 dark:bg-gray-700 rounded"></div>
+              <div className="h-8 w-20 bg-gray-300 rounded"></div>
+              <div className="h-8 w-20 bg-gray-300 rounded"></div>
             </div>
           </div>
         </div>
@@ -58,15 +58,15 @@ function LoadingSkeleton() {
         {/* Content skeleton */}
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto space-y-6">
-            <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-800 rounded"></div>
-            <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div className="h-8 w-3/4 bg-gray-200 rounded"></div>
+            <div className="h-4 w-1/2 bg-gray-200 rounded"></div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="space-y-4">
-                  <div className="h-40 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
-                  <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                  <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                  <div className="h-40 bg-gray-200 rounded-lg"></div>
+                  <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+                  <div className="h-4 w-1/2 bg-gray-200 rounded"></div>
                 </div>
               ))}
             </div>

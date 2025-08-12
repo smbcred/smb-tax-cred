@@ -260,17 +260,17 @@ export function useComplianceMemo() {
   };
 
   const getComplianceColor = (score: number): string => {
-    if (score >= 85) return 'text-green-600 dark:text-green-400';
-    if (score >= 70) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+    if (score >= 85) return 'text-green-600';
+    if (score >= 70) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getRiskColor = (risk: 'low' | 'medium' | 'high'): string => {
     switch (risk) {
-      case 'low': return 'text-green-600 dark:text-green-400';
-      case 'medium': return 'text-yellow-600 dark:text-yellow-400';
-      case 'high': return 'text-red-600 dark:text-red-400';
-      default: return 'text-gray-600 dark:text-gray-400';
+      case 'low': return 'text-green-600';
+      case 'medium': return 'text-yellow-600';
+      case 'high': return 'text-red-600';
+      default: return 'text-gray-600';
     }
   };
 

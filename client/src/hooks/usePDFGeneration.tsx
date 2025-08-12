@@ -289,9 +289,9 @@ export function usePDFGeneration() {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'pending': return 'text-yellow-600 dark:text-yellow-400';
-      case 'processing': return 'text-blue-600 dark:text-blue-400';
-      case 'completed': return 'text-green-600 dark:text-green-400';
+      case 'pending': return 'text-yellow-600';
+      case 'processing': return 'text-blue-600';
+      case 'completed': return 'text-green-600';
       case 'failed': return 'text-red-600 dark:text-red-400';
       default: return 'text-gray-600 dark:text-gray-400';
     }

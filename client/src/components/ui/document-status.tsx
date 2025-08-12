@@ -169,7 +169,7 @@ export function DocumentStatus({
                 <Calendar className="h-3 w-3" />
                 Expires:
               </span>
-              <span className={cn(isExpired && "text-red-600 dark:text-red-400")}>
+              <span className={cn(isExpired && "text-red-600")}>
                 {formatDistanceToNow(new Date(document.accessExpiresAt), { addSuffix: true })}
               </span>
             </div>
@@ -186,7 +186,7 @@ export function DocumentStatus({
         {/* Error Message */}
         {document.status === 'failed' && document.generationError && (
           <div className="mt-3 pt-3 border-t">
-            <div className="text-xs text-red-600 dark:text-red-400">
+            <div className="text-xs text-red-600">
               <strong>Error:</strong> {document.generationError}
             </div>
           </div>
@@ -217,11 +217,11 @@ export function DocumentList({
         {[1, 2, 3].map((i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-8 bg-gray-200 rounded"></div>
             </CardContent>
           </Card>
         ))}

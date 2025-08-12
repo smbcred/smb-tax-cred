@@ -107,7 +107,7 @@ export function SyncStatusIndicator({
             </span>
           )}
           {syncStatus.error && (
-            <span className="text-red-600 dark:text-red-400">
+            <span className="text-red-600">
               Error: {syncStatus.error}
             </span>
           )}
@@ -168,7 +168,7 @@ export function SyncStatusCard({
 
       {syncStatus.status === 'failed' && syncStatus.error && (
         <div className="mt-3 pt-3 border-t">
-          <div className="text-xs text-red-600 dark:text-red-400">
+          <div className="text-xs text-red-600">
             <strong>Error:</strong> {syncStatus.error}
           </div>
         </div>
