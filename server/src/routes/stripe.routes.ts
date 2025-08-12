@@ -1,8 +1,9 @@
-import { Router } from "express";
-import { postCheckout } from "../controllers/stripe.controller.js";
+import { Router } from 'express';
+import { postCheckout } from '../controllers/stripe.controller';
 
-const r = Router();
+const router = Router();
 
-r.post("/checkout", postCheckout);
+// Checkout endpoint that the calculator calls
+router.post('/checkout', postCheckout);
 
-export default r;
+export default router;

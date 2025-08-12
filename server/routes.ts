@@ -14,7 +14,7 @@ import { userRegistrationValidation, userLoginValidation } from "./middleware/va
 import checkoutRoutes from "./routes/checkout.js";
 import { adminRouter } from "./routes/admin";
 import { healthRouter } from "./routes/health";
-import stripeRoutes from "./src/routes/stripe.routes.js";
+import stripeRoutes from "./src/routes/stripe.routes";
 
 // Define authentication middleware directly
 function isAuthenticated(req: any, res: any, next: any) {
