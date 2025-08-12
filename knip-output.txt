@@ -1,0 +1,456 @@
+Unused files (99)
+client/src/components/admin/IntegrationStatus.tsx                
+client/src/components/downloads/DownloadManager.tsx              
+client/src/components/error/ErrorBoundary.tsx                    
+client/src/components/error/ErrorFallback.tsx                    
+client/src/components/error/ErrorProvider.tsx                    
+client/src/components/intake/CompanyInfo.tsx                     
+client/src/components/intake/IntakeForm.tsx                      
+client/src/components/leadCapture/LeadCaptureModal.tsx           
+client/src/components/marketing/FeaturesSection.tsx              
+client/src/components/marketing/GoogleAnalytics.tsx              
+client/src/components/marketing/HeroSection.tsx                  
+client/src/components/marketing/LandingOptimizations.tsx         
+client/src/components/marketing/PricingSection.tsx               
+client/src/components/marketing/SocialShare.tsx                  
+client/src/components/modals/LeadCaptureModal.tsx                
+client/src/components/seo/SEOHead.tsx                            
+client/src/components/seo/StructuredData.tsx                     
+client/src/components/ui/alert-dialog.tsx                        
+client/src/components/ui/aspect-ratio.tsx                        
+client/src/components/ui/avatar.tsx                              
+client/src/components/ui/breadcrumb.tsx                          
+client/src/components/ui/calendar.tsx                            
+client/src/components/ui/carousel.tsx                            
+client/src/components/ui/chart.tsx                               
+client/src/components/ui/collapsible.tsx                         
+client/src/components/ui/command.tsx                             
+client/src/components/ui/context-menu.tsx                        
+client/src/components/ui/document-status.tsx                     
+client/src/components/ui/drawer.tsx                              
+client/src/components/ui/hover-card.tsx                          
+client/src/components/ui/input-otp.tsx                           
+client/src/components/ui/lazy-component.tsx                      
+client/src/components/ui/menubar.tsx                             
+client/src/components/ui/navigation-menu.tsx                     
+client/src/components/ui/optimized-image.tsx                     
+client/src/components/ui/pagination.tsx                          
+client/src/components/ui/popover.tsx                             
+client/src/components/ui/progress-monitor.tsx                    
+client/src/components/ui/radio-group.tsx                         
+client/src/components/ui/resizable.tsx                           
+client/src/components/ui/scroll-area.tsx                         
+client/src/components/ui/sidebar.tsx                             
+client/src/components/ui/slider.tsx                              
+client/src/components/ui/switch.tsx                              
+client/src/components/ui/sync-status.tsx                         
+client/src/components/ui/table.tsx                               
+client/src/components/ui/toggle-group.tsx                        
+client/src/components/ui/toggle.tsx                              
+client/src/components/ui/workflow-status.tsx                     
+client/src/data/complianceContent.ts                             
+client/src/hooks/use-mobile.tsx                                  
+client/src/hooks/useClaudeService.tsx                            
+client/src/hooks/useComplianceMemo.tsx                           
+client/src/hooks/useDebounce.ts                                  
+client/src/hooks/useDocumentOrchestrator.tsx                     
+client/src/hooks/useDownloadSystem.tsx                           
+client/src/hooks/useEmailNotifications.tsx                       
+client/src/hooks/useErrorHandler.tsx                             
+client/src/hooks/useIntegrationStatus.tsx                        
+client/src/hooks/useLazyLoad.tsx                                 
+client/src/hooks/useLeadCapture.ts                               
+client/src/hooks/useNarrativeService.tsx                         
+client/src/hooks/usePDFGeneration.tsx                            
+client/src/hooks/useS3Storage.tsx                                
+client/src/hooks/useStatusPolling.tsx                            
+client/src/lib/errorReporting.ts                                 
+client/src/services/calculation/business-examples.service.ts     
+client/src/services/calculation/calculator.engine.ts             
+client/src/services/calculation/innovation-calculator.engine.ts  
+client/src/styles/design-tokens.ts                               
+client/src/test/setup.ts                                         
+client/src/types/index.ts                                        
+client/src/types/innovation-calculation.types.ts                 
+client/src/utils/analytics.ts                                    
+client/src/utils/animations.ts                                   
+client/src/utils/caching.ts                                      
+client/src/utils/cdn.ts                                          
+client/src/utils/lawRegime.ts                                    
+client/src/utils/pricing.ts                                      
+client/src/utils/security.ts                                     
+server/config/environment.ts                                     
+server/config/lawRegime.ts                                       
+server/middleware/caching.ts                                     
+server/middleware/integrationMiddleware.ts                       
+server/middleware/rateLimit.ts                                   
+server/middleware/webhook.ts                                     
+server/objectAcl.ts                                              
+server/objectStorage.ts                                          
+server/services/backupService.ts                                 
+server/services/complianceService.ts                             
+server/services/connectionPool.ts                                
+server/services/integrationRecovery.ts                           
+server/services/queryOptimizer.ts                                
+server/services/queueService.ts                                  
+server/services/retryService.ts                                  
+server/src/services/documint.ts                                  
+tests/playwright/helpers/axe.ts                                  
+tests/playwright/helpers/env.ts                                  
+tests/playwright/playwright.config.ts                            
+Unused dependencies (48)
+@google-cloud/storage            package.json:18:6 
+@jridgewell/trace-mapping        package.json:20:6 
+@radix-ui/react-alert-dialog     package.json:24:6 
+@radix-ui/react-aspect-ratio     package.json:25:6 
+@radix-ui/react-avatar           package.json:26:6 
+@radix-ui/react-collapsible      package.json:28:6 
+@radix-ui/react-context-menu     package.json:29:6 
+@radix-ui/react-hover-card       package.json:32:6 
+@radix-ui/react-menubar          package.json:34:6 
+@radix-ui/react-navigation-menu  package.json:35:6 
+@radix-ui/react-popover          package.json:36:6 
+@radix-ui/react-radio-group      package.json:38:6 
+@radix-ui/react-scroll-area      package.json:39:6 
+@radix-ui/react-slider           package.json:42:6 
+@radix-ui/react-switch           package.json:44:6 
+@radix-ui/react-toggle           package.json:47:6 
+@radix-ui/react-toggle-group     package.json:48:6 
+@sendgrid/client                 package.json:50:6 
+@testing-library/user-event      package.json:58:6 
+@uppy/aws-s3                     package.json:68:6 
+@uppy/core                       package.json:69:6 
+@uppy/dashboard                  package.json:70:6 
+@uppy/drag-drop                  package.json:71:6 
+@uppy/file-input                 package.json:72:6 
+@uppy/progress-bar               package.json:73:6 
+@uppy/react                      package.json:74:6 
+cmdk                             package.json:81:6 
+connect-pg-simple                package.json:82:6 
+embla-carousel-react             package.json:88:6 
+express-session                  package.json:94:6 
+glob                             package.json:97:6 
+google-auth-library              package.json:98:6 
+input-otp                        package.json:101:6
+memoizee                         package.json:106:6
+memorystore                      package.json:107:6
+next-themes                      package.json:110:6
+node-cron                        package.json:111:6
+node-fetch                       package.json:112:6
+nodemon                          package.json:113:6
+openid-client                    package.json:114:6
+passport                         package.json:115:6
+passport-local                   package.json:116:6
+react-day-picker                 package.json:120:6
+react-helmet-async               package.json:122:6
+react-resizable-panels           package.json:126:6
+tw-animate-css                   package.json:132:6
+vaul                             package.json:133:6
+zod-validation-error             package.json:138:6
+Unused devDependencies (3)
+@tailwindcss/forms  package.json:143:6
+@tailwindcss/vite   package.json:145:6
+zod-to-json-schema  package.json:174:6
+Unlisted dependencies (1)
+@vitest/coverage-v8  vitest.config.ts
+Unlisted binaries (2)
+deprecated/.*        .github/workflows/ci.yml
+check-is-deprecated  .github/workflows/ci.yml
+Unused exports (214)
+StripeCheckout                             client/src/components/checkout/StripeCheckout.tsx:18:14
+default                                    client/src/components/help/HelpWidget.tsx:229:8        
+ResponsiveGrid                             client/src/components/layout/ResponsiveGrid.tsx:28:14  
+AlertTitle                                 client/src/components/ui/alert.tsx:59:16               
+badgeVariants                              client/src/components/ui/badge.tsx:36:16               
+buttonVariants                             client/src/components/ui/button.tsx:56:17              
+CardFooter                                 client/src/components/ui/card.tsx:79:27                
+DialogPortal                               client/src/components/ui/dialog.tsx:112:10             
+DialogOverlay                              client/src/components/ui/dialog.tsx:113:16             
+DialogClose                                client/src/components/ui/dialog.tsx:114:17             
+DialogFooter                               client/src/components/ui/dialog.tsx:118:16             
+DropdownMenuCheckboxItem                   client/src/components/ui/dropdown-menu.tsx:186:20      
+DropdownMenuRadioItem                      client/src/components/ui/dropdown-menu.tsx:187:28      
+DropdownMenuLabel                          client/src/components/ui/dropdown-menu.tsx:188:25      
+DropdownMenuShortcut                       client/src/components/ui/dropdown-menu.tsx:190:25      
+DropdownMenuGroup                          client/src/components/ui/dropdown-menu.tsx:191:24      
+DropdownMenuPortal                         client/src/components/ui/dropdown-menu.tsx:192:21      
+DropdownMenuSub                            client/src/components/ui/dropdown-menu.tsx:193:22      
+DropdownMenuSubContent                     client/src/components/ui/dropdown-menu.tsx:194:19      
+DropdownMenuSubTrigger                     client/src/components/ui/dropdown-menu.tsx:195:26      
+DropdownMenuRadioGroup                     client/src/components/ui/dropdown-menu.tsx:196:26      
+ErrorFallback                    function  client/src/components/ui/error-boundary.tsx:68:17      
+useErrorHandler                  function  client/src/components/ui/error-boundary.tsx:225:17     
+withErrorRecovery                function  client/src/components/ui/error-boundary.tsx:233:17     
+useFormField                               client/src/components/ui/form.tsx:169:9                
+FormDescription                            client/src/components/ui/form.tsx:174:15               
+InlineSpinner                    function  client/src/components/ui/loading-spinner.tsx:56:17     
+FullPageLoader                   function  client/src/components/ui/loading-spinner.tsx:73:17     
+CardLoader                       function  client/src/components/ui/loading-spinner.tsx:102:17    
+TableLoader                      function  client/src/components/ui/loading-spinner.tsx:124:17    
+FormLoader                       function  client/src/components/ui/loading-spinner.tsx:141:17    
+DocumentLoader                   function  client/src/components/ui/loading-spinner.tsx:170:17    
+SelectGroup                                client/src/components/ui/select.tsx:148:10             
+SelectLabel                                client/src/components/ui/select.tsx:152:17             
+SelectSeparator                            client/src/components/ui/select.tsx:154:14             
+SelectScrollUpButton                       client/src/components/ui/select.tsx:155:19             
+SelectScrollDownButton                     client/src/components/ui/select.tsx:156:24             
+SheetPortal                                client/src/components/ui/sheet.tsx:130:9               
+SheetOverlay                               client/src/components/ui/sheet.tsx:131:15              
+SheetTrigger                               client/src/components/ui/sheet.tsx:132:16              
+SheetClose                                 client/src/components/ui/sheet.tsx:133:16              
+SheetFooter                                client/src/components/ui/sheet.tsx:136:15              
+SheetDescription                           client/src/components/ui/sheet.tsx:138:14              
+SkeletonTable                              client/src/components/ui/skeleton.tsx:199:16           
+SkeletonDashboard                          client/src/components/ui/skeleton.tsx:202:22           
+DownloadSuccessAnimation         function  client/src/components/ui/success-animation.tsx:170:17  
+SuccessToastContent              function  client/src/components/ui/success-animation.tsx:219:17  
+ToastAction                                client/src/components/ui/toast.tsx:125:14              
+HelpfulTooltip                   function  client/src/components/ui/tooltip.tsx:64:17             
+SuccessTooltip                   function  client/src/components/ui/tooltip.tsx:165:17            
+Tooltip                                    client/src/components/ui/tooltip.tsx:268:9             
+TooltipTrigger                             client/src/components/ui/tooltip.tsx:268:18            
+TooltipContent                             client/src/components/ui/tooltip.tsx:268:34            
+naicsCodes                                 client/src/data/naics-codes.ts:8:14                    
+getNAICSByCode                   function  client/src/data/naics-codes.ts:122:17                  
+getProjectTemplate               function  client/src/data/rd-project-templates.ts:94:17          
+reducer                                    client/src/hooks/use-toast.ts:74:14                    
+usePageTracking                  function  client/src/hooks/useAnalytics.ts:112:17                
+useApiCall                       function  client/src/hooks/useLoadingStates.ts:199:17            
+useFormSubmission                function  client/src/hooks/useLoadingStates.ts:226:17            
+useFileUpload                    function  client/src/hooks/useLoadingStates.ts:239:17            
+useCalculation                   function  client/src/hooks/useLoadingStates.ts:260:17            
+usePayment                       function  client/src/hooks/useLoadingStates.ts:273:17            
+globalLoadingManager                       client/src/hooks/useLoadingStates.ts:320:14            
+useGlobalLoading                 function  client/src/hooks/useLoadingStates.ts:322:17            
+useResponsiveValue               function  client/src/hooks/useViewport.ts:183:17                 
+useWindowSize                    function  client/src/hooks/useViewport.ts:200:17                 
+useScrollLock                    function  client/src/hooks/useViewport.ts:233:17                 
+useAuthManager                   function  client/src/lib/auth.ts:143:17                          
+authFetch                        function  client/src/lib/auth.ts:159:23                          
+getQueryFn                                 client/src/lib/queryClient.ts:36:14                    
+useTheme                                   client/src/providers/ThemeProvider.tsx:17:14           
+calculatorService                          client/src/services/api.service.ts:70:14               
+leadService                                client/src/services/api.service.ts:88:14               
+companyService                             client/src/services/api.service.ts:96:14               
+intakeFormService                          client/src/services/api.service.ts:114:14              
+dashboardService                           client/src/services/api.service.ts:151:14              
+handleApiError                             client/src/services/api.service.ts:159:14              
+getAuthHeaders                             client/src/services/api.service.ts:182:14              
+authenticatedApiRequest                    client/src/services/api.service.ts:193:14              
+businessTypes                              client/src/services/calculator.service.ts:38:14        
+qualifyingActivities                       client/src/services/calculator.service.ts:78:14        
+pricingTiers                               client/src/services/calculator.service.ts:130:14       
+calculateRDTaxCredit                       client/src/services/calculator.service.ts:237:14       
+getPricingTier                             client/src/services/calculator.service.ts:270:14       
+validateExpenses                           client/src/services/calculator.service.ts:284:14       
+formatPercentage                           client/src/services/calculator.service.ts:326:14       
+getBusinessTypeSuggestions                 client/src/services/calculator.service.ts:338:14       
+calculateStateCreditEstimate               client/src/services/calculator.service.ts:358:14       
+PaymentEvents                              client/src/utils/analyticsEvents.ts:108:14             
+DocumentEvents                             client/src/utils/analyticsEvents.ts:147:14             
+AuthEvents                                 client/src/utils/analyticsEvents.ts:179:14             
+PerformanceEvents                          client/src/utils/analyticsEvents.ts:325:14             
+ConversionFunnels                          client/src/utils/analyticsEvents.ts:352:14             
+TrackingUtils                              client/src/utils/analyticsEvents.ts:373:14             
+formatNumber                     function  client/src/utils/calculations.ts:85:17                 
+isLandscape                      function  client/src/utils/mobileOptimizations.ts:253:17         
+getSafeAreaInsets                function  client/src/utils/mobileOptimizations.ts:261:17         
+optimizeFormInput                function  client/src/utils/mobileOptimizations.ts:279:17         
+createMobileModal                function  client/src/utils/mobileOptimizations.ts:314:17         
+debounceTouch                    function  client/src/utils/mobileOptimizations.ts:405:17         
+throttleScroll                   function  client/src/utils/mobileOptimizations.ts:420:17         
+preventInputZoom                 function  client/src/utils/mobileOptimizations.ts:473:17         
+performanceMonitor                         client/src/utils/performance.ts:152:14                 
+ResourcePreloader                class     client/src/utils/performance.ts:155:14                 
+resourcePreloader                          client/src/utils/performance.ts:225:14                 
+debounce                         function  client/src/utils/performance.ts:228:17                 
+throttle                         function  client/src/utils/performance.ts:249:17                 
+getMemoryUsage                   function  client/src/utils/performance.ts:265:17                 
+trackBundleSize                  function  client/src/utils/performance.ts:282:17                 
+addResourceHints                 function  client/src/utils/performance.ts:294:17                 
+cleanupPerformanceMonitoring     function  client/src/utils/performance.ts:346:17                 
+pool                                       server/db.ts:14:14                                     
+authenticate                               server/middleware/adminAuth.ts:28:14                   
+adminOnly                                  server/middleware/adminAuth.ts:73:14                   
+AccessLogger                     class     server/middleware/dataProtection.ts:31:14              
+PIIDetector                      class     server/middleware/dataProtection.ts:165:14             
+dataAccessControl                function  server/middleware/dataProtection.ts:219:17             
+dataSanitization                 function  server/middleware/dataProtection.ts:266:17             
+filterSensitiveData              function  server/middleware/dataProtection.ts:288:17             
+DataRetention                    class     server/middleware/dataProtection.ts:325:14             
+PrivacyCompliance                class     server/middleware/dataProtection.ts:388:14             
+applyDataProtection              function  server/middleware/dataProtection.ts:458:17             
+encryptData                      function  server/middleware/encryption.ts:34:23                  
+decryptData                      function  server/middleware/encryption.ts:62:23                  
+hashSensitiveData                function  server/middleware/encryption.ts:87:17                  
+encryptPII                       function  server/middleware/encryption.ts:92:23                  
+decryptPII                       function  server/middleware/encryption.ts:106:23                 
+secureTransmission               function  server/middleware/encryption.ts:120:17                 
+FieldEncryption                  class     server/middleware/encryption.ts:139:14                 
+KeyRotation                      class     server/middleware/encryption.ts:200:14                 
+generateSecureToken              function  server/middleware/encryption.ts:227:17                 
+constantTimeCompare              function  server/middleware/encryption.ts:232:17                 
+getEncryptionSettings            function  server/middleware/encryption.ts:244:17                 
+logEncryptionEvent               function  server/middleware/encryption.ts:297:17                 
+createNotFoundHandler            function  server/middleware/errorHandler.ts:242:17               
+createRequestLogger              function  server/middleware/errorHandler.ts:274:17               
+requestMonitoring                function  server/middleware/monitoring.ts:9:17                   
+errorMonitoring                  function  server/middleware/monitoring.ts:43:17                  
+healthCheckMonitoring            function  server/middleware/monitoring.ts:64:17                  
+rateLimitMonitoring              function  server/middleware/monitoring.ts:85:17                  
+databaseMonitoring               function  server/middleware/monitoring.ts:117:17                 
+securityMonitoring               function  server/middleware/monitoring.ts:144:17                 
+validateFields                   function  server/middleware/validation.ts:42:17                  
+emailSchema                                server/middleware/validation.ts:68:14                  
+passwordSchema                             server/middleware/validation.ts:70:14                  
+phoneSchema                                server/middleware/validation.ts:78:14                  
+einSchema                                  server/middleware/validation.ts:82:14                  
+urlSchema                                  server/middleware/validation.ts:86:14                  
+nameSchema                                 server/middleware/validation.ts:91:14                  
+companyNameSchema                          server/middleware/validation.ts:96:14                  
+amountSchema                               server/middleware/validation.ts:101:14                 
+yearSchema                                 server/middleware/validation.ts:106:14                 
+sanitizeEmail                    function  server/middleware/validation.ts:112:17                 
+sanitizeName                     function  server/middleware/validation.ts:116:17                 
+sanitizePhoneNumber              function  server/middleware/validation.ts:120:17                 
+sanitizeUrl                      function  server/middleware/validation.ts:124:17                 
+secureStringSchema                         server/middleware/validation.ts:129:14                 
+alphanumericSchema                         server/middleware/validation.ts:134:14                 
+slugSchema                                 server/middleware/validation.ts:138:14                 
+fileSchema                                 server/middleware/validation.ts:143:14                 
+companyInfoSchema                          server/middleware/validation.ts:160:14                 
+expenseBreakdownSchema                     server/middleware/validation.ts:176:14                 
+validateBody                     function  server/middleware/validation.ts:187:17                 
+validateQuery                    function  server/middleware/validation.ts:191:17                 
+validateParams                   function  server/middleware/validation.ts:195:17                 
+paginationSchema                           server/middleware/validation.ts:200:14                 
+searchSchema                               server/middleware/validation.ts:208:14                 
+idSchema                                   server/middleware/validation.ts:214:14                 
+dateRangeSchema                            server/middleware/validation.ts:217:14                 
+conditionalValidation            function  server/middleware/validation.ts:226:17                 
+emailValidator                             server/middleware/validation.ts:243:14                 
+passwordValidator                          server/middleware/validation.ts:248:14                 
+nameValidator                              server/middleware/validation.ts:254:14                 
+phoneValidator                             server/middleware/validation.ts:261:14                 
+uuidValidator                              server/middleware/validation.ts:266:14                 
+companyCreationValidation                  server/middleware/validation.ts:289:14                 
+expenseValidation                          server/middleware/validation.ts:291:14                 
+default                                    server/services/airtable.ts:462:8                      
+defaultClaudeConfig                        server/services/claude.ts:268:14                       
+setClaudeService                 function  server/services/claude.ts:294:17                       
+validateClaudeConfig             function  server/services/claude.ts:299:17                       
+riskAssessmentSchema                       server/services/complianceMemo.ts:4:14                 
+fourPartTestAnalysisSchema                 server/services/complianceMemo.ts:16:14                
+qreJustificationSchema                     server/services/complianceMemo.ts:44:14                
+complianceMemoRequestSchema                server/services/complianceMemo.ts:68:14                
+documentJobSchema                          server/services/documentOrchestrator.ts:5:14           
+documentGenerationRequestSchema            server/services/documentOrchestrator.ts:51:14          
+downloadRequestSchema                      server/services/downloadManager.ts:7:14                
+downloadResponseSchema                     server/services/downloadManager.ts:16:14               
+downloadTrackingSchema                     server/services/downloadManager.ts:26:14               
+downloadStatsSchema                        server/services/downloadManager.ts:44:14               
+emailNotificationRequestSchema             server/services/emailNotificationService.ts:5:14       
+emailDeliveryStatusSchema                  server/services/emailNotificationService.ts:19:14      
+emailTemplateSchema                        server/services/emailNotificationService.ts:36:14      
+emailStatsSchema                           server/services/emailNotificationService.ts:48:14      
+errorContextSchema                         server/services/logger.ts:26:14                        
+errorLogSchema                             server/services/logger.ts:39:14                        
+defaultWorkflowConfig                      server/services/makeWorkflow.ts:145:14                 
+setWorkflowService               function  server/services/makeWorkflow.ts:162:17                 
+default                                    server/services/monitoring.ts:464:8                    
+companyContextSchema                       server/services/narrativePrompts.ts:4:14               
+projectContextSchema                       server/services/narrativePrompts.ts:13:14              
+narrativeOptionsSchema                     server/services/narrativePrompts.ts:34:14              
+setNarrativePromptService        function  server/services/narrativePrompts.ts:583:17             
+s3ConfigSchema                             server/services/s3Storage.ts:7:14                      
+s3UploadRequestSchema                      server/services/s3Storage.ts:14:14                     
+s3UploadResponseSchema                     server/services/s3Storage.ts:24:14                     
+s3FileMetadataSchema                       server/services/s3Storage.ts:37:14                     
+s3FolderStructureSchema                    server/services/s3Storage.ts:52:14                     
+defaultPollingConfig                       server/services/statusPolling.ts:269:14                
+setPollingService                function  server/services/statusPolling.ts:286:17                
+stripe                                     server/services/stripe.ts:7:14                         
+DatabaseStorage                  class     server/storage.ts:131:14                               
+Unused exported types (71)
+BadgeProps                    interface  client/src/components/ui/badge.tsx:26:18         
+ButtonProps                   interface  client/src/components/ui/button.tsx:36:18        
+ExpenseCategory               interface  client/src/data/expense-categories.ts:3:18       
+SoftwareCategory              interface  client/src/data/expense-categories.ts:11:18      
+IndustryOption                interface  client/src/data/industry-options.ts:2:18         
+ProjectTemplate               interface  client/src/data/rd-project-templates.ts:2:18     
+UseAnalyticsReturn            interface  client/src/hooks/useAnalytics.ts:7:18            
+LoadingState                  interface  client/src/hooks/useLoadingStates.ts:3:18        
+UseLoadingStatesOptions       interface  client/src/hooks/useLoadingStates.ts:10:18       
+TouchGesture                  interface  client/src/hooks/useTouch.ts:3:18                
+TouchOptions                  interface  client/src/hooks/useTouch.ts:13:18               
+UseTouchResult                interface  client/src/hooks/useTouch.ts:20:18               
+ViewportInfo                  interface  client/src/hooks/useViewport.ts:3:18             
+ViewportBreakpoints           interface  client/src/hooks/useViewport.ts:17:18            
+BusinessType                  interface  client/src/services/calculator.service.ts:14:18  
+QualifyingActivity            interface  client/src/services/calculator.service.ts:21:18  
+PricingTier                   interface  client/src/services/calculator.service.ts:28:18  
+ExpenseInputs                 interface  client/src/utils/calculations.ts:7:18            
+CalculationResult             interface  client/src/utils/calculations.ts:16:18           
+MobileOptimizationConfig      interface  client/src/utils/mobileOptimizations.ts:5:18     
+DataClassification            enum       server/middleware/dataProtection.ts:5:13         
+DataRetentionPolicy           interface  server/middleware/dataProtection.ts:23:18        
+ErrorWithContext              interface  server/middleware/errorHandler.ts:5:18           
+ClaudeConfig                  interface  server/services/claude.ts:3:18                   
+ClaudeRequest                 interface  server/services/claude.ts:13:18                  
+ClaudeResponse                interface  server/services/claude.ts:21:18                  
+ClaudeError                   interface  server/services/claude.ts:36:18                  
+RiskAssessment                type       server/services/complianceMemo.ts:109:13         
+FourPartTestAnalysis          type       server/services/complianceMemo.ts:110:13         
+QREJustification              type       server/services/complianceMemo.ts:111:13         
+ComplianceMemoRequest         type       server/services/complianceMemo.ts:112:13         
+ComplianceMemo                interface  server/services/complianceMemo.ts:114:18         
+DocumentJob                   type       server/services/documentOrchestrator.ts:98:13    
+DocumentGenerationRequest     type       server/services/documentOrchestrator.ts:99:13    
+DocumentGenerationResult      interface  server/services/documentOrchestrator.ts:101:18   
+DocumentGenerationParams      interface  server/services/documents/orchestrator.ts:8:18   
+DocumentGenerationResult      interface  server/services/documents/orchestrator.ts:18:18  
+DownloadRequest               type       server/services/downloadManager.ts:61:13         
+DownloadResponse              type       server/services/downloadManager.ts:62:13         
+DownloadTracking              type       server/services/downloadManager.ts:63:13         
+DownloadStats                 type       server/services/downloadManager.ts:64:13         
+WelcomeEmailData              interface  server/services/email.ts:8:18                    
+OrderConfirmationEmailData    interface  server/services/email.ts:17:18                   
+EmailNotificationRequest      type       server/services/emailNotificationService.ts:68:13
+EmailDeliveryStatus           type       server/services/emailNotificationService.ts:69:13
+EmailTemplate                 type       server/services/emailNotificationService.ts:70:13
+EmailStats                    type       server/services/emailNotificationService.ts:71:13
+ErrorContext                  type       server/services/logger.ts:54:13                  
+ErrorLog                      type       server/services/logger.ts:55:13                  
+MakeWorkflowResponse          interface  server/services/makeWorkflow.ts:3:18             
+WorkflowConfig                interface  server/services/makeWorkflow.ts:11:18            
+CompanyContext                type       server/services/narrativePrompts.ts:43:13        
+ProjectContext                type       server/services/narrativePrompts.ts:44:13        
+NarrativeOptions              type       server/services/narrativePrompts.ts:45:13        
+NarrativeTemplate             interface  server/services/narrativePrompts.ts:47:18        
+GeneratedNarrative            interface  server/services/narrativePrompts.ts:59:18        
+S3Config                      type       server/services/s3Storage.ts:61:13               
+S3UploadRequest               type       server/services/s3Storage.ts:62:13               
+S3UploadResponse              type       server/services/s3Storage.ts:63:13               
+S3FileMetadata                type       server/services/s3Storage.ts:64:13               
+S3FolderStructure             type       server/services/s3Storage.ts:65:13               
+PollingConfig                 interface  server/services/statusPolling.ts:3:18            
+WorkflowStatus                interface  server/services/statusPolling.ts:10:18           
+MakeStatusResponse            interface  server/services/statusPolling.ts:19:18           
+S3Config                      interface  server/services/storage/s3.ts:4:18               
+DocKeyParams                  interface  server/services/storage/s3.ts:11:18              
+UploadPdfParams               interface  server/services/storage/s3.ts:17:18              
+CreateCheckoutSessionParams   interface  server/services/stripe.ts:12:18                  
+CreateUserFromCheckoutParams  interface  server/services/userCreation.ts:8:18             
+UserCreationResult            interface  server/services/userCreation.ts:16:18            
+IStorage                      interface  server/storage.ts:47:18                          
+Unused exported enum members (3)
+BIOMETRIC_DATA  PIICategory  server/middleware/dataProtection.ts:17:3
+LOCATION_DATA   PIICategory  server/middleware/dataProtection.ts:18:3
+DEVICE_INFO     PIICategory  server/middleware/dataProtection.ts:19:3
+Duplicate exports (5)
+StripeCheckout|default     client/src/components/checkout/StripeCheckout.tsx
+HelpWidget|default         client/src/components/help/HelpWidget.tsx        
+AirtableService|default    server/services/airtable.ts                      
+monitoringService|default  server/services/monitoring.ts                    
+tierFor|assignPricingTier  shared/config/pricing.ts                         
+Configuration hints (12)
