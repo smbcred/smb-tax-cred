@@ -1,0 +1,69 @@
+You are a senior DX engineer. Before writing docs, SCAN the repository to avoid hallucinations.
+
+1) Collect facts (output them as a single JSON block named REPO_FACTS at the end):
+- Commit & runtime:
+  - git rev-parse --short HEAD (if available)
+  - node -v && npm -v
+- Workspace layout (top 3 levels):
+  - Run: find . -maxdepth 3 -type d | sort
+- Package manifests (root, client, server):
+  - cat ./package.json (if present)
+  - cat ./client/package.json (if present)
+  - cat ./server/package.json (if present)
+- TS configs:
+  - cat ./tsconfig.json || true
+  - cat ./client/tsconfig.json || true
+  - cat ./server/tsconfig.json || true
+- Tailwind/PostCSS/Vite:
+  - cat ./client/tailwind.config.* || true
+  - cat ./postcss.config.* || true
+  - cat ./client/vite.config.* || true
+- Key code entrypoints:
+  - ls -la ./client/src
+  - ls -la ./server/src
+- Existing docs (only list what actually exists):
+  - ls -la ./docs || true
+  - for f in calculation-spec.md calculation-fixtures.json law-regime-toggle.md copy-catalog.json admin-backoffice-prd.md security-data-classification.md release-rollback-playbook.md analytics-event-map.md qa-uat-checklist.md; do test -f "./docs/$f" && echo "FOUND ./docs/$f"; done
+- Playwright tests (if you added the UX pack):
+  - find ./tests -maxdepth 3 -type f | sort || true
+
+2) Validate law-regime defaults:
+- Print values of env vars if accessible: LAW_REGIME, VITE_LAW_REGIME, PAYROLL_OFFSET_CAP (don’t print secrets, only names and presence).
+- Grep the codebase for "OBBBA_174A_EXPENSE" and "TCJA_174_CAPITALIZE_2022_2025" and summarize where they appear.
+
+3) Summarize the calculator implementation you actually find:
+- Location of the calculator component(s)
+- Where QRE math lives
+- Where 65% contractor limit is enforced
+- Where ASC (6%/14%) is chosen
+- Where price tiering is implemented
+
+4) Summarize Results → Checkout CTA gating:
+- File containing the “Continue to Checkout” button
+- Booleans or conditions that disable it (e.g., form validity, stripeReady, priceId)
+- Any console logs referencing CTA state
+
+5) Summarize Intake auto-save:
+- File and interval (every 30s?) and API endpoint used
+- Where errors are surfaced
+
+6) Summarize doc generation:
+- Where Airtable/Make/Documint/S3/SendGrid code lives
+- Any feature flags used (docGen provider, sandbox)
+- Error handling path
+
+7) Output REPO_FACTS as compact JSON with keys:
+  {
+    commit, node, npm, layout[], rootPkg, clientPkg, serverPkg,
+    tsconfigRoot, tsconfigClient, tsconfigServer,
+    hasTailwind, hasPostcss, hasVite,
+    calc: { files[], has65pctLimit, ascLogicWhere, pricingWhere },
+    cta: { file, conditions[] },
+    intake: { file, intervalMs, saveEndpoint },
+    docgen: { services[], flags[] },
+    lawRegime: { default, occurrences: { obbba: string[], tcja: string[] } },
+    docsFound: string[],
+    testsFound: string[]
+  }
+
+ONLY produce the JSON block as your final output for this prompt, nothing else.

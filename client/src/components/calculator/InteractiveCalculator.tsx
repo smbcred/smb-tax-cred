@@ -71,10 +71,11 @@ function CTAButton({ size = 'default', className, children, results, onDebugLog 
   return (
     <Button 
       size={size} 
-      className={className}
+      className={`${className} ${!isEligible ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={handleClick}
-      disabled={isDevelopment ? false : !isEligible}
-      variant={isEligible ? 'default' : 'secondary'}
+      disabled={!isEligible && !isDevelopment}
+      variant={isEligible ? 'default' : 'outline'}
+      title={!isEligible ? `Minimum credit of $${minEligibleCredit.toLocaleString()} required` : ''}
     >
       {children}
     </Button>
@@ -291,14 +292,17 @@ export function InteractiveCalculator() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <Card className="shadow-lg border-0 bg-white dark:bg-gray-950">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-6 w-6 text-blue-600" />
+      <Card className="shadow-lg border-0 bg-card dark:bg-card">
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-foreground">
+            <Calculator className="h-7 w-7 text-primary" />
             R&D Tax Credit Calculator
           </CardTitle>
+          <p className="text-muted-foreground text-base mt-2">
+            Get an instant estimate of your potential federal R&D tax credits
+          </p>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 p-6 sm:p-8">
           {/* Business Type Selection */}
           {step === 1 && (
             <motion.div
@@ -307,8 +311,8 @@ export function InteractiveCalculator() {
               className="space-y-6"
             >
               <div>
-                <h3 className="text-lg font-semibold mb-4">What type of business are you?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="text-xl font-semibold mb-6 text-foreground">What type of business are you?</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {businessTypes.map((type) => (
                     <button
                       key={type.id}
@@ -330,12 +334,14 @@ export function InteractiveCalculator() {
                         
                         setStep(2);
                       }}
-                      className={`p-4 border rounded-lg text-left hover:border-blue-500 transition-colors ${
-                        state.businessType === type.id ? 'border-blue-500 bg-blue-50' : ''
+                      className={`group p-6 border-2 rounded-xl text-left hover:border-primary hover:bg-accent/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                        state.businessType === type.id 
+                          ? 'border-primary bg-primary/5 ring-2 ring-primary ring-offset-2' 
+                          : 'border-border bg-card hover:shadow-md'
                       }`}
                     >
-                      <h4 className="font-medium mb-1">{type.name}</h4>
-                      <p className="text-sm text-gray-600">{type.description}</p>
+                      <h4 className="font-semibold mb-2 text-card-foreground group-hover:text-primary transition-colors">{type.name}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{type.description}</p>
                     </button>
                   ))}
                 </div>
@@ -351,8 +357,8 @@ export function InteractiveCalculator() {
               className="space-y-6"
             >
               <div>
-                <h3 className="text-lg font-semibold mb-4">Enter your annual R&D expenses</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
+                <h3 className="text-xl font-semibold mb-6 text-foreground">Enter your annual R&D expenses</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="wages" className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
@@ -367,7 +373,7 @@ export function InteractiveCalculator() {
                       onChange={(e) => updateState({ wages: Number(e.target.value) || 0 })}
                       className="text-lg"
                     />
-                    <p className="text-sm text-gray-500">Annual salaries for developers, engineers, designers</p>
+                    <p className="text-sm text-muted-foreground">Annual salaries for developers, engineers, designers</p>
                   </div>
 
                   <div className="space-y-2">
@@ -384,7 +390,7 @@ export function InteractiveCalculator() {
                       onChange={(e) => updateState({ contractors: Number(e.target.value) || 0 })}
                       className="text-lg"
                     />
-                    <p className="text-sm text-gray-500">External developers, consultants, agencies</p>
+                    <p className="text-sm text-muted-foreground">External developers, consultants, agencies</p>
                   </div>
 
                   <div className="space-y-2">
@@ -401,7 +407,7 @@ export function InteractiveCalculator() {
                       onChange={(e) => updateState({ supplies: Number(e.target.value) || 0 })}
                       className="text-lg"
                     />
-                    <p className="text-sm text-gray-500">Development tools, API costs, testing platforms</p>
+                    <p className="text-sm text-muted-foreground">Development tools, API costs, testing platforms</p>
                   </div>
 
                   <div className="space-y-2">
@@ -418,7 +424,7 @@ export function InteractiveCalculator() {
                       onChange={(e) => updateState({ cloud: Number(e.target.value) || 0 })}
                       className="text-lg"
                     />
-                    <p className="text-sm text-gray-500">AWS, servers, databases, hosting costs</p>
+                    <p className="text-sm text-muted-foreground">AWS, servers, databases, hosting costs</p>
                   </div>
                 </div>
               </div>

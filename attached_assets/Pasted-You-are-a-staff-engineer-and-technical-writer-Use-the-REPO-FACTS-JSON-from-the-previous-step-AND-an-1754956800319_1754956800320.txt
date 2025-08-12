@@ -1,0 +1,96 @@
+You are a staff engineer and technical writer. Use the REPO_FACTS JSON from the previous step AND any existing files under ./docs as the sources of truth. Do not invent files or paths—if something is missing, mark it clearly as TODO. Default law regime to OBBBA (§174A expensing).
+
+Produce ONE markdown file named:
+SMBTaxCredits.com — Complete System Documentation (v1.1 OBBBA).md
+
+Constraints:
+- Be accurate to the codebase. If REPO_FACTS contradicts earlier descriptions, prefer REPO_FACTS and call out the discrepancy in a “Conflicts & Gaps” section.
+- Include copy/paste snippets where fixes are common (CTA gating, Tailwind container, Zod validation).
+- Include Mermaid diagrams for flows.
+- Include a Troubleshooting Matrix and a Release/Rollback quick play.
+- Call out MVP scope: Federal only; state credits post-MVP.
+- Respect compliance: documentation service, not tax advice; no guarantees.
+- Make a “Finish Line” checklist with testable acceptance criteria.
+
+Structure (use these exact headings):
+
+# Executive Overview
+- Mission, audience, value prop (one paragraph each).
+- Law regime: OBBBA (§174A expensing) as default; Form 6765 + Form 8974 note for payroll offset.
+- Pricing tiers (from /shared/config/pricing.ts if present; else list current tiers used in app or say TODO).
+
+# System Architecture
+- High-level diagram (Mermaid) from Landing → Calculator → Results → Checkout → Dashboard → Intake → Doc Gen → Delivery.
+- Runtime & versions from REPO_FACTS (node, npm).
+- Folder map (top 3 levels) taken from REPO_FACTS.layout (don’t list folders that don’t exist).
+
+# File Structure & Ownership
+- List key entrypoints actually found (client/src, server/src).
+- Map features to files (calculator, pricing, CTA button, intake autosave, docgen orchestrator).
+
+# Business Logic & Rules (grounded in docs if present)
+- Four-part test summary.
+- QRE components with 65% contractor limiter.
+- ASC method: first-time 6%; otherwise 14% of excess over 50% of 3-year average.
+- Startup payroll offset cap: $500,000 (configurable).
+- Disclaimers & compliance boundaries (pull from copy-catalog.json if present).
+
+# User Journey & Screens
+- Step-by-step flow, each step’s success criteria and primary CTA.
+- For each screen, include “Heuristic Issues to Check” (from ux-audit-checklist.md if present).
+
+# Component Documentation
+- Calculator: where inputs live, where math is called, validation layers (Zod).
+- Results: CTA gating—list the exact conditions from REPO_FACTS.cta.conditions.
+- Checkout: Stripe session creation; webhook path.
+- Dashboard & Intake: autosave cadence, error surfacing.
+- Doc Generation: Airtable → Make → Claude → Documint → S3 → SendGrid with filenames and flags.
+
+# API Reference (current state)
+- List only endpoints that exist. For each: method, path, request/response Zod schemas (if present). If missing, add TODO stubs referencing /shared/schemas.
+
+# Database Schema (current state)
+- If you find Drizzle schema files, summarize tables and important relations.
+- If not available, include the proposed schema from the draft and mark as TODO to align.
+
+# External Integrations
+- Stripe, Airtable, Make.com, Claude, Documint, S3, SendGrid — list actual service files found and any ENV names (do not dump secrets).
+- Include a Runbook link if ./docs/runbooks exist; else add TODOs.
+
+# Security & Authentication
+- JWT/bcrypt basics (from code). Note request_id logging if present.
+- Data classes (PII, financial, operational) and storage locations.
+- Environment flags in use: LAW_REGIME, VITE_LAW_REGIME, PAYROLL_OFFSET_CAP, payments.sandbox, docGen provider, etc.
+
+# Deployment & Configuration
+- Commands to run dev and build as they exist in package.json.
+- Health endpoints (/healthz, /readyz) if present; TODO if absent.
+- Release & Rollback Quick Play (use ./docs/release-rollback-playbook.md if found; else include the minimal version).
+
+# Testing & Quality Assurance
+- Unit tests present? If none, list mandatory ones (calc fixtures, 65% limiter, ASC branch).
+- E2E (Playwright) — list tests found from REPO_FACTS.testsFound or add TODO to add the UX pack.
+- Accessibility smoke (axe) — present or TODO.
+- Acceptance criteria “Finish Line” checklist (must be binary/pass-fail).
+
+# Conflicts & Gaps (Actionable)
+- List any mismatches between code and docs, missing files, disabled CTAs, failing env flags, or TODOs for state credits.
+- For each item: Owner (Frontend/Backend/Ops), Fix type (Bug/Doc/Config), ETA (S/M/L), and a one-line fix hint.
+
+# Troubleshooting Matrix
+- Symptom → Likely Cause → Where to Look → Quick Fix.
+  - “Checkout button disabled” → stripeReady/priceId/invalid form → Results component → use gating snippet + console.debug
+  - “Docs not generated” → Documint/Make down → services/documint|make → retry/backoff + puppeteer fallback
+  - “Calculator misaligned” → Tailwind tokens not loaded → client/src/main.tsx/index.css → ensure @tailwind directives + container classes
+
+# Changelog & Version
+- Version v1.1 (OBBBA default), date (use today’s date).
+- Sources: list which ./docs files and REPO_FACTS were used.
+
+Formatting:
+- Use fenced code blocks for snippets.
+- Use Mermaid for diagrams.
+- Do not include any credentials or secret values.
+- If something is unknown, write “TODO: …” instead of guessing.
+
+Deliver ONLY the final Markdown file content.
