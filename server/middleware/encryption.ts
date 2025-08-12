@@ -19,9 +19,11 @@ async function deriveKey(password: string, salt: Buffer): Promise<Buffer> {
 // Get encryption key from environment or generate one
 function getEncryptionKey(): string {
   const key = process.env.ENCRYPTION_KEY;
-  if (!key) {
-    console.warn('No ENCRYPTION_KEY found in environment. Generating temporary key for development.');
+  if (!key && process.env.NODE_ENV !== "production") {
+    console.debug('ENCRYPTION_KEY not set. Using an ephemeral dev key.');
     return crypto.randomBytes(32).toString('hex');
+  } else if (!key) {
+    throw new Error('ENCRYPTION_KEY is required in production');
   }
   return key;
 }
