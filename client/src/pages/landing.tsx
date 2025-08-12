@@ -26,13 +26,14 @@ import {
   FaFileSignature,
   FaDownload,
   FaChevronDown,
-  FaChevronRight
+  FaChevronRight,
+  FaArrowRight
 } from "react-icons/fa";
 import ResponsiveNav from "@/components/navigation/ResponsiveNav";
 import ResponsiveHero from "@/components/sections/ResponsiveHero";
 import { BenefitsGrid, PricingGrid, ProcessStepsGrid } from "@/components/layout/ResponsiveGrid";
 import { MetaTags } from "@/components/seo/MetaTags";
-import { InteractiveCalculator } from "@/components/calculator/InteractiveCalculator";
+import { Link } from "wouter";
 import { benefitsContent } from "@/data/benefitsContent";
 import { processSteps } from "@/data/processContent";
 import { pricingContent } from "@/data/pricingContent";
@@ -83,9 +84,9 @@ export default function LandingPage() {
   // Use top 5 FAQs from imported content
   const faqItems = faqContent.slice(0, 5);
 
-  // Conversion optimization point: Scroll to calculator
-  const scrollToCalculator = () => {
-    document.getElementById("calculator-section")?.scrollIntoView({ behavior: "smooth" });
+  // Conversion optimization point: Navigate to calculator
+  const goToCalculator = () => {
+    window.location.href = '/calculator';
   };
 
   return (
@@ -184,31 +185,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Interactive Calculator Preview Section - Responsive */}
-      <section id="calculator-section" className="py-12 sm:py-16">
+      {/* Calculator CTA Section - Responsive */}
+      <section id="calculator-section" className="py-12 sm:py-16 bg-gradient-to-r from-blue-600 to-green-600">
         <div className="container mx-auto px-4">
           <motion.div
             ref={calcRef}
             initial={{ opacity: 0, y: 20 }}
             animate={calcInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="text-center mb-8 sm:mb-12"
+            className="text-center"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
               Calculate what your AI experiments may be worth
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600">
-              Quick calculator for businesses using ChatGPT, Claude, and other AI tools
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8">
+              Quick 3-step calculator for businesses using ChatGPT, Claude, and other AI tools
             </p>
-          </motion.div>
 
-          {/* Interactive Calculator Component */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={calcInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <InteractiveCalculator />
+            <Link to="/calculator">
+              <button className="bg-white text-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg 
+                               text-base sm:text-lg font-semibold hover:bg-gray-100 
+                               transition-all transform hover:scale-105 
+                               focus:outline-none focus:ring-4 focus:ring-white/50
+                               inline-flex items-center gap-2 group">
+                <FaCalculator className="w-5 h-5" />
+                Start Free Calculator
+                <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
+
+            <p className="text-white/80 text-sm mt-4">
+              Get instant estimates • No signup required • Takes 2 minutes
+            </p>
           </motion.div>
         </div>
       </section>
@@ -434,17 +442,17 @@ export default function LandingPage() {
             <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Join thousands of SMBs who've simplified their R&D tax credit claims
             </p>
-            <button
-              onClick={scrollToCalculator}
-              className="bg-white text-green-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg 
+            <Link to="/calculator">
+              <button className="bg-white text-green-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg 
                        text-base sm:text-lg font-semibold hover:bg-gray-100 
                        transition-all transform hover:scale-105 
                        focus:outline-none focus:ring-4 focus:ring-white/50
-                       shadow-lg"
-              aria-label="Start Your Free Estimate"
-            >
-              {HeroContent.primaryCTA}
-            </button>
+                       shadow-lg inline-flex items-center gap-2 group"
+                aria-label="Start Your Free Estimate">
+                {HeroContent.primaryCTA}
+                <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
             <p className="text-xs sm:text-sm text-white/80 mt-4">
               No credit card required. Get your estimate in 2 minutes.
             </p>

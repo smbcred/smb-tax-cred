@@ -8,6 +8,7 @@
 import { motion } from 'framer-motion';
 import { FaChevronRight, FaArrowRight } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
+import { Link } from 'wouter';
 import { HeroContent } from '@/data/heroContent';
 
 interface ResponsiveHeroProps {
@@ -35,7 +36,8 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
     if (onStartEstimate) {
       onStartEstimate();
     } else {
-      document.getElementById("calculator-section")?.scrollIntoView({ behavior: "smooth" });
+      // Navigate to the new calculator page
+      window.location.href = '/calculator';
     }
   };
 
@@ -80,17 +82,18 @@ const ResponsiveHero: React.FC<ResponsiveHeroProps> = ({ onStartEstimate }) => {
             
             {/* Mobile-optimized CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-              <button 
-                onClick={handleStartEstimate}
-                className="w-full sm:w-auto bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 
-                         rounded-lg text-base sm:text-lg font-semibold hover:bg-green-700 
-                         transition-all transform hover:scale-105 
-                         focus:outline-none focus:ring-4 focus:ring-green-500/50
-                         flex items-center justify-center gap-2 group"
-              >
-                {HeroContent.primaryCTA}
-                <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <Link to="/calculator">
+                <button 
+                  className="w-full sm:w-auto bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 
+                           rounded-lg text-base sm:text-lg font-semibold hover:bg-green-700 
+                           transition-all transform hover:scale-105 
+                           focus:outline-none focus:ring-4 focus:ring-green-500/50
+                           flex items-center justify-center gap-2 group"
+                >
+                  {HeroContent.primaryCTA}
+                  <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
               
               <a href="#how-it-works" 
                  className="w-full sm:w-auto text-green-600 px-6 sm:px-8 py-3 sm:py-4 
