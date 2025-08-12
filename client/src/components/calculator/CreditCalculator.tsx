@@ -60,6 +60,7 @@ const STORAGE_KEY = 'rd-calculator-data';
 
 export default function CreditCalculator() {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const { isCapitalization } = useLawRegime();
   
   const form = useForm<CalculatorForm>({
@@ -129,6 +130,48 @@ export default function CreditCalculator() {
 
   const formatCurrency = (amount: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+
+  // Checkout logic with proper gating
+  const emailValid = watchedValues.email?.includes("@");
+  const ctaDisabled = !form.formState.isValid || !emailValid || !pricingTier?.priceId || loading;
+  
+  if (import.meta.env.DEV) {
+    console.debug("CTA state", { 
+      emailValid, 
+      formValid: form.formState.isValid, 
+      priceId: pricingTier?.priceId, 
+      loading 
+    });
+  }
+
+  async function onCheckout() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          priceId: pricingTier.priceId, 
+          metadata: { 
+            credit: creditResult.credit, 
+            tier: pricingTier.tier, 
+            email: watchedValues.email 
+          } 
+        })
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Checkout could not start. Check server logs.");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Checkout failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="max-w-screen-lg mx-auto p-4 md:p-6">
@@ -525,11 +568,12 @@ export default function CreditCalculator() {
               <div className="space-y-4">
                 <Button
                   size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-3"
-                  onClick={() => window.location.href = '/checkout'}
+                  className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={onCheckout}
+                  disabled={ctaDisabled}
                 >
                   <DollarSign className="mr-2 h-5 w-5" />
-                  Continue to Checkout
+                  {loading ? "Starting Checkout..." : "Continue to Checkout"}
                 </Button>
                 
                 <div className="flex justify-center">

@@ -71,7 +71,7 @@ router.post('/session', checkoutRateLimit, validateCheckoutSession, async (req: 
     // Create Stripe checkout session
     const session = await createCheckoutSession({
       priceInCents: pricingTier.price,
-      tierName: pricingTier.name,
+      tierName: `Tier ${pricingTier.tier}`,
       estimatedCredit,
       leadId,
       customerEmail,
@@ -84,9 +84,9 @@ router.post('/session', checkoutRateLimit, validateCheckoutSession, async (req: 
       sessionId: session.id,
       url: session.url,
       tier: {
-        name: pricingTier.name,
-        price: pricingTier.displayPrice,
-        description: pricingTier.description,
+        name: `Tier ${pricingTier.tier}`,
+        price: pricingTier.price,
+        description: `R&D Tax Credit Documentation for $${estimatedCredit.toLocaleString()} credit`,
       },
     });
   } catch (error) {
